@@ -138,7 +138,9 @@ class CanvasCreator:
 
     def getYPosLineBase(self, line):
         heightLine = self.settings["yMax"] - self.settings["yMin"]
-        yPosLineBase = 1  - self.linesToLineOnPage[line] * heightLine - self.settings["yMax"]
+        yPosLineBase = 1 - self.linesToLineOnPage[line] * (heightLine + self.settings["vMarginLineTop"]) - self.settings["yMax"]
         if self.linesToPage[line] == 0:
             yPosLineBase -= self.settings["heightTitleAx"]
+        else:
+            yPosLineBase -= self.settings["vMarginLineTop"]
         return yPosLineBase
