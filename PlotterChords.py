@@ -10,8 +10,9 @@ class PlotterChords:
         self.settings = settings
 
         self.LocationFinder = LocationFinder
+        self.CanvasCreator = CanvasCreator
 
-        self.axs1D = CanvasCreator.getAxs()
+        self.axs = CanvasCreator.getAxs()
 
         self.yMin = yMin
 
@@ -25,7 +26,10 @@ class PlotterChords:
             line, xPos = self.LocationFinder.getLocation(chord.offset)
             xPos = xPos + self.xShiftChords
 
-            self.axs1D[line].text(xPos, self.yMin, self._findFigure(chord),
+            yPos = self.yMin + self.CanvasCreator.getYPosLineBase(line)
+            page = self.CanvasCreator.getLinesToPage()[line]
+
+            self.axs[page].text(xPos, yPos, self._findFigure(chord),
                                   va='bottom', size=self.settings['fontSizeChords'], fontweight='semibold')
 
     def _findFigure(self, chordSymbol):
