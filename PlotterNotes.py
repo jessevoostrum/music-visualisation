@@ -11,9 +11,13 @@ class PlotterNotes:
         self.settings = settings
 
         self.LocationFinder = LocationFinder
+        self.CanvasCreator = CanvasCreator
 
-        self.axs1D = CanvasCreator.getAxs1D()
+        self.axs = CanvasCreator.getAxs()
         self.widthAxs = CanvasCreator.getWidthAx()
+        self.linesToLineOnPage = CanvasCreator.getLinesToLineOnPage()
+        self.linesToPage = CanvasCreator.getLinesToPage()
+
 
         self.barSpace = settings["barSpace"]
         self.overlapFactor = settings["overlapFactor"]
@@ -37,9 +41,17 @@ class PlotterNotes:
 
             if type(el) == music21.note.Note:
 
-                yPos = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.overlapFactor)
                 offset = el.getOffsetInHierarchy(self.streamObj)  # + self.xExtensionNoteWhenTied
                 line, xPos = self.LocationFinder.getLocation(offset)
+
+                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+
+                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.overlapFactor)
+
+                yPos = yPosLineBase + yPosWithinLine
+
+                page = self.linesToPage[line]
+
                 xLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
                 facecolor = self.facecolor
                 linewidth = 0
@@ -95,7 +107,7 @@ class PlotterNotes:
                                              [xPos + xLength, yMiddle + self.barSpace], [xPos + xLength, yMiddle]],
                                             facecolor=self.facecolor,
                                             alpha=self.alpha)
-                            self.axs1D[line].add_patch(patch)
+                            self.axs[page].add_patch(patch)
 
                         elif sp.isLast(el):
                             endGlissando = True
@@ -110,7 +122,7 @@ class PlotterNotes:
                                              [xPos + xLength, yPos + self.barSpace], [xPos + xLength, yPos]],
                                             facecolor=self.facecolor,
                                             alpha=self.alpha)
-                            self.axs1D[line].add_patch(patch)
+                            self.axs[page].add_patch(patch)
 
                         if not (el.tie and not (el.tie.type == 'start')):
                             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
@@ -122,7 +134,7 @@ class PlotterNotes:
 
                             if endGlissando:
                                 xPos += xLength - 4 * self.xShiftNumbers
-                            self.axs1D[line].text(xPos + self.xShiftNumbers,
+                            self.axs[page].text(xPos + self.xShiftNumbers,
                                                   yPos + self.yShiftNumbers + 0.5 * self.barSpace,
                                                   number,
                                                   va='center')
@@ -138,8 +150,8 @@ class PlotterNotes:
                                        hatch=hatch
                                        )
 
-                self.axs1D[line].add_patch(patch)
-                self.axs1D[line].add_patch(rec)
+                self.axs[page].add_patch(patch)
+                self.axs[page].add_patch(rec)
                 patch.set_clip_path(rec)
 
 
@@ -159,7 +171,7 @@ class PlotterNotes:
                     if xLengthBeforeExtension < (2 * xCenterNumbers):
                         xShiftNumbers = 0.5 * xLengthBeforeExtension + 0.5 * self.xWidthNumber
 
-                    self.axs1D[line].text(xPos + xShiftNumbers,
+                    self.axs[page].text(xPos + xShiftNumbers,
                                           yPos + self.yShiftNumbers + 0.5 * self.barSpace,
                                           number, fontsize=self.settings['fontSizeNotes'],
                                           va='center', ha='right')

@@ -41,6 +41,9 @@ class Visualiser:
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
         self.yMin, self.yMax = self._getRangeYs()
+        settings['yMin'], settings['yMax'] = self._getRangeYs()
+
+
 
         self.CanvasCreator = CanvasCreator(settings,
                                            self.LocationFinder.getNumLines(),
@@ -62,9 +65,9 @@ class Visualiser:
     def plot(self):
 
         self.PlotterNotes.plotNotes()
-        self.PlotterChords.plotChords()
-        self.PlotterBarlines.plotBarlines()
-        self.PlotterMetadata.plotMetadata()
+        # self.PlotterChords.plotChords()
+        # self.PlotterBarlines.plotBarlines()
+        # self.PlotterMetadata.plotMetadata()
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
@@ -120,13 +123,13 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    settings["xMax"] = 8
-    settings["subdivision"] = 2
+    # settings["xMax"] = 8
+    # settings["subdivision"] = 2
 
     vis = Visualiser(s, settings)
     vis.plot()
 
-    title = "dec1963" # vis.Plotter._getSongTitle()
+    title = vis.PlotterMetadata._getSongTitle()
 
     figs = vis.CanvasCreator.getFigs()
 

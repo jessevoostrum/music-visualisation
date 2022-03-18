@@ -13,7 +13,7 @@ class PlotterBarlines:
 
         self.LocationFinder = LocationFinder
 
-        self.axs1D = CanvasCreator.getAxs1D()
+        self.axs1D = CanvasCreator.getAxs()
         self.widthAxs = CanvasCreator.getWidthAx()
 
         self.yMin = yMin

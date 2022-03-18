@@ -45,47 +45,46 @@ class CanvasCreator:
 
         self.figs = []
         self.axs = []
+        self.linesToPage = []
+        self.linesToLineOnPage = []
 
         self._createCanvas(numLines)
 
-    def _createCanvas(self, numAxsToMake):
+    def _createCanvas(self, numLines):
 
-        self._createFigsAndMusicAxs(numAxsToMake)
+        self._createFigsAndMusicAxs(numLines)
         self._formatMusicAxs()
         self._createAndFormatTitleAx()
 
-    def _createFigsAndMusicAxs(self, numAxsToMake):
+    def _createFigsAndMusicAxs(self, numLines):
 
+        pageIndex = 0
         isFirstPage = True
-        while numAxsToMake > 0:
+        numLinesToMake = numLines
+        while numLinesToMake > 0:
             fig = plt.figure(figsize=(self.settings["widthA4"], self.settings["heightA4"]))
-            numLinesFig = min(self._getNumLinesPage(isFirstPage), numAxsToMake)
-            axsFig = fig.subplots(numLinesFig, sharex=True, squeeze=False)
+            axFig = fig.subplots()
             self.figs.append(fig)
-            self.axs.append(list(axsFig[:, 0]))
-            numAxsToMake -= numLinesFig
-            isFirstPage = False
-            if numLinesFig == 0:
+            self.axs.append(axFig)
+            numLinesPage = min(self._getNumLinesPageMax(isFirstPage), numLinesToMake)
+            numLinesToMake -= numLinesPage
+            self.linesToLineOnPage += [LineOnPage for LineOnPage in range(numLinesPage)]
+            self.linesToPage += [pageIndex for _ in range(numLinesPage)]
+            isFirstPage = False   # TODO Use pageIndex
+            pageIndex += 1
+            if numLinesPage == 0:
                 print("ax too big")
                 break
 
     def _formatMusicAxs(self):
-        isFirstPage = True
-        for j, axsFig in enumerate(self.axs):
-            for i, ax in enumerate(axsFig):
-                ax.set_ylim(self.yMin, self.yMax + self.settings["vMarginLineTop"])
-                ax.set_xlim(- self.xPickupMeasureSpacePlusMargin, self.xMax + self.xPickupMeasureSpacePlusMargin)
+        for ax in self.axs:
+            ax.set_ylim(0, 1)
+            ax.set_xlim(- self.xPickupMeasureSpacePlusMargin, self.xMax + self.xPickupMeasureSpacePlusMargin)
 
-                ax.axis('off')
+            ax.axis('off')
 
-                vPosAx = 1 - (i + 1) * self.heightAxs
-                if isFirstPage:
-                    vPosAx += -self.heightTitleAx + self.settings["vMarginLineTop"] - self.settings["vMarginFirstLineTop"]
+            ax.set_position([0, 0, 1, 1])
 
-                ax.set_position([0, vPosAx, 1, self.heightAxs])
-            isFirstPage = False
-
-        self.vPosLowest = vPosAx
 
     def _createAndFormatTitleAx(self):
         titleAx = self.figs[0].subplots(1, squeeze=True)
@@ -95,7 +94,7 @@ class CanvasCreator:
         titleAx.set_ylim(0, 1)
         self.titleAx = titleAx
 
-    def _getNumLinesPage(self, isFirstPage):
+    def _getNumLinesPageMax(self, isFirstPage):
         """returns the number of lines that fits on the page"""
         if isFirstPage:
             return math.floor((1 - self.heightTitleAx) / (self.heightAxs))
@@ -122,8 +121,8 @@ class CanvasCreator:
     def getTitleAx(self):
         return self.titleAx
 
-    def getAxs1D(self):
-        return [ax for axsFig in self.axs for ax in axsFig]
+    def getAxs(self):
+        return self.axs
 
     def getFigs(self):
         return self.figs
@@ -131,5 +130,15 @@ class CanvasCreator:
     def getWidthAx(self):
         return self.xLengthWithMargin
 
-    def getVPosLowest(self):
-        return self.vPosLowest
+    def getLinesToLineOnPage(self):
+        return self.linesToLineOnPage
+
+    def getLinesToPage(self):
+        return self.linesToPage
+
+    def getYPosLineBase(self, line):
+        heightLine = self.settings["yMax"] - self.settings["yMin"]
+        yPosLineBase = 1  - self.linesToLineOnPage[line] * heightLine - self.settings["yMax"]
+        if self.linesToPage[line] == 0:
+            yPosLineBase -= self.settings["heightTitleAx"]
+        return yPosLineBase
