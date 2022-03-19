@@ -41,6 +41,7 @@ class CanvasCreator:
         self.xMax = settings["xMax"]
 
         self.lengthPickupMeasure = lengthPickupMeasure
+        self.pickupMeasureSpace = self._calculatePickupMeasureSpace()
 
         self._setXDimensionsMusic(lengthPickupMeasure)
         self._setXDimensionsTitle()
@@ -150,17 +151,28 @@ class CanvasCreator:
         return yPosLineBase
 
 
-    def getXPosFromOffsetLine(self, offsetLine):
-
+    def _calculatePickupMeasureSpace(self):
         xMinimalPickupMeasureSpace = self.xMax * self.settings["xMinimalPickupMeasureSpaceFraction"]
 
         xPickupMeasureSpace = max(self.lengthPickupMeasure, xMinimalPickupMeasureSpace)
-        offsetLength = self.xMax + 2 * xPickupMeasureSpace
+
+        return xPickupMeasureSpace
+
+
+    def getXLengthFromOffsetLength(self, offsetLength):
+
+        offsetLengthLine = self.xMax + 2 * self.pickupMeasureSpace
 
         plotSpace = 1 - 2 * self.settings["widthMarginLine"]
 
-        xPerOffset = plotSpace / offsetLength
+        xPerOffset = plotSpace / offsetLengthLine
 
-        xPos = self.settings["widthMarginLine"] + (xPickupMeasureSpace + offsetLine) * xPerOffset
+        xLength = offsetLength * xPerOffset
+
+        return xLength
+
+
+    def getXPosFromOffsetLine(self, offsetLine):
+        xPos = self.settings["widthMarginLine"] + self.getXLengthFromOffsetLength((self.pickupMeasureSpace + offsetLine))
 
         return xPos
