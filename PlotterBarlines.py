@@ -39,12 +39,12 @@ class PlotterBarlines:
             if not measure.number == 0:
                 # vline start measure
                 line, xPos = self.LocationFinder.getLocation(measure.offset)
-                self.axs[page].vlines(xPos, yPosLow, yPosHigh + heightBarline0Extension,
+                self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh + heightBarline0Extension,
                                         linestyle='solid', linewidth=linewidth_0, color='grey', zorder=.5)
             # vline end measure
             offsetEndMeasure = measure.offset + measure.quarterLength
             line, xPos = self.LocationFinder.getLocation(offsetEndMeasure, start=False)
-            self.axs[page].vlines(xPos, yPosLow, yPosHigh + heightBarline0Extension,
+            self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh + heightBarline0Extension,
                                     linestyle='solid', linewidth=linewidth_0, color='grey', zorder=.5)
 
             if not measure.number == 0:
@@ -52,14 +52,14 @@ class PlotterBarlines:
                     for t in np.arange(0, measure.quarterLength, step=1):
                         offset = measure.offset + t
                         line, xPos = self.LocationFinder.getLocation(offset, start=True)
-                        self.axs[page].vlines(xPos, yPosLow, yPosHigh,
+                        self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh,
                                 linestyle='solid', linewidth=linewidth_1, color='grey', zorder=.5)
 
                 if self.subdivision >= 2:
                     for t in np.arange(0, measure.quarterLength, step=.25):
                         offset = measure.offset + t
                         line, xPos = self.LocationFinder.getLocation(offset, start=True)
-                        self.axs[page].vlines(xPos, yPosLow, yPosHigh,
+                        self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh,
                                                 linestyle='solid', linewidth=linewidth_2, color='grey', zorder=.5)
 
             if measure.number == 0:
@@ -67,13 +67,13 @@ class PlotterBarlines:
                      for t in np.arange(0, measure.quarterLength, step=1):
                          offset = measure.offset + measure.quarterLength - t
                          line, xPos = self.LocationFinder.getLocation(offset, start=True)
-                         self.axs[page].vlines(xPos, yPosLow, yPosHigh,
+                         self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh,
                                                  linestyle='solid', linewidth=linewidth_1, color='grey', zorder=.5)
 
                  if self.subdivision >= 2:
                      for t in np.arange(0, measure.quarterLength, step=.25):
                          offset = measure.offset + measure.quarterLength - t
                          line, xPos = self.LocationFinder.getLocation(offset, start=True)
-                         self.axs[page].vlines(xPos, yPosLow, yPosHigh,
+                         self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh,
                                                  linestyle='solid', linewidth=linewidth_2, color='grey', zorder=.5)
 

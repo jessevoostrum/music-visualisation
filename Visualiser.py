@@ -66,7 +66,7 @@ class Visualiser:
 
         # self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
-        # self.PlotterBarlines.plotBarlines()
+        self.PlotterBarlines.plotBarlines()
         self.PlotterMetadata.plotMetadata()
 
     def _getRangeNotes(self):
