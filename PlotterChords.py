@@ -23,8 +23,8 @@ class PlotterChords:
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
         for chord in chords:
-            line, xPos = self.LocationFinder.getLocation(chord.offset)
-            xPos = xPos + self.xShiftChords
+            line, offsetLine = self.LocationFinder.getLocation(chord.offset)
+            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChordsRelative"]
 
             yPos = self.yMin + self.CanvasCreator.getYPosLineBase(line)
             page = self.CanvasCreator.getLinesToPage()[line]
