@@ -1,2 +1,5 @@
 .DS_Store
 *.pdf
+__pycache__/
+scratch/
+.idea/
