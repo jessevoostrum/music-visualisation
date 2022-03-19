@@ -27,10 +27,12 @@ class PlotterNotes:
         self.facecolor = settings["facecolor"]
 
         self.yShiftNumbers = settings['yShiftNumbers']
-        self.xShiftNumbersFixed = settings['xShiftNumbersPerWidthFixed'] * self.widthAxs
-        self.xWidthNumber = settings["widthNumber"] * self.widthAxs
+        self.xShiftNumbersFixed = settings['xShiftNumbersPerWidthFixed']
+        self.xWidthNumber = settings["widthNumber"]
 
-        self.xExtensionNoteWhenTied = settings["xExtensionNoteWhenTiedRelative"] * self.widthAxs
+        # self.xExtensionNoteWhenTied = settings["xExtensionNoteWhenTiedRelative"] * self.widthAxs
+        self.xExtensionNoteWhenTied = settings["xExtensionNoteWhenTiedRelative"]
+
 
         self.key = key
 
@@ -42,7 +44,7 @@ class PlotterNotes:
             if type(el) == music21.note.Note:
 
                 offset = el.getOffsetInHierarchy(self.streamObj)  # + self.xExtensionNoteWhenTied
-                line, xPos = self.LocationFinder.getLocation(offset)
+                line, offsetLine = self.LocationFinder.getLocation(offset)
 
                 yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
 
@@ -52,22 +54,16 @@ class PlotterNotes:
 
                 page = self.linesToPage[line]
 
-                xLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
+                offsetLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
                 facecolor = self.facecolor
                 linewidth = 0
                 alpha = self.alpha
                 hatch = None
 
-                # tied notes
-                # if el.tie:
-                #     if el.tie.type == 'start':
-                #         xLength += self.xExtensionNoteWhenTied
-                #     elif el.tie.type == 'continue':
-                #         xLength += 2 * self.xExtensionNoteWhenTied
-                #         xPos -= self.xExtensionNoteWhenTied
-                #     elif el.tie.type == 'stop':
-                #         xLength += self.xExtensionNoteWhenTied
-                #         xPos -= self.xExtensionNoteWhenTied
+
+                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+                xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
+
 
                 rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
                 xLengthBeforeExtension = xLength
@@ -166,7 +162,7 @@ class PlotterNotes:
                     else:
                         number = f"${number}$"
 
-                    xCenterNumbers = 0.015625 * self.settings['xMax']
+                    xCenterNumbers = 0.015625
                     xShiftNumbers = xCenterNumbers + 0.5 * self.xWidthNumber
                     if xLengthBeforeExtension < (2 * xCenterNumbers):
                         xShiftNumbers = 0.5 * xLengthBeforeExtension + 0.5 * self.xWidthNumber
