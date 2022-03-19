@@ -64,7 +64,7 @@ class Visualiser:
                                self.CanvasCreator.getTitleAx(), key)
     def plot(self):
 
-        # self.PlotterNotes.plotNotes()
+        self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarlines()
         self.PlotterMetadata.plotMetadata()
