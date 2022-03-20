@@ -22,7 +22,7 @@
   "yShiftNumbersPerFontSize": -0.00009,
   "xShiftCenterOfNumber": 0.01,
   "xLengthNumberPerFontSize": 0.00084,
-  "xShiftChordsRelative": 0.0125,
+  "xShiftChords": 0.0125,
   "setInMajorKey": true,
   "heightTitle": 0.65,
   "heightComposer": 0.35,
@@ -31,7 +31,7 @@
   "linewidth_1": 1,
   "linewidth_2": 0.2,
   "heightBarline0Extension": 0.007,
-  "xPadding": 0.001,
+  "xMarginNote": 0.001,
   "radiusCorners": 0.006,
   "mutationAspect": 0.3
 }

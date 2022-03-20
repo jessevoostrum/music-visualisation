@@ -16,15 +16,13 @@ class PlotterChords:
 
         self.yMin = yMin
 
-        self.xShiftChords = settings["xShiftChordsRelative"] * CanvasCreator.getWidthAx()
-
         self.key = key
 
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
         for chord in chords:
             line, offsetLine = self.LocationFinder.getLocation(chord.offset)
-            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChordsRelative"]
+            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChords"]
 
             yPos = self.yMin + self.CanvasCreator.getYPosLineBase(line)
             page = self.CanvasCreator.getLinesToPage()[line]
