@@ -101,7 +101,7 @@ class Visualiser:
     def _computeSettings(self, settings):
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
         settings['yShiftNumbers'] = settings['yShiftNumbersPerFontSize'] * settings['fontSizeNotes']
-        settings['widthNumber'] = settings['widthNumberPerFontSize'] * settings['fontSizeNotes']
+        settings['xWidthNumber'] = settings['xLengthNumberPerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
         return settings
 

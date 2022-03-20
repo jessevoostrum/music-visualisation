@@ -20,8 +20,8 @@
   "capHeightRatio": 0.673,
   "yShiftNumbers": -0.0008,
   "yShiftNumbersPerFontSize": -0.00009,
-  "xShiftNumbersPerWidthFixed": 0.0046,
-  "widthNumberPerFontSize": 0.00084,
+  "xShiftCenterOfNumber": 0.01,
+  "xLengthNumberPerFontSize": 0.00084,
   "xShiftChordsRelative": 0.0125,
   "setInMajorKey": true,
   "heightTitle": 0.65,
@@ -32,7 +32,7 @@
   "linewidth_2": 0.2,
   "heightBarline0Extension": 0.007,
   "xPadding": 0.001,
-  "radiusCorners": 0.013,
-  "mutationAspect": 0.15
+  "radiusCorners": 0.006,
+  "mutationAspect": 0.3
 }
 
