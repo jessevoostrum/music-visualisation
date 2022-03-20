@@ -34,7 +34,7 @@ class Visualiser:
     def __init__(self, streamObj, settings):
         self.streamObj = streamObj
 
-        self.LocationFinder = LocationFinder(self.streamObj, settings["xMax"])
+        self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
 
         self.settings = self._computeSettings(settings)
 
@@ -59,7 +59,7 @@ class Visualiser:
                                self.LocationFinder, self.CanvasCreator,
                                )
         self.PlotterMetadata = PlotterMetadata(self.streamObj, settings,
-                               self.CanvasCreator.getTitleAx(), key)
+                               self.CanvasCreator.getAxs()[0], key)
     def plot(self):
 
         self.PlotterNotes.plotNotes()
@@ -101,10 +101,8 @@ class Visualiser:
         settings['yShiftNumbers'] = settings['yShiftNumbersPerFontSize'] * settings['fontSizeNotes']
         settings['xWidthNumber'] = settings['xLengthNumberPerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
+        settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
         return settings
-
-
-
 
 
 if __name__ == '__main__':
@@ -121,7 +119,7 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    # settings["xMax"] = 8
+    # settings["offsetLineMax"] = 8
     settings["subdivision"] = 2
 
     vis = Visualiser(s, settings)

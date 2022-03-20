@@ -15,7 +15,6 @@ class PlotterBarlines:
         self.CanvasCreator = CanvasCreator
 
         self.axs = CanvasCreator.getAxs()
-        self.widthAxs = CanvasCreator.getWidthAx()
 
 
     def plotBarlines(self):

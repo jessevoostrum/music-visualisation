@@ -4,11 +4,11 @@ import copy
 
 class LocationFinder:
 
-    def __init__(self, streamObj, xMax):
+    def __init__(self, streamObj, offsetLineMax):
         self.streamObj = streamObj
-        self.offsetsStartLine, self.xsStartLine = self._getOffsetsAndXsStartLine(xMax)
+        self.offsetsStartLine, self.xsStartLine = self._getOffsetsAndXsStartLine(offsetLineMax)
 
-    def _getOffsetsAndXsStartLine(self, xMax):
+    def _getOffsetsAndXsStartLine(self, offsetLineMax):
         offsetsStartLine = []
         xsStartLine = []
 
@@ -42,11 +42,11 @@ class LocationFinder:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
-            elif measure.offset + measure.quarterLength - offsetsStartLine[-1] + xsStartLine[-1] > xMax:
+            elif measure.offset + measure.quarterLength - offsetsStartLine[-1] + xsStartLine[-1] > offsetLineMax:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
-            # will not work if length of measure exceeds xMax, then will be counted in first and last (el)if statement
+            # will not work if length of measure exceeds offsetLineMax, then will be counted in first and last (el)if statement
 
         return offsetsStartLine, xsStartLine
 
