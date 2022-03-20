@@ -30,21 +30,13 @@ class CanvasCreator:
 
         self.settings = settings
 
-        # below height and width are given relative to height and width of the page
-        self.heightTitleAx = settings["heightTitleAx"]
-        self.widthMarginLine = settings["widthMarginLine"]
-
         self.yMin = yMin
         self.yMax = yMax
         self.heightAxs = yMax - yMin + settings["vMarginLineTop"]
 
-        self.xMax = settings["xMax"]
+        self.offsetLineMax = settings["offsetLineMax"]
 
         self.lengthPickupMeasure = lengthPickupMeasure
-        self.pickupMeasureSpace = self._calculatePickupMeasureSpace()
-
-        self._setXDimensionsMusic(lengthPickupMeasure)
-        self._setXDimensionsTitle()
 
         self.figs = []
         self.axs = []
@@ -55,20 +47,14 @@ class CanvasCreator:
 
     def _createCanvas(self, numLines):
 
-        self._createFigsAndMusicAxs(numLines)
-        self._formatMusicAxs()
-        self._createAndFormatTitleAx()
-
-    def _createFigsAndMusicAxs(self, numLines):
-
         pageIndex = 0
         isFirstPage = True
         numLinesToMake = numLines
         while numLinesToMake > 0:
-            fig = plt.figure(figsize=(self.settings["widthA4"], self.settings["heightA4"]))
-            axFig = fig.subplots()
+            fig, ax = plt.subplots(figsize=(self.settings["widthA4"], self.settings["heightA4"]))
+            ax = self._formatAx(ax)
             self.figs.append(fig)
-            self.axs.append(axFig)
+            self.axs.append(ax)
             numLinesPage = min(self._getNumLinesPageMax(isFirstPage), numLinesToMake)
             numLinesToMake -= numLinesPage
             self.linesToLineOnPage += [LineOnPage for LineOnPage in range(numLinesPage)]
@@ -79,52 +65,19 @@ class CanvasCreator:
                 print("ax too big")
                 break
 
-    def _formatMusicAxs(self):
-        for ax in self.axs:
-            ax.set_ylim(0, 1)
-            # ax.set_xlim(- self.xPickupMeasureSpacePlusMargin, self.xMax + self.xPickupMeasureSpacePlusMargin)
-            ax.set_xlim(0, 1)
-
-            ax.axis('off')
-
-            ax.set_position([0, 0, 1, 1])
-
-
-    def _createAndFormatTitleAx(self):
-        titleAx = self.figs[0].subplots(1, squeeze=True)
-        titleAx.axis("off")
-        titleAx.set_position([0, 1 - self.heightTitleAx, 1, self.heightTitleAx])
-        titleAx.set_xlim(- self.xPickupMeasureSpacePlusMarginTitle, self.xMax + self.xPickupMeasureSpacePlusMarginTitle)
-        titleAx.set_ylim(0, 1)
-        self.titleAx = titleAx
+    def _formatAx(self, ax):
+        ax.set_ylim(0, 1)
+        ax.set_xlim(0, 1)
+        ax.axis('off')
+        ax.set_position([0, 0, 1, 1])
+        return ax
 
     def _getNumLinesPageMax(self, isFirstPage):
         """returns the number of lines that fits on the page"""
         if isFirstPage:
-            return math.floor((1 - self.heightTitleAx) / (self.heightAxs))
+            return math.floor((1 - self.settings["yLengthTitleAx"]) / self.heightAxs)
         else:
-            return math.floor((1) / (self.heightAxs))
-
-    def _setXDimensionsMusic(self, lengthPickupMeasure):
-        xMinimalPickupMeasureSpace = self.xMax * self.settings["xMinimalPickupMeasureSpaceFraction"]
-
-        xPickupMeasureSpace = max(lengthPickupMeasure, xMinimalPickupMeasureSpace)
-        xLengthWithoutMargin = self.xMax + 2 * xPickupMeasureSpace
-
-        xMargin = xLengthWithoutMargin * self.widthMarginLine / (1 - self.widthMarginLine)
-        self.xPickupMeasureSpacePlusMargin = xPickupMeasureSpace + xMargin
-        self.xLengthWithMargin = xLengthWithoutMargin + 2 * xMargin
-
-    def _setXDimensionsTitle(self):
-        # the composer location and key definition is always determined using the xMinimalPickupMeasureSpace
-        # so that it is constant
-        xMinimalPickupMeasureSpace = self.xMax * self.settings["xMinimalPickupMeasureSpaceFraction"]
-        xLengthWithoutMarginTitle = self.xMax + 2 * xMinimalPickupMeasureSpace
-        xMarginTitle = xLengthWithoutMarginTitle * self.widthMarginLine / (1 - self.widthMarginLine)
-        self.xPickupMeasureSpacePlusMarginTitle = xMinimalPickupMeasureSpace + xMarginTitle
-
-    def getTitleAx(self):
-        return self.titleAx
+            return math.floor(1 / self.heightAxs)
 
     def getAxs(self):
         return self.axs
@@ -132,36 +85,34 @@ class CanvasCreator:
     def getFigs(self):
         return self.figs
 
-    def getWidthAx(self):
-        return self.xLengthWithMargin
-
     def getLinesToLineOnPage(self):
         return self.linesToLineOnPage
 
     def getLinesToPage(self):
         return self.linesToPage
 
+
+    # these functions could be moved to a general plotter class?
+
     def getYPosLineBase(self, line):
         heightLine = self.settings["yMax"] - self.settings["yMin"]
         yPosLineBase = 1 - self.linesToLineOnPage[line] * (heightLine + self.settings["vMarginLineTop"]) - self.settings["yMax"]
         if self.linesToPage[line] == 0:
-            yPosLineBase -= self.settings["heightTitleAx"]
+            yPosLineBase -= self.settings["yLengthTitleAx"]
         else:
             yPosLineBase -= self.settings["vMarginLineTop"]
         return yPosLineBase
 
 
-    def _calculatePickupMeasureSpace(self):
-        xMinimalPickupMeasureSpace = self.xMax * self.settings["xMinimalPickupMeasureSpaceFraction"]
-
-        xPickupMeasureSpace = max(self.lengthPickupMeasure, xMinimalPickupMeasureSpace)
+    def _getPickupMeasureSpace(self):
+        xPickupMeasureSpace = max(self.lengthPickupMeasure, self.settings["xMinimalPickupMeasureSpace"])
 
         return xPickupMeasureSpace
 
 
     def getXLengthFromOffsetLength(self, offsetLength):
 
-        offsetLengthLine = self.xMax + 2 * self.pickupMeasureSpace
+        offsetLengthLine = self.offsetLineMax + 2 * self._getPickupMeasureSpace()
 
         plotSpace = 1 - 2 * self.settings["widthMarginLine"]
 
@@ -173,6 +124,6 @@ class CanvasCreator:
 
 
     def getXPosFromOffsetLine(self, offsetLine):
-        xPos = self.settings["widthMarginLine"] + self.getXLengthFromOffsetLength((self.pickupMeasureSpace + offsetLine))
+        xPos = self.settings["widthMarginLine"] + self.getXLengthFromOffsetLength((self._getPickupMeasureSpace() + offsetLine))
 
         return xPos

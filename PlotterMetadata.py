@@ -6,16 +6,18 @@ import numpy as np
 
 class PlotterMetadata:
 
-    def __init__(self, streamObj, settings, titleAx, key):
+    def __init__(self, streamObj, settings, ax, key):
 
         self.streamObj = streamObj
         self.settings = settings
 
-        self.titleAx = titleAx
+        self.ax = ax
 
-        self.xMax = settings["xMax"]
+        self.offsetLineMax = settings["offsetLineMax"]
 
         self.key = key
+
+        self.xPosLeft, self.xPosRight = self._computeXPos()
 
 
     def plotMetadata(self):
@@ -25,28 +27,28 @@ class PlotterMetadata:
         self._plotKey()
 
     def _plotTitle(self):
-        self.titleAx.text(self.xMax / 2, self.settings["heightTitle"],
+        self.ax.text(0.5, self.settings["yPosTitle"],
                           self._getSongTitle(), fontsize=16, horizontalalignment='center',
         verticalalignment='top')
 
     def _plotComposer(self):
         if self._getPlayer() == "":
-            height = self.settings["heightPlayer"]
+            height = self.settings["yPosPlayer"]
         else:
-            height = self.settings["heightComposer"]
+            height = self.settings["yPosComposer"]
 
-        self.titleAx.text(self.xMax, height,
+        self.ax.text(self.xPosRight, height,
                           self._getComposer(), fontsize=10, horizontalalignment='right',
         verticalalignment='center')
 
     def _plotPlayer(self):
-        self.titleAx.text(self.xMax, self.settings["heightPlayer"],
+        self.ax.text(self.xPosRight, self.settings["yPosPlayer"],
                           self._getPlayer(), fontsize=10, horizontalalignment='right',
                           verticalalignment='center')
 
     def _plotKey(self):
 
-        self.titleAx.text(0, self.settings["heightPlayer"],
+        self.ax.text(self.xPosLeft, self.settings["yPosPlayer"],
                           f"$1 = {self._getKeyLetter()} $", fontsize=10, horizontalalignment='left',
                           verticalalignment='center')
 
@@ -85,3 +87,14 @@ class PlotterMetadata:
                 letter = f"{letter}^b"
 
         return letter
+
+    def _computeXPos(self):
+        offsetLengthLine = self.offsetLineMax + 2 * self.settings["xMinimalPickupMeasureSpace"]
+        plotSpace = 1 - 2 * self.settings["widthMarginLine"]
+
+        xPerOffset = plotSpace / offsetLengthLine
+
+        xPosLeft = self.settings["widthMarginLine"] + self.settings["xMinimalPickupMeasureSpace"] * xPerOffset
+        xPosRight = self.settings["widthMarginLine"] + (self.settings["xMinimalPickupMeasureSpace"] + self.settings["offsetLineMax"]) * xPerOffset
+
+        return xPosLeft, xPosRight

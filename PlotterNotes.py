@@ -14,7 +14,6 @@ class PlotterNotes:
         self.CanvasCreator = CanvasCreator
 
         self.axs = CanvasCreator.getAxs()
-        self.widthAxs = CanvasCreator.getWidthAx()
         self.linesToLineOnPage = CanvasCreator.getLinesToLineOnPage()
         self.linesToPage = CanvasCreator.getLinesToPage()
 
