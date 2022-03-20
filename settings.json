@@ -22,7 +22,6 @@
   "yShiftNumbersPerFontSize": -0.00009,
   "xShiftNumbersPerWidthFixed": 0.0046,
   "widthNumberPerFontSize": 0.00084,
-  "xExtensionNoteWhenTiedRelative": 0.04,
   "xShiftChordsRelative": 0.0125,
   "setInMajorKey": true,
   "heightTitle": 0.65,
@@ -31,6 +30,9 @@
   "linewidth_0": 1,
   "linewidth_1": 1,
   "linewidth_2": 0.2,
-  "heightBarline0Extension": 0.007
+  "heightBarline0Extension": 0.007,
+  "xPadding": 0.001,
+  "radiusCorners": 0.013,
+  "mutationAspect": 0.15
 }
 

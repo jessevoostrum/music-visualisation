@@ -18,7 +18,6 @@ class PlotterNotes:
         self.linesToLineOnPage = CanvasCreator.getLinesToLineOnPage()
         self.linesToPage = CanvasCreator.getLinesToPage()
 
-
         self.barSpace = settings["barSpace"]
         self.overlapFactor = settings["overlapFactor"]
         self.noteLowest = noteLowest
@@ -30,9 +29,7 @@ class PlotterNotes:
         self.xShiftNumbersFixed = settings['xShiftNumbersPerWidthFixed']
         self.xWidthNumber = settings["widthNumber"]
 
-        # self.xExtensionNoteWhenTied = settings["xExtensionNoteWhenTiedRelative"] * self.widthAxs
-        self.xExtensionNoteWhenTied = settings["xExtensionNoteWhenTiedRelative"]
-
+        self.xExtensionNoteWhenTied = settings["radiusCorners"] + settings["xPadding"]
 
         self.key = key
 
@@ -68,6 +65,9 @@ class PlotterNotes:
                 rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
                 xLengthBeforeExtension = xLength
 
+                xPos += self.settings["xPadding"]
+                xLength -= 2 * self.settings["xPadding"]
+
                 if el.tie:
                     if el.tie.type == 'start':
                         xLength += self.xExtensionNoteWhenTied
@@ -92,8 +92,8 @@ class PlotterNotes:
 
                 patch = FancyBboxPatch((xPos, yPos),
                                        xLength, self.barSpace,
-                                       boxstyle="round, pad=-0.01, rounding_size=0.1",
-                                       mutation_aspect=0.02,
+                                       boxstyle=f"round, pad=0, rounding_size={self.settings['radiusCorners']}",
+                                       mutation_aspect=self.settings["mutationAspect"],
                                        fc=facecolor, alpha=alpha,
                                        edgecolor='black', linewidth=linewidth,
                                        hatch=hatch
