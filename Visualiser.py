@@ -124,7 +124,7 @@ if __name__ == '__main__':
     settings = json.load(f)
 
     # settings["xMax"] = 8
-    # settings["subdivision"] = 2
+    settings["subdivision"] = 2
 
     vis = Visualiser(s, settings)
     vis.plot()
