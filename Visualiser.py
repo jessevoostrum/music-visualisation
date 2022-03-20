@@ -43,8 +43,6 @@ class Visualiser:
         self.yMin, self.yMax = self._getRangeYs()
         settings['yMin'], settings['yMax'] = self._getRangeYs()
 
-
-
         self.CanvasCreator = CanvasCreator(settings,
                                            self.LocationFinder.getNumLines(),
                                            self.LocationFinder.getLengthPickupMeasure(),
@@ -58,7 +56,7 @@ class Visualiser:
                                self.LocationFinder, self.CanvasCreator, self.yMin,
                                key)
         self.PlotterBarlines = PlotterBarlines(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator, self.yMin, self.yMax,
+                               self.LocationFinder, self.CanvasCreator,
                                )
         self.PlotterMetadata = PlotterMetadata(self.streamObj, settings,
                                self.CanvasCreator.getTitleAx(), key)

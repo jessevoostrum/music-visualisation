@@ -6,7 +6,7 @@ import numpy as np
 
 class PlotterBarlines:
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator, yMin, yMax,):
+    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator):
 
         self.streamObj = streamObj
         self.settings = settings
@@ -17,51 +17,33 @@ class PlotterBarlines:
         self.axs = CanvasCreator.getAxs()
         self.widthAxs = CanvasCreator.getWidthAx()
 
-        self.yMin = yMin
-        self.yMax = yMax
-
-        self.subdivision = settings["subdivision"]
-
 
     def plotBarlines(self):
-        heightBarline0Extension = self.settings["heightBarline0Extension"]
-        assert (heightBarline0Extension < self.settings["vMarginLineTop"]), "barlineExtension should be smaller than vMarginLineTop"
-        linewidth_0 = self.settings["linewidth_0"]
-        linewidth_1 = self.settings["linewidth_1"]
-        linewidth_2 = self.settings["linewidth_2"]
 
         for measure in self.streamObj.recurse().getElementsByClass(music21.stream.Measure):
-            line = self.LocationFinder.getLocation(measure.offset)[0]  #this is assuming the whole measure stays on the same line
-            page = self.CanvasCreator.getLinesToPage()[line]
-            yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-            yPosLow = yPosLineBase + self.yMin
-            yPosHigh = yPosLineBase + self.yMax
 
-            if not measure.number == 0:
-                # vline start measure
-                line, xPos = self.LocationFinder.getLocation(measure.offset)
-                self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh + heightBarline0Extension,
-                                        linestyle='solid', linewidth=linewidth_0, color='grey', zorder=.5)
-            # vline end measure
-            offsetEndMeasure = measure.offset + measure.quarterLength
-            line, xPos = self.LocationFinder.getLocation(offsetEndMeasure, start=False)
-            self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh + heightBarline0Extension,
-                                    linestyle='solid', linewidth=linewidth_0, color='grey', zorder=.5)
+            self.plotMeasureBarlines(measure)
 
-            if self.subdivision >= 1:
-                self.plotSubdivisionBarlines(measure, 1, page, yPosHigh, yPosLow)
+            if self.settings["subdivision"] >= 1:
+                self.plotSubdivisionBarlines(measure, 1)
 
-            if self.subdivision >= 2:
-                self.plotSubdivisionBarlines(measure, 2, page, yPosHigh, yPosLow)
+            if self.settings["subdivision"] >= 2:
+                self.plotSubdivisionBarlines(measure, 2)
 
+    def plotMeasureBarlines(self, measure):
+        if not measure.number == 0:
+            self.plotVBar(measure.offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], True)
 
-    def plotSubdivisionBarlines(self, measure, subdivision, page, yPosHigh, yPosLow):
+        offsetEndMeasure = measure.offset + measure.quarterLength
+        self.plotVBar(offsetEndMeasure, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], False)
+
+    def plotSubdivisionBarlines(self, measure, subdivision):
         if subdivision == 1:
             step = 1
-            lineWidth = self.settings["linewidth_1"]
+            lineWidth = self.settings["lineWidth1"]
         elif subdivision == 2:
             step = 0.25
-            lineWidth = self.settings["linewidth_2"]
+            lineWidth = self.settings["lineWidth2"]
 
         for t in np.arange(0, measure.quarterLength, step=step):
             if measure.number == 0:
@@ -69,7 +51,21 @@ class PlotterBarlines:
             elif measure.number >= 1:
                 offset = measure.offset + t
 
-            line, xPos = self.LocationFinder.getLocation(offset, start=True)
-            self.axs[page].vlines(self.CanvasCreator.getXPosFromOffsetLine(xPos), yPosLow, yPosHigh,
-                                  linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+            self.plotVBar(offset, lineWidth, 0, True)
 
+
+
+
+    def plotVBar(self, offset, lineWidth, extension, start):
+
+        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
+        page = self.CanvasCreator.getLinesToPage()[line]
+
+        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+        yPosLow = yPosLineBase + self.settings["yMin"]
+        yPosHigh = yPosLineBase + self.settings["yMax"]
+
+        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+
+        self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
+                              linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
