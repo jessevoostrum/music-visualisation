@@ -87,8 +87,56 @@ class PlotterNotes:
                     alpha = 0.15
                     hatch = 'xxxxx'   # this controls the fine graindedness of the x pattern? TODO: make notebook
 
+                    # glissando
+                    if el.getSpannerSites():
+                        sp = el.getSpannerSites()[0]
+                        if type(sp) == music21.spanner.Glissando:
+                            endGlissando = False
+                            if sp.isFirst(el):
+                                xLength += self.xExtensionNoteWhenTied
+                                noteTarget = sp.getLast()
+                                # offsetTarget = noteTarget.getOffsetInHierarchy(self.streamObj)
+                                yTarget = (noteTarget.pitch.ps - self.noteLowest) * self.barSpace * (
+                                            1 - self.overlapFactor)
+                                yMiddle = (yTarget + yPos) / 2
+                                patch = Polygon([[xPos, yPos], [xPos, yPos + self.barSpace],
+                                                 [xPos + xLength, yMiddle + self.barSpace], [xPos + xLength, yMiddle]],
+                                                facecolor=self.facecolor,
+                                                alpha=self.alpha)
+                                self.axs[page].add_patch(patch)
 
-                
+                            elif sp.isLast(el):
+                                endGlissando = True
+                                xLength += self.xExtensionNoteWhenTied
+                                xPos -= self.xExtensionNoteWhenTied
+
+                                noteOrigin = sp.getFirst()
+                                yOrigin = (noteOrigin.pitch.ps - self.noteLowest) * self.barSpace * (
+                                            1 - self.overlapFactor)
+                                yMiddle = (yOrigin + yPos) / 2
+
+                                patch = Polygon([[xPos, yMiddle], [xPos, yMiddle + self.barSpace],
+                                                 [xPos + xLength, yPos + self.barSpace], [xPos + xLength, yPos]],
+                                                facecolor=self.facecolor,
+                                                alpha=self.alpha)
+                                self.axs[page].add_patch(patch)
+
+                            if not (el.tie and not (el.tie.type == 'start')):
+                                number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
+                                if accidental:
+                                    if accidental.name == 'sharp':
+                                        number = f"$ {{}}^\\# {number}$"
+                                    elif accidental.name == 'flat':
+                                        number = f"$ {{}}^b {number}$"
+
+                                if endGlissando:
+                                    xPos += xLength - 4 * self.xShiftNumbers
+                                self.axs[page].text(xPos + self.xShiftNumbers,
+                                                    yPos + self.yShiftNumbers + 0.5 * self.barSpace,
+                                                    number,
+                                                    va='center')
+
+                            continue
 
                 patch = FancyBboxPatch((xPos, yPos),
                                        xLength, self.barSpace,
