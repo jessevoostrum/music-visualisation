@@ -20,6 +20,13 @@ rename
 
 import music21
 
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.transforms import Bbox
+from matplotlib import rc
+
+
+
 from LocationFinder import LocationFinder
 from CanvasCreator import CanvasCreator
 from PlotterNotes import PlotterNotes
@@ -60,12 +67,38 @@ class Visualiser:
                                )
         self.PlotterMetadata = PlotterMetadata(self.streamObj, settings,
                                self.CanvasCreator.getAxs()[0], key)
+
+    def generate(self, directoryName):
+        self.plot()
+
+        title = vis.PlotterMetadata._getSongTitle()
+        figs = vis.CanvasCreator.getFigs()
+
+        pathName = directoryName + f"{title}.pdf"
+
+        with PdfPages(pathName) as pdf:
+            for fig in figs:
+                yPosLowest = self.CanvasCreator.getYPosLineBase(-1)
+                yLengthAboveTitle = 1 - self.settings["yPosTitle"]
+                if len(figs) == 1 and yPosLowest >= 0.55:
+                    heightStart = self.settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
+                    bbox = Bbox([[0, heightStart], [settings["widthA4"], settings["heightA4"]]])
+                    pdf.savefig(fig, bbox_inches=bbox)
+                else:
+                    pdf.savefig(fig)
+                pdf.savefig(fig)
+
+        plt.close("all")
+
     def plot(self):
 
+        plt.rcParams.update({"text.usetex": False})
+        self.PlotterMetadata.plotMetadata()
+        rc('text.latex', preamble=r'\usepackage{amssymb}')
+        plt.rcParams.update({"text.usetex": True})
         self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarlines()
-        self.PlotterMetadata.plotMetadata()
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
@@ -125,25 +158,10 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    # settings["offsetLineMax"] = 8
-    # settings["subdivision"] = 2
+    settings["offsetLineMax"] = 8
+    settings["subdivision"] = 2
     settings["setInMajorKey"] = False
 
     vis = Visualiser(s, settings)
-    vis.plot()
+    vis.generate("output/")
 
-    title = vis.PlotterMetadata._getSongTitle()
-
-    figs = vis.CanvasCreator.getFigs()
-
-    from matplotlib.backends.backend_pdf import PdfPages
-
-    # Create the PdfPages object to which we will save the pages:
-    # The with statement makes sure that the PdfPages object is closed properly at
-    # the end of the block, even if an Exception occurs.
-    with PdfPages(f"output/{title}3.pdf") as pdf:
-        for fig in figs:
-            pdf.savefig(fig)
-
-    import matplotlib.pyplot as plt
-    plt.close("all")

@@ -17,14 +17,14 @@ f = open('settings.json')
 settings = json.load(f)
 
 
-if True:
+if False:
     path_note = dir_notes + filename_standards
     path_songs = dir_songs_standards
 
 else:
     path_note = dir_notes + filename_bass
     path_songs = dir_songs_bass
-    settings["xMax"] = 8
+    settings["offsetLineMax"] = 8
     settings["subdivision"] = 2
 
 
@@ -44,12 +44,16 @@ for line in lines:
 
     title = vis.PlotterMetadata._getSongTitle()
     figs = vis.CanvasCreator.getFigs()
-    vPosLowest = vis.CanvasCreator.getVPosLowest()
 
-    with PdfPages(f"output2/{title}.pdf") as pdf:
+    settings["heightTitle"] = 0.65
+    vPosLowest = vis.CanvasCreator.getYPosLineBase(-1)
+
+    with PdfPages(f"output/{title}.pdf") as pdf:
         for fig in figs:
+            yPosLowest = vis.CanvasCreator.getYPosLineBase(-1)
+            yLengthAboveTitle = 1 - vis.settings["yPosTitle"]
             if len(figs) == 1 and vPosLowest >= 0.55:
-                heightStart = heightA4 * (vPosLowest - 0.35 * settings["heightTitle"])
+                heightStart = settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
                 bbox = Bbox([[0, heightStart], [settings["widthA4"], settings["heightA4"]]])
                 pdf.savefig(fig, bbox_inches=bbox)
             else:
