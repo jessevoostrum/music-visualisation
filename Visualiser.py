@@ -48,7 +48,7 @@ class Visualiser:
                                            self.LocationFinder.getLengthPickupMeasure(),
                                            self.yMin, self.yMax)
 
-        key = self._getMajorKey()
+        key = self._getKey()
         self.PlotterNotes = PlotterNotes(self.streamObj, settings,
                                self.LocationFinder, self.CanvasCreator, self.noteLowest,
                                key)
@@ -81,20 +81,26 @@ class Visualiser:
             yMin = - self.settings["barSpace"] * .2  # why?
         return yMin, yMax
 
-    def _getMajorKey(self):
-        # no support for multiple keys
-        # to recognise minor, one can use analyse method
-        # key can be coded in mxl file as a key or keysignature
-        if len(self.streamObj.flat.getElementsByClass(['KeySignature', 'Key'])) == 0:
-            key = music21.key.Key('C')
+    def _getKey(self):
+        if self.streamObj[music21.key.Key].first():
+            key = self.streamObj[music21.key.Key]
+        elif self.streamObj[music21.key.KeySignature].first():
+            key1 = self.streamObj[music21.key.KeySignature].first().asKey()
+            if self.settings["setInMajorKey"]:
+                key = key1
+            else:
+                key = self.streamObj.analyze('key')
+                if not (key == key1 or key == key1.relative):
+                    print("analysed key does not correspond to keysignature")
         else:
-            key = self.streamObj.flat.getElementsByClass('KeySignature')[0].asKey()
+            key = self.streamObj.analyze('key')
+            print("no key signature found")
+
+        if self.settings["setInMajorKey"] and key.mode == 'minor':
+            key = key.relative
+
         return key
 
-        # key = self.streamObj.analyze('key')
-        # if key.mode == 'minor':
-        #     key = key.relative
-        # return key
 
     def _computeSettings(self, settings):
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
@@ -111,7 +117,7 @@ if __name__ == '__main__':
 
     s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/bass_lines_SBL/December 1963.mxl")
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
+    # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
 
     import json
 
@@ -119,7 +125,7 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    # settings["offsetLineMax"] = 8
+    settings["offsetLineMax"] = 8
     settings["subdivision"] = 2
 
     vis = Visualiser(s, settings)
