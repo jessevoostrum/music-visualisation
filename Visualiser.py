@@ -115,7 +115,7 @@ if __name__ == '__main__':
 
     s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/All_Of_Me.mxl")
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/bass_lines_SBL/December 1963.mxl")
+    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
 
@@ -125,8 +125,9 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    settings["offsetLineMax"] = 8
-    settings["subdivision"] = 2
+    # settings["offsetLineMax"] = 8
+    # settings["subdivision"] = 2
+    settings["setInMajorKey"] = False
 
     vis = Visualiser(s, settings)
     vis.plot()
