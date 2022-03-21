@@ -12,17 +12,19 @@ to do:
 import math
 
 import matplotlib.pyplot as plt
-from matplotlib import rc
+import matplotlib.font_manager as font_manager
+from matplotlib import rcParams
 
+# Add every font at the specified location
+font_dir = ['/Users/jvo/Downloads/OH no Type Company Order #e6cd109/Vulf Mono/Desktop']
+for font in font_manager.findSystemFonts(font_dir):
+    font_manager.fontManager.addfont(font)
 
-rc('text.latex', preamble=r'\usepackage{amssymb}')
-plt.rcParams.update({
-        "text.usetex": True,
-        "font.family": "sans-serif",
-        "font.sans-serif": ['Computer Modern Sans serif']
-        # "font.sans-serif": ['Helvetica']
+# Set font family globally
+rcParams['font.family'] = 'Vulf Mono'
+rcParams['font.style'] = 'italic'
+rcParams['font.weight'] = 'light'
 
-})
 
 
 class CanvasCreator:
