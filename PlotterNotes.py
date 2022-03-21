@@ -50,9 +50,9 @@ class PlotterNotes:
                 self.plotNumber(el, page, xLength, xPos, yPos)
 
     def plotRectangle(self, el, page, xLength, xPos, yPos):
+        rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
         xPos += self.settings["xMarginNote"]
         xLength -= 2 * self.settings["xMarginNote"]
-        rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
         xLength, xPos = self.extendNotesWhenTied(el, xLength, xPos)
         alpha, facecolor, hatch = self.adjustVisualParametersForGhostNote(el)
         patch = FancyBboxPatch((xPos, yPos),
@@ -79,7 +79,7 @@ class PlotterNotes:
                 number = f"${number}$"
 
             xShiftNumbers = self.settings["xShiftCenterOfNumber"] + 0.5 * self.settings["xWidthNumber"]
-            if xLengthBeforeExtension < (2 * self.settings["xShiftCenterOfNumber"]):
+            if xLengthBeforeExtension < (2 * self.settings["xShiftCenterOfNumber"]) and (not el.tie):
                 xShiftNumbers = 0.5 * xLengthBeforeExtension + 0.5 * self.settings["xWidthNumber"]
 
             self.axs[page].text(xPos + xShiftNumbers,
