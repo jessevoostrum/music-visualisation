@@ -116,7 +116,7 @@ class Visualiser:
 
     def _getKey(self):
         if self.streamObj[music21.key.Key].first():
-            key = self.streamObj[music21.key.Key]
+            key = self.streamObj[music21.key.Key].first()
         elif self.streamObj[music21.key.KeySignature].first():
             key1 = self.streamObj[music21.key.KeySignature].first().asKey()
             if self.settings["setInMajorKey"]:
