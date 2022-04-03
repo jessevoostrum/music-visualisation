@@ -84,11 +84,11 @@ class PlotterMetadata:
         if accidental:
             if accidental.name == 'sharp':
                 # letter = f"{letter}^\\#"
-                letter = letter + "${}^\\#$"
+                letter = letter + "{}^\\#"
             elif accidental.name == 'flat':
                 # letter = f"{letter}^b"
-                letter = letter + "${}^b$"
-
+                letter = letter + "{}^b"
+        letter = f"$\\mathregular{{{letter}}}$"
 
         return letter
 

@@ -71,8 +71,8 @@ class Visualiser:
     def generate(self, directoryName):
         self.plot()
 
-        title = vis.PlotterMetadata._getSongTitle()
-        figs = vis.CanvasCreator.getFigs()
+        title = self.PlotterMetadata._getSongTitle()
+        figs = self.CanvasCreator.getFigs()
 
         pathName = directoryName + f"{title}.pdf"
 
@@ -92,10 +92,10 @@ class Visualiser:
 
     def plot(self):
 
-        plt.rcParams.update({"text.usetex": False})
+        # plt.rcParams.update({"text.usetex": False})
         self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
-        plt.rcParams.update({"text.usetex": True})
+        # plt.rcParams.update({"text.usetex": True})
         self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarlines()
