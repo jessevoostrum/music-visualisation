@@ -26,7 +26,7 @@ else:
     path_songs = dir_songs_bass
     settings["offsetLineMax"] = 8
     settings["subdivision"] = 2
-    settings["setInMajorKey"]=False
+    # settings["setInMajorKey"]=False
 
 with open(path_note) as f:
     lines = f.readlines()

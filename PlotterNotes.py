@@ -72,11 +72,10 @@ class PlotterNotes:
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
             if accidental:
                 if accidental.name == 'sharp':
-                    number = f"$ {{}}^\\# {number}$"
+                    number = f"{{}}^\\# {number}"
                 elif accidental.name == 'flat':
-                    number = f"$ {{}}^b {number}$"
-            else:
-                number = f"${number}$"
+                    number = f"{{}}^b {number}"
+            number = f"$\\mathregular{{{number}}}$"
 
             xShiftNumbers = self.settings["xShiftCenterOfNumber"] + 0.5 * self.settings["xWidthNumber"]
             if xLengthBeforeExtension < (2 * self.settings["xShiftCenterOfNumber"]) and (not el.tie):
