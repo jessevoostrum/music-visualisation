@@ -1,3 +1,4 @@
+import json
 import music21
 from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle
@@ -24,6 +25,8 @@ class PlotterNotes:
         self.facecolor = settings["facecolor"]
 
         self.key = key
+
+        self.yShiftNumbers = self.computeYShiftNumbers()
 
     def plotNotes(self):
 
@@ -70,22 +73,29 @@ class PlotterNotes:
     def plotNumber(self, el, page, xLengthBeforeExtension, xPos, yPos):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
+
+
+            xShiftNumbers = self.settings["xShiftNumberNote"]
+            if xLengthBeforeExtension < (2 * self.settings["xShiftNumberNote"] + self.settings["widthNumberNote"]) and (not el.tie):
+                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.settings["widthNumberNote"]
+
+            xPos += xShiftNumbers
+            yPos += self.yShiftNumbers
+
+            self.axs[page].text(xPos, yPos, number,
+                                fontsize=self.settings['fontSizeNotes'],
+                                va='baseline', ha='left')
             if accidental:
+                symbolAccidental = None
                 if accidental.name == 'sharp':
-                    number = f"{{}}^\\# {number}"
+                    symbolAccidental = '#'
                 elif accidental.name == 'flat':
-                    number = f"{{}}^b {number}"
-            number = f"$\\mathregular{{{number}}}$"
+                    symbolAccidental = 'b'
 
-            xShiftNumbers = self.settings["xShiftCenterOfNumber"] + 0.5 * self.settings["xWidthNumber"]
-            if xLengthBeforeExtension < (2 * self.settings["xShiftCenterOfNumber"]) and (not el.tie):
-                xShiftNumbers = 0.5 * xLengthBeforeExtension + 0.5 * self.settings["xWidthNumber"]
-
-            self.axs[page].text(xPos + xShiftNumbers,
-                                yPos + self.settings["yShiftNumbers"] + 0.5 * self.barSpace,
-                                number, fontsize=self.settings['fontSizeNotes'],
-                                va='center', ha='right')
-
+                if symbolAccidental:
+                    self.axs[page].text(xPos + 0.2 * self.settings["widthNumberNote"], yPos + self.settings['capsizeNumberNote'] * 0.7, symbolAccidental,
+                                fontsize=self.settings['fontSizeNoteAccidental'],
+                                va='baseline', ha='right', fontname='Arial', fontweight=1)
 
     def adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor
@@ -112,5 +122,9 @@ class PlotterNotes:
         return xLength, xPos
 
 
+    def computeYShiftNumbers(self):
 
+        yShiftNumbers = (self.barSpace - self.settings['capsizeNumberNote']) / 2
+
+        return yShiftNumbers
 
