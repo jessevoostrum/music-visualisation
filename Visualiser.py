@@ -71,8 +71,8 @@ class Visualiser:
     def generate(self, directoryName):
         self.plot()
 
-        title = vis.PlotterMetadata._getSongTitle()
-        figs = vis.CanvasCreator.getFigs()
+        title = self.PlotterMetadata._getSongTitle()
+        figs = self.CanvasCreator.getFigs()
 
         pathName = directoryName + f"{title}.pdf"
 
