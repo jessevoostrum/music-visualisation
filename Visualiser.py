@@ -17,7 +17,7 @@ rename
 
 
 """
-
+import json
 import music21
 
 import matplotlib.pyplot as plt
@@ -136,9 +136,13 @@ class Visualiser:
 
 
     def _computeSettings(self, settings):
+        f = open('fontDimensions.json')
+        fontDimensions = json.load(f)
+
+        settings['capsizeNumberNote'] = fontDimensions["Vulf Mono"]["capsize"] * settings['fontSizeNotes']
+        settings['widthNumberNote'] = fontDimensions["Vulf Mono"]["width"] * settings['fontSizeNotes']
+        settings['fontSizeNoteAccidental'] = settings['accidentalRatio'] * settings['fontSizeNotes']
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
-        settings['yShiftNumbers'] = settings['yShiftNumbersPerFontSize'] * settings['fontSizeNotes']
-        settings['xWidthNumber'] = settings['xLengthNumberPerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
         settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
         return settings
@@ -146,9 +150,9 @@ class Visualiser:
 
 if __name__ == '__main__':
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/All_Of_Me.mxl")
+    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/All_Of_Me.mxl")
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/bass_lines_SBL/Use Me.mxl")
+    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
 
