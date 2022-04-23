@@ -3,10 +3,15 @@ import music21
 from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle
 
+from Plotter import Plotter
 
-class PlotterNotes:
+
+
+class PlotterNotes(Plotter):
 
     def __init__(self, streamObj, settings, LocationFinder, CanvasCreator,  noteLowest, key):
+
+        super().__init__(CanvasCreator.getAxs())
 
         self.streamObj = streamObj
         self.settings = settings
@@ -14,7 +19,7 @@ class PlotterNotes:
         self.LocationFinder = LocationFinder
         self.CanvasCreator = CanvasCreator
 
-        self.axs = CanvasCreator.getAxs()
+        # self.axs = CanvasCreator.getAxs()
         self.linesToLineOnPage = CanvasCreator.getLinesToLineOnPage()
         self.linesToPage = CanvasCreator.getLinesToPage()
 
@@ -85,17 +90,8 @@ class PlotterNotes:
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=self.settings['fontSizeNotes'],
                                 va='baseline', ha='left')
-            if accidental:
-                symbolAccidental = None
-                if accidental.name == 'sharp':
-                    symbolAccidental = '#'
-                elif accidental.name == 'flat':
-                    symbolAccidental = 'b'
 
-                if symbolAccidental:
-                    self.axs[page].text(xPos + 0.2 * self.settings["widthNumberNote"], yPos + self.settings['capsizeNumberNote'] * 0.7, symbolAccidental,
-                                fontsize=self.settings['fontSizeNoteAccidental'],
-                                va='baseline', ha='right', fontname='Arial', fontweight=1)
+            self.plotAccidental(accidental, self.settings['fontSizeNotes'], xPos, yPos, page)
 
     def adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor

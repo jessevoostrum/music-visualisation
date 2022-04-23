@@ -1,9 +1,12 @@
 import music21
 import chordTypes
+from Plotter import Plotter
 
-class PlotterChords:
+
+class PlotterChords(Plotter):
 
     def __init__(self, streamObj, settings, LocationFinder, CanvasCreator, yMin, key):
+        super().__init__(CanvasCreator.getAxs())
 
         self.streamObj = streamObj
 
@@ -12,7 +15,7 @@ class PlotterChords:
         self.LocationFinder = LocationFinder
         self.CanvasCreator = CanvasCreator
 
-        self.axs = CanvasCreator.getAxs()
+        # self.axs = CanvasCreator.getAxs()
 
         self.yMin = yMin
 
@@ -27,8 +30,19 @@ class PlotterChords:
             yPos = self.yMin + self.CanvasCreator.getYPosLineBase(line)
             page = self.CanvasCreator.getLinesToPage()[line]
 
-            self.axs[page].text(xPos, yPos, self._findFigure(chord),
-                                  va='bottom', size=self.settings['fontSizeChords'], fontweight='semibold')
+            self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+
+            # self.axs[page].text(xPos, yPos, self._findFigure(chord),
+            #                       va='bottom', size=self.settings['fontSizeChords'], fontweight='semibold')
+
+    def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
+        number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+
+        self.axs[page].text(xPos, yPos, number,
+                            va='bottom', size=self.settings['fontSizeChords'])
+
+        self.plotAccidental(accidental, self.settings['fontSizeChords'], xPos, yPos, page)
+
 
     def _findFigure(self, chordSymbol):
 
