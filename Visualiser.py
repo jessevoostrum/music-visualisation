@@ -138,10 +138,11 @@ class Visualiser:
     def _computeSettings(self, settings):
         f = open('fontDimensions.json')
         fontDimensions = json.load(f)
-
-        settings['capsizeNumberNote'] = fontDimensions["Vulf Mono"]["capsize"] * settings['fontSizeNotes']
-        settings['widthNumberNote'] = fontDimensions["Vulf Mono"]["width"] * settings['fontSizeNotes']
-        settings['fontSizeNoteAccidental'] = settings['accidentalRatio'] * settings['fontSizeNotes']
+        settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
+        settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
+        settings['capsizeNumberNote'] = fontDimensions[settings["font"]]["capsize"] * settings['fontSizeNotes']
+        settings['widthNumberNote'] = fontDimensions[settings["font"]]["width"] * settings['fontSizeNotes']
+        settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
         settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
@@ -152,7 +153,7 @@ if __name__ == '__main__':
 
     s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/All_Of_Me.mxl")
 
-    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
+    # s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
 
@@ -162,9 +163,9 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    settings["offsetLineMax"] = 8
-    settings["subdivision"] = 2
-    settings["setInMajorKey"] = False
+    # settings["offsetLineMax"] = 8
+    # settings["subdivision"] = 2
+    # settings["setInMajorKey"] = False
 
     vis = Visualiser(s, settings)
     vis.generate("output/")
