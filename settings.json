@@ -32,6 +32,7 @@
   "radiusCorners": 0.006,
   "mutationAspect": 0.3,
   "font": "Vulf Mono",
-  "fontSizeAccidentalRelative": 0.7
+  "fontSizeAccidentalRelative": 0.7,
+  "hDistanceChordAddition": -0.1
 }
 
