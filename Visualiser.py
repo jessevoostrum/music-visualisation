@@ -17,7 +17,7 @@ rename
 
 
 """
-
+import json
 import music21
 
 import matplotlib.pyplot as plt
@@ -82,7 +82,7 @@ class Visualiser:
                 yLengthAboveTitle = 1 - self.settings["yPosTitle"]
                 if len(figs) == 1 and yPosLowest >= 0.55:
                     heightStart = self.settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
-                    bbox = Bbox([[0, heightStart], [settings["widthA4"], settings["heightA4"]]])
+                    bbox = Bbox([[0, heightStart], [self.settings["widthA4"], self.settings["heightA4"]]])
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:
                     pdf.savefig(fig)
@@ -92,10 +92,10 @@ class Visualiser:
 
     def plot(self):
 
-        plt.rcParams.update({"text.usetex": False})
+        # plt.rcParams.update({"text.usetex": False})
         self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
-        plt.rcParams.update({"text.usetex": True})
+        # plt.rcParams.update({"text.usetex": True})
         self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarlines()
@@ -136,9 +136,14 @@ class Visualiser:
 
 
     def _computeSettings(self, settings):
+        f = open('fontDimensions.json')
+        fontDimensions = json.load(f)
+        settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
+        settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
+        settings['capsizeNumberNote'] = fontDimensions[settings["font"]]["capsize"] * settings['fontSizeNotes']
+        settings['widthNumberNote'] = fontDimensions[settings["font"]]["width"] * settings['fontSizeNotes']
+        settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
-        settings['yShiftNumbers'] = settings['yShiftNumbersPerFontSize'] * settings['fontSizeNotes']
-        settings['xWidthNumber'] = settings['xLengthNumberPerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
         settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
         return settings
@@ -146,9 +151,9 @@ class Visualiser:
 
 if __name__ == '__main__':
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/All_Of_Me.mxl")
+    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/All_Of_Me.mxl")
 
-    s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/bass_lines_SBL/Use Me.mxl")
+    # s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
 
@@ -158,9 +163,9 @@ if __name__ == '__main__':
 
     settings = json.load(f)
 
-    settings["offsetLineMax"] = 8
-    settings["subdivision"] = 2
-    settings["setInMajorKey"] = False
+    # settings["offsetLineMax"] = 8
+    # settings["subdivision"] = 2
+    # settings["setInMajorKey"] = False
 
     vis = Visualiser(s, settings)
     vis.generate("output/")
