@@ -86,7 +86,6 @@ class Visualiser:
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:
                     pdf.savefig(fig)
-                pdf.savefig(fig)
 
         plt.close("all")
 
