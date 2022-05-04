@@ -65,7 +65,7 @@ class PlotterChords(Plotter):
 
     def _findAddition(self, chordSymbol):
         addition = ""
-
+        
         kind = chordSymbol.chordKind
 
         if kind in music21.harmony.CHORD_ALIASES:
