@@ -82,7 +82,7 @@ class Visualiser:
                 yLengthAboveTitle = 1 - self.settings["yPosTitle"]
                 if len(figs) == 1 and yPosLowest >= 0.55:
                     heightStart = self.settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
-                    bbox = Bbox([[0, heightStart], [settings["widthA4"], settings["heightA4"]]])
+                    bbox = Bbox([[0, heightStart], [self.settings["widthA4"], self.settings["heightA4"]]])
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:
                     pdf.savefig(fig)
