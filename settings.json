@@ -17,10 +17,7 @@
   "facecolor": "blue",
   "ptToInches": 0.01389,
   "capHeightRatio": 0.673,
-  "yShiftNumbers": -0.0008,
-  "yShiftNumbersPerFontSize": -0.00009,
-  "xShiftCenterOfNumber": 0.01,
-  "xLengthNumberPerFontSize": 0.00084,
+  "xShiftNumberNote": 0.005,
   "xShiftChords": 0.0125,
   "setInMajorKey": true,
   "yLengthTitleAx": 0.1,
@@ -33,6 +30,9 @@
   "heightBarline0Extension": 0.007,
   "xMarginNote": 0.001,
   "radiusCorners": 0.006,
-  "mutationAspect": 0.3
+  "mutationAspect": 0.3,
+  "font": "Vulf Mono",
+  "fontSizeAccidentalRelative": 0.7,
+  "hDistanceChordAddition": -0.1
 }
 
