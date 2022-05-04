@@ -8,13 +8,14 @@ class Plotter:
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':
-                symbolAccidental = '#'
+                symbolAccidental = '♯'
             elif accidental.name == 'flat':
-                symbolAccidental = 'b'
+                symbolAccidental = '♭'
 
             if symbolAccidental:
                 self.axs[page].text(xPos + 0.2 * self.settings["widthNumberRelative"] * fontSize,
-                                    yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.7, symbolAccidental,
+                                    yPos + 0.7 * self.settings['capsizeNumberRelative'] * fontSize, symbolAccidental,
                                     fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
-                                    va='baseline', ha='right', fontname='Arial', fontweight=1)
+                                    va='baseline', ha='right', fontname='Vulf Mono', #fontweight=1
+                                    )
 
