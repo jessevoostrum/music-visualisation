@@ -1,6 +1,5 @@
 import music21
-from matplotlib.patches import Polygon
-from matplotlib.patches import FancyBboxPatch, Rectangle
+from matplotlib.patches import Circle
 import numpy as np
 
 
@@ -38,6 +37,16 @@ class PlotterBarlines:
         offsetEndMeasure = measure.offset + measure.quarterLength
         self.plotVBar(offsetEndMeasure, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], False)
 
+        for barLine in measure[music21.bar.Barline]:
+            if type(barLine) == music21.bar.Repeat:
+                if barLine.direction == 'start':
+                    start = True
+                else:
+                    start = False
+                offset = measure.offset + barLine.offset
+
+                self.plotVBar(offset, self.settings["lineWidth0"] , self.settings["heightBarline0Extension"], start)
+
     def plotSubdivisionBarlines(self, measure, subdivision):
         if subdivision == 1:
             step = 1
@@ -67,6 +76,27 @@ class PlotterBarlines:
 
         self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
                               linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+
+    def _plotDots(self, offset, start):
+        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
+        page = self.CanvasCreator.getLinesToPage()[line]
+
+        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+        yPosLow = yPosLineBase + self.settings["yMin"]
+        yPosHigh = yPosLineBase + self.settings["yMax"]
+        yPos = (yPosHigh + yPosLow)/2
+
+        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+
+        shift = - 0.003
+        if start:
+            shift = shift * -1
+
+        xPos = xPos + shift
+
+        patch = Circle(xPos, yPos)
+
+        self.axs[page].add_patch(patch)
 
     def _plotRepeatBracket(self, measure):
         if measure.getSpannerSites():
