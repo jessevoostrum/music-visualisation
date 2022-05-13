@@ -50,11 +50,10 @@ class PlotterChords(Plotter):
 
         addition = self._findAddition(chordSymbol)
 
-        # lengthAddition = len(addition)  # does not work
-
         fontSize = self.settings['fontSizeChords']
 
-        self.axs[page].text(xPos + (1 + self.settings["hDistanceChordAddition"]) * self.settings["widthNumberRelative"] * fontSize,
+        if addition:
+            self.axs[page].text(xPos + (1 + self.settings["hDistanceChordAddition"]) * self.settings["widthNumberRelative"] * fontSize,
                             yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.7, addition,
                             fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
                             va='baseline', ha='left',
@@ -93,7 +92,10 @@ class PlotterChords(Plotter):
                 # addition += ' ' + csMod.modType + ' ' + str(csMod.degree)
                 addition += str(csMod.degree)
 
-        addition  = "$" + addition + "$"
+        if not addition == "":
+            addition  = "$" + addition + "$"
+        else:
+            addition = None
 
         return addition
 

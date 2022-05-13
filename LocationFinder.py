@@ -17,24 +17,8 @@ class LocationFinder:
 
         for measure in self.streamObj.recurse().getElementsByClass(music21.stream.Measure):
 
-            # check if measure is part of repetition bracket
-            if measure.getSpannerSites():
 
-                if len(measure.getSpannerSites()) > 1:
-                    print("multiple spanners attached to measure")
-
-                spanner = measure.getSpannerSites()[0]
-                if type(spanner) == music21.spanner.RepeatBracket:
-                    if spanner.number == '1':
-                        if spanner.isFirst(measure):
-                            xPosSpanner = measure.offset - offsetsStartLine[-1] + xsStartLine[-1]
-
-                    elif int(spanner.number) > 1:
-                        if spanner.isFirst(measure):
-                            offsetsStartLine.append(measure.offset)
-                            xsStartLine.append(xPosSpanner)
-
-            if measure.number == 0:
+            if measure.number == 0:  # pickup measure
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(-measure.quarterLength)
 
@@ -42,9 +26,31 @@ class LocationFinder:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
-            elif measure.offset + measure.quarterLength - offsetsStartLine[-1] + xsStartLine[-1] > offsetLineMax:
+            elif measure.flat.getElementsByClass(music21.expressions.RehearsalMark).first() and not measure.number == 1:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
+
+            elif measure.getSpannerSites():
+
+                spanner = measure.getSpannerSites()[0]
+                if type(spanner) == music21.spanner.RepeatBracket:
+                    if int(spanner.number) > 1:
+                        if spanner.isFirst(measure):
+                            offsetsStartLine.append(measure.offset)
+                            xsStartLine.append(xPosSpanner)
+
+            if measure.offset + measure.quarterLength - offsetsStartLine[-1] + xsStartLine[-1] > offsetLineMax:
+                offsetsStartLine.append(measure.offset)
+                xsStartLine.append(0)
+
+            if measure.getSpannerSites():
+
+                spanner = measure.getSpannerSites()[0]
+                if type(spanner) == music21.spanner.RepeatBracket:
+                    if spanner.number == '1':
+                        if spanner.isFirst(measure):
+                            xPosSpanner = measure.offset - offsetsStartLine[-1] + xsStartLine[-1]
+
 
             # will not work if length of measure exceeds offsetLineMax, then will be counted in first and last (el)if statement
 

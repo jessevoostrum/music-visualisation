@@ -21,9 +21,9 @@ for font in font_manager.findSystemFonts(font_dir):
     font_manager.fontManager.addfont(font)
 
 # Set font family globally
-# rcParams['font.family'] = 'Vulf Mono'
-# rcParams['font.style'] = 'italic'
-# rcParams['font.weight'] = 'light'
+rcParams['font.family'] = 'Vulf Mono'
+rcParams['font.style'] = 'italic'
+rcParams['font.weight'] = 'light'
 
 
 
