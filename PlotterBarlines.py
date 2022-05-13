@@ -29,6 +29,8 @@ class PlotterBarlines:
             if self.settings["subdivision"] >= 2:
                 self.plotSubdivisionBarlines(measure, 2)
 
+            self._plotRepeatBracket(measure)
+
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
             self.plotVBar(measure.offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], True)
@@ -52,9 +54,6 @@ class PlotterBarlines:
 
             self.plotVBar(offset, lineWidth, 0, True)
 
-
-
-
     def plotVBar(self, offset, lineWidth, extension, start):
 
         line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
@@ -68,3 +67,37 @@ class PlotterBarlines:
 
         self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
                               linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+
+    def _plotRepeatBracket(self, measure):
+        if measure.getSpannerSites():
+            spanner = measure.getSpannerSites()[0]
+            if type(spanner) == music21.spanner.RepeatBracket:
+
+                offset = measure.offset
+
+                line, offsetLine = self.LocationFinder.getLocation(offset, start=True)
+                page = self.CanvasCreator.getLinesToPage()[line]
+
+                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+                yPosHigh = yPosLineBase + self.settings["yMax"]
+
+                xPosStart = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+                xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
+
+                lineWidth = self.settings["lineWidth0"]
+                self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
+                                      linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
+
+                if spanner.isFirst(measure):
+                    number = spanner.number + "."
+                    self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number)
+
+                    self.axs[page].vlines(xPosStart, yPosHigh + 0.01, yPosHigh + 0.02,
+                                          linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
+
+                if spanner.isLast(measure):
+                    # self.axs[page].vlines(xPosEnd, yPosHigh + 0.01, yPosHigh + 0.02,
+                    #                       linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+
+                    pass
+
