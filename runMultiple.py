@@ -17,7 +17,7 @@ f = open('settings.json')
 settings = json.load(f)
 
 
-if False:
+if True:
     path_note = dir_notes + filename_standards
     path_songs = dir_songs_standards
 

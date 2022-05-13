@@ -150,8 +150,11 @@ class Visualiser:
 
 if __name__ == '__main__':
 
-    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/All_Of_Me.mxl")
-
+    path = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
+    song = "Alone_Together_Lead_sheet_with_lyrics_.mxl"
+    song = "Misty.mxl"
+    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/selection/Misty.mxl")
+    # s = music21.converter.parse(path+song)
     # s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
