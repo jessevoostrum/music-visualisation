@@ -57,6 +57,8 @@ class PlotterNotes(Plotter):
 
                 self.plotNumber(el, page, xLength, xPos, yPos)
 
+                self.plotLyric(el, page, xLength, xPos, yPosLineBase)
+
     def plotRectangle(self, el, page, xLength, xPos, yPos):
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
         xPos += self.settings["xMarginNote"]
@@ -92,6 +94,18 @@ class PlotterNotes(Plotter):
                                 va='baseline', ha='left')
 
             self.plotAccidental(accidental, self.settings['fontSizeNotes'], xPos, yPos, page)
+
+    def plotLyric(self, el, page, xLength, xPos, yPos):
+        lyric = el.lyric
+        if el.lyric:
+            syllabic = el.lyrics[0].syllabic
+            if syllabic == 'begin' or syllabic == 'middle':
+                lyric += "-"
+        xPosCenter = xPos # + 0.5 * xLength
+        yPos -= self.settings['barSpace'] * 0.5
+        self.axs[page].text(xPosCenter, yPos, lyric,
+                            fontsize=7,
+                            va='baseline', ha='left')
 
     def adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor
