@@ -40,7 +40,11 @@ for line in lines:
 
     line = line.rstrip('\n')
 
-    streamObj = music21.converter.parse(path_songs + line)
+    try:
+        streamObj = music21.converter.parse(path_songs + line)
 
-    vis = Visualiser(streamObj, settings)
-    vis.generate("output-standards/")
+        vis = Visualiser(streamObj, settings)
+
+        vis.generate("output-standards/")
+    except:
+        pass
