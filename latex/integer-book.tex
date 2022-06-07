@@ -1,0 +1,34 @@
+\documentclass{article}
+
+\usepackage{pdfpages}
+\usepackage{fancyhdr}
+\usepackage{fontspec}
+\setmainfont[Mapping=tex-text-ms]{Vulf Mono Light Italic}
+\usepackage[hidelinks]{hyperref}
+
+
+\setlength{\footskip}{80pt}
+
+
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+	{\Huge The Integer Book\par}
+	\vspace{2cm}
+    {\large by\par}
+    \vspace{1cm}
+	{\Large Jesse van Oostrum}
+\end{titlepage}
+
+\tableofcontents    
+
+
+\input{../inputTexFile.txt}
+
+\end{document}
+
+
+
+% \includepdf[pages=-, addtotoc={1,section,1,Autumn Leaves,p1}, pagecommand={}]{/Users/jvo/Documents/music-visualisation/output/Autumn Leaves.pdf}
