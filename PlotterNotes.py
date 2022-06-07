@@ -40,22 +40,26 @@ class PlotterNotes(Plotter):
 
             if type(el) == music21.note.Note:
 
-                offset = el.getOffsetInHierarchy(self.streamObj)  # + self.xExtensionNoteWhenTied
-                line, offsetLine = self.LocationFinder.getLocation(offset)
-                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
-                yPos = yPosLineBase + yPosWithinLine
+                self._plotNote(el)
 
-                page = self.linesToPage[line]
+            elif type(el) == music21.chord.Chord:
 
-                offsetLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
+                for note in el.notes:
+                    self._plotNote(note, offset=el.getOffsetInHierarchy(self.streamObj))
 
-                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
-                xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
-
-                self.plotRectangle(el, page, xLength, xPos, yPos)
-
-                self.plotNumber(el, page, xLength, xPos, yPos)
+    def _plotNote(self, el, offset=None):
+        if not offset:
+            offset = el.getOffsetInHierarchy(self.streamObj)  # + self.xExtensionNoteWhenTied
+        line, offsetLine = self.LocationFinder.getLocation(offset)
+        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+        yPos = yPosLineBase + yPosWithinLine
+        page = self.linesToPage[line]
+        offsetLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
+        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+        xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
+        self.plotRectangle(el, page, xLength, xPos, yPos)
+        self.plotNumber(el, page, xLength, xPos, yPos)
 
     def plotRectangle(self, el, page, xLength, xPos, yPos):
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
