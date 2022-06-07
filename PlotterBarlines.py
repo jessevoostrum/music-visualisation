@@ -1,5 +1,5 @@
 import music21
-from matplotlib.patches import Circle
+from matplotlib.patches import Ellipse, Rectangle
 import numpy as np
 
 
@@ -32,10 +32,10 @@ class PlotterBarlines:
 
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
-            self.plotVBar(measure.offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], True)
+            self.plotVBar(measure.offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=True)
 
         offsetEndMeasure = measure.offset + measure.quarterLength
-        self.plotVBar(offsetEndMeasure, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], False)
+        self.plotVBar(offsetEndMeasure, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False)
 
         for barLine in measure[music21.bar.Barline]:
             if type(barLine) == music21.bar.Repeat:
@@ -45,7 +45,15 @@ class PlotterBarlines:
                     start = False
                 offset = measure.offset + barLine.offset
 
-                self.plotVBar(offset, self.settings["lineWidth0"] , self.settings["heightBarline0Extension"], start)
+                self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start, rectangle=True)
+                self._plotDots(offset, start)
+
+            if type(barLine) == music21.bar.Barline and barLine.type == 'final':
+
+                offset = measure.offset + barLine.offset
+
+                self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start=False, rectangle=True)
+
 
     def plotSubdivisionBarlines(self, measure, subdivision):
         if subdivision == 1:
@@ -63,7 +71,7 @@ class PlotterBarlines:
 
             self.plotVBar(offset, lineWidth, 0, True)
 
-    def plotVBar(self, offset, lineWidth, extension, start):
+    def plotVBar(self, offset, lineWidth, extension, start, rectangle=False):
 
         line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
         page = self.CanvasCreator.getLinesToPage()[line]
@@ -74,8 +82,15 @@ class PlotterBarlines:
 
         xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
-        self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
+        if not rectangle:
+            self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
                               linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+        else:
+            width = 0.002
+            if not start:
+                xPos -= width
+            patch = Rectangle((xPos, yPosLow), width=width, height=self.settings["yMax"] + extension - self.settings["yMin"], color='grey', fill=True)
+            self.axs[page].add_patch(patch)
 
     def _plotDots(self, offset, start):
         line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
@@ -83,20 +98,23 @@ class PlotterBarlines:
 
         yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
         yPosLow = yPosLineBase + self.settings["yMin"]
-        yPosHigh = yPosLineBase + self.settings["yMax"]
+        yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
         yPos = (yPosHigh + yPosLow)/2
 
         xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
-        shift = - 0.003
+        shift = - 0.0065
         if start:
             shift = shift * -1
 
         xPos = xPos + shift
 
-        patch = Circle(xPos, yPos)
+        for i in [-1, 1]:
 
-        self.axs[page].add_patch(patch)
+            xyRatio =  self.settings["widthA4"] / self.settings["heightA4"]
+            patch = Ellipse((xPos, yPos + i*0.005), width=0.003, height=0.003*xyRatio, color='grey')
+
+            self.axs[page].add_patch(patch)
 
     def _plotRepeatBracket(self, measure):
         if measure.getSpannerSites():
