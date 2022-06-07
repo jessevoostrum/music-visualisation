@@ -1,7 +1,14 @@
+import inspect
 import music21
 from matplotlib.patches import Ellipse, Rectangle
+import matplotlib.font_manager as fm
 import numpy as np
 
+
+fp1=fm.FontProperties(fname="/Users/jvo/Downloads/freefont-20120503/FreeSerif.ttf")
+fp1=fm.FontProperties(fname="/Users/jvo/Downloads/symbola/Symbola.ttf")
+
+fp2=fm.FontProperties(fname="/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
 
 class PlotterBarlines:
 
@@ -28,7 +35,8 @@ class PlotterBarlines:
             if self.settings["subdivision"] >= 2:
                 self.plotSubdivisionBarlines(measure, 2)
 
-            self._plotRepeatBracket(measure)
+            self._plotRepeatBrackets(measure)
+            self._plotRepeatExpressions(measure)
 
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
@@ -38,21 +46,25 @@ class PlotterBarlines:
         self.plotVBar(offsetEndMeasure, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False)
 
         for barLine in measure[music21.bar.Barline]:
+            offset = measure.offset + barLine.offset
+
             if type(barLine) == music21.bar.Repeat:
+
                 if barLine.direction == 'start':
                     start = True
                 else:
                     start = False
-                offset = measure.offset + barLine.offset
 
                 self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start, rectangle=True)
                 self._plotDots(offset, start)
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'final':
 
-                offset = measure.offset + barLine.offset
-
                 self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start=False, rectangle=True)
+
+            if type(barLine) == music21.bar.Barline and barLine.type == 'double':
+
+                self.plotVBar(offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False, double=True)
 
 
     def plotSubdivisionBarlines(self, measure, subdivision):
@@ -71,7 +83,7 @@ class PlotterBarlines:
 
             self.plotVBar(offset, lineWidth, 0, True)
 
-    def plotVBar(self, offset, lineWidth, extension, start, rectangle=False):
+    def plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
 
         line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
         page = self.CanvasCreator.getLinesToPage()[line]
@@ -81,6 +93,9 @@ class PlotterBarlines:
         yPosHigh = yPosLineBase + self.settings["yMax"]
 
         xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+
+        if double:
+            xPos -= 0.003
 
         if not rectangle:
             self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
@@ -116,7 +131,7 @@ class PlotterBarlines:
 
             self.axs[page].add_patch(patch)
 
-    def _plotRepeatBracket(self, measure):
+    def _plotRepeatBrackets(self, measure):
         if measure.getSpannerSites():
             spanner = measure.getSpannerSites()[0]
             if type(spanner) == music21.spanner.RepeatBracket:
@@ -127,7 +142,7 @@ class PlotterBarlines:
                 page = self.CanvasCreator.getLinesToPage()[line]
 
                 yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-                yPosHigh = yPosLineBase + self.settings["yMax"]
+                yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
 
                 xPosStart = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
                 xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
@@ -149,3 +164,45 @@ class PlotterBarlines:
 
                     pass
 
+
+    def _plotRepeatExpressions(self, measure):
+
+        for el in measure.recurse():
+
+            if type(el).__module__ == 'music21.repeat' and music21.repeat.RepeatExpression in inspect.getmro(type(el)):
+
+                offsetMeasure = measure.offset
+
+                line, offsetLine = self.LocationFinder.getLocation(offsetMeasure)
+
+                offsetLine += el.getOffsetInHierarchy(measure)
+                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+
+                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+                yPos = yPosLineBase + self.settings["yMax"] # + self.settings["heightBarline0Extension"]
+                page = self.CanvasCreator.getLinesToPage()[line]
+
+
+                if el.getOffsetInHierarchy(measure) < measure.duration.quarterLength * 0.5:
+                    ha = 'left'
+                    xPos += self.settings["xShiftChords"]
+                else:
+                    ha = 'right'
+                    xPos -= self.settings["xShiftChords"]
+
+                fp = fp1
+                fontsize = 16
+                if el.name == 'segno':
+                    text = "𝄋"
+                elif el.name == 'coda':
+                    text = '𝄌'
+                    fontsize=24
+                else:
+                    text = el.getText()
+                    fp = fp2
+                    fontsize = self.settings['fontSizeNotes']
+
+                self.axs[page].text(xPos, yPos, text,
+                                    fontsize=fontsize,
+                                    fontproperties=fp,
+                                    va='baseline', ha=ha)
