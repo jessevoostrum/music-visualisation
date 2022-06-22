@@ -22,6 +22,8 @@ class PlotterBarlines:
 
         self.axs = CanvasCreator.getAxs()
 
+        self.spannedMeasures = self._getSpannedMeasures()
+
 
     def plotBarlines(self):
 
@@ -132,37 +134,35 @@ class PlotterBarlines:
             self.axs[page].add_patch(patch)
 
     def _plotRepeatBrackets(self, measure):
-        if measure.getSpannerSites():
-            spanner = measure.getSpannerSites()[0]
-            if type(spanner) == music21.spanner.RepeatBracket:
+        if measure.number in self.spannedMeasures:
+            spanner = self.spannedMeasures[measure.number]
+            offset = measure.offset
 
-                offset = measure.offset
+            line, offsetLine = self.LocationFinder.getLocation(offset, start=True)
+            page = self.CanvasCreator.getLinesToPage()[line]
 
-                line, offsetLine = self.LocationFinder.getLocation(offset, start=True)
-                page = self.CanvasCreator.getLinesToPage()[line]
+            yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+            yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
 
-                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-                yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
+            xPosStart = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+            xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
 
-                xPosStart = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
-                xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
+            lineWidth = self.settings["lineWidth0"]
+            self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
+                                  linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
 
-                lineWidth = self.settings["lineWidth0"]
-                self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
+            if spanner.isFirst(measure):
+                number = spanner.number + "."
+                self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number)
+
+                self.axs[page].vlines(xPosStart, yPosHigh + 0.01, yPosHigh + 0.02,
                                       linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
 
-                if spanner.isFirst(measure):
-                    number = spanner.number + "."
-                    self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number)
+            if spanner.isLast(measure):
+                # self.axs[page].vlines(xPosEnd, yPosHigh + 0.01, yPosHigh + 0.02,
+                #                       linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
 
-                    self.axs[page].vlines(xPosStart, yPosHigh + 0.01, yPosHigh + 0.02,
-                                          linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
-
-                if spanner.isLast(measure):
-                    # self.axs[page].vlines(xPosEnd, yPosHigh + 0.01, yPosHigh + 0.02,
-                    #                       linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
-
-                    pass
+                pass
 
 
     def _plotRepeatExpressions(self, measure):
@@ -206,3 +206,16 @@ class PlotterBarlines:
                                     fontsize=fontsize,
                                     fontproperties=fp,
                                     va='baseline', ha=ha)
+
+    def _getSpannedMeasures(self):
+        includedMeasuresDict = {}
+        spanners = self.streamObj[music21.spanner.RepeatBracket]
+        for sp in spanners:
+            spannedMeasures = sp.getSpannedElements()
+            measureNumberFirst = spannedMeasures[0].measureNumber
+            measureNumberLast = spannedMeasures[-1].measureNumber
+
+            for includedMeasure in np.arange(measureNumberFirst, measureNumberLast + 1):
+                includedMeasuresDict[includedMeasure] = sp
+
+        return includedMeasuresDict
