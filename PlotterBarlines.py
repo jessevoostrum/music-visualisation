@@ -64,7 +64,7 @@ class PlotterBarlines:
 
                 self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start=False, rectangle=True)
 
-            if type(barLine) == music21.bar.Barline and barLine.type == 'double':
+            if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
 
                 self.plotVBar(offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False, double=True)
 
