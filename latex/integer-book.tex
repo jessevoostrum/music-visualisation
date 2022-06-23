@@ -1,14 +1,27 @@
 \documentclass{article}
 
+\usepackage[bottom=90pt, footskip=70pt]{geometry}
 \usepackage{pdfpages}
 \usepackage{fancyhdr}
 \usepackage{fontspec}
 \setmainfont[Mapping=tex-text-ms]{Vulf Mono Light Italic}
-\usepackage[hidelinks]{hyperref}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,   
+    urlcolor=cyan,
+    pdftitle={The Integer Book},
+    }
 
 
-\setlength{\footskip}{80pt}
+\pagestyle{plain}
 
+% \fancyhead[L,C, R]{}
+% \fancyfoot[L, R]{}
+% \fancyfoot[C]{\thepage}
+% \renewcommand{\headrulewidth}{0.4pt}
+% \renewcommand{\footrulewidth}{2pt}
+
+% \setlength{\footskip}{90pt}  % controls the length between text block and page number, alternatively the geometry package can be used to set these parameters
 
 
 \begin{document}
@@ -22,10 +35,12 @@
 	{\Large Jesse van Oostrum}
 \end{titlepage}
 
-\tableofcontents    
+\tableofcontents
+\newpage
 
+\input{introduction.tex}
 
-\input{../inputTexFile.txt}
+\input{../inputTexFile2.txt}
 
 \end{document}
 
