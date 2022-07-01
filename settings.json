@@ -33,6 +33,7 @@
   "mutationAspect": 0.3,
   "font": "Vulf Mono",
   "fontSizeAccidentalRelative": 0.7,
-  "hDistanceChordAddition": -0.1
+  "hDistanceChordAddition": -0.1,
+  "widthThickBarline": 0.002
 }
 
