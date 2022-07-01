@@ -59,6 +59,7 @@ class PlotterBarlines:
 
                 self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start, rectangle=True)
                 self._plotDots(offset, start)
+                self._plotHBar(offset, start)
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'final':
 
@@ -103,11 +104,12 @@ class PlotterBarlines:
             self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
                               linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
         else:
-            width = 0.002
+            width = self.settings["widthThickBarline"]
             if not start:
                 xPos -= width
-            patch = Rectangle((xPos, yPosLow), width=width, height=self.settings["yMax"] + extension - self.settings["yMin"], color='grey', fill=True)
+            patch = Rectangle((xPos, yPosLow), width=width, height=self.settings["yMax"] + extension - self.settings["yMin"], color='grey', fill=True, zorder=.5)
             self.axs[page].add_patch(patch)
+
 
     def _plotDots(self, offset, start):
         line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
@@ -120,17 +122,44 @@ class PlotterBarlines:
 
         xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
-        shift = - 0.0065
+        shift = - self.settings["widthThickBarline"] * 0.5  # - 0.0065
         if start:
             shift = shift * -1
-
         xPos = xPos + shift
 
         for i in [-1, 1]:
 
+            distance = 0.007
             xyRatio =  self.settings["widthA4"] / self.settings["heightA4"]
-            patch = Ellipse((xPos, yPos + i*0.005), width=0.003, height=0.003*xyRatio, color='grey')
+            patch = Ellipse((xPos, yPos + i*distance), width=self.settings["widthThickBarline"], height=self.settings["widthThickBarline"]*xyRatio, color='grey')
 
+            self.axs[page].add_patch(patch)
+
+            # height = 0.008
+            # patch = Rectangle((xPos - 0.5 * self.settings["widthThickBarline"], yPos + i * distance - height/2), width=self.settings["widthThickBarline"], height=height, color='white', zorder=0.5)
+            # self.axs[page].add_patch(patch)
+
+        margin = 0.007
+        patch = Rectangle((xPos - 0.5 * self.settings["widthThickBarline"] - 0.0001, yPos - distance - margin),
+                          width=self.settings["widthThickBarline"] + 0.0002, height=2 * distance + 2 * margin, color='white', zorder=0.5)
+
+        self.axs[page].add_patch(patch)
+
+    def _plotHBar(self, offset, start):
+        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
+        page = self.CanvasCreator.getLinesToPage()[line]
+
+        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+        yPosLow = yPosLineBase + self.settings["yMin"]
+        yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
+
+        width = 0.008
+        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+        if not start:
+            xPos -= width
+
+        for yPos in [yPosLow, yPosHigh - self.settings["widthThickBarline"]]:
+            patch = Rectangle((xPos, yPos), height=self.settings["widthThickBarline"], width=width, color='grey')
             self.axs[page].add_patch(patch)
 
     def _plotRepeatBrackets(self, measure):
