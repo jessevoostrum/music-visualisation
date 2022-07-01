@@ -39,18 +39,18 @@ class PlotterMetadata:
 
         self.ax.text(self.xPosRight, height,
                           self._getComposer(), fontsize=10, horizontalalignment='right',
-        verticalalignment='center')
+        verticalalignment='baseline')
 
     def _plotPlayer(self):
-        self.ax.text(self.xPosRight, self.settings["yPosPlayer"],
+        self.ax.text(self.xPosRight, self.settings["yPosComposer"],
                           self._getPlayer(), fontsize=10, horizontalalignment='right',
-                          verticalalignment='center')
+                          verticalalignment='baseline')
 
     def _plotKey(self):
 
         self.ax.text(self.xPosLeft, self.settings["yPosPlayer"],
                           f"1 = {self._getKeyLetter()} ", fontsize=10, horizontalalignment='left',
-                          verticalalignment='center')
+                          verticalalignment='baseline')
 
     def _getSongTitle(self):
         try:

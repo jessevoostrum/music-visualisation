@@ -11,7 +11,7 @@
   "widthMarginLine": 0.025,
   "xMinimalPickupMeasureSpaceFraction": 0.125,
   "vMarginLineTop": 0.03,
-  "vMarginFirstLineTop": 0.015,
+  "vMarginFirstLineTop": 0.03,
   "vMarginBottomMinimal": 0.05,
   "alpha": 0.2,
   "facecolor": "blue",
