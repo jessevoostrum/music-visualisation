@@ -40,6 +40,8 @@ class PlotterBarlines:
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
 
+            self._plotTimeSignature(measure)
+
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
             self.plotVBar(measure.offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=True)
@@ -235,6 +237,26 @@ class PlotterBarlines:
                                     fontsize=fontsize,
                                     fontproperties=fp,
                                     va='baseline', ha=ha)
+
+    def _plotTimeSignature(self, measure):
+        if measure[music21.meter.TimeSignature]:
+            ts = measure[music21.meter.TimeSignature][0]
+            ts = f"{ts.numerator}/{ts.denominator}"
+
+            line, offsetLine = self.LocationFinder.getLocation(measure.offset, start=True)
+            page = self.CanvasCreator.getLinesToPage()[line]
+
+            yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+            yPosHigh = yPosLineBase + self.settings["yMax"]
+            yPos = yPosHigh # + self.settings["yPosPlayer"] - (1 - self.settings["yLengthTitleAx"])
+
+            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChords"]
+
+            self.axs[page].text(xPos, yPos, ts,
+                                fontsize=10,
+                                va='baseline', ha='left')
+
+
 
     def _getSpannedMeasures(self):
         includedMeasuresDict = {}
