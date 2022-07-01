@@ -101,8 +101,11 @@ class Visualiser:
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
-        pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
-        return pitchSpan[0], pitchSpan[1]
+        if p.getPitchSpan(self.streamObj):
+            pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
+            return pitchSpan[0], pitchSpan[1]
+        else:
+            return 1, 10
 
     def _getRangeYs(self):
         numTones = self.noteHighest - self.noteLowest + 1
