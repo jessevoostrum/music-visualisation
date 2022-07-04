@@ -34,6 +34,7 @@
   "fontSizeAccidentalRelative": 0.7,
   "hDistanceChordAddition": -0.1,
   "widthThickBarline": 0.002,
-  "timeSignatureWithBarlines": true
+  "timeSignatureWithBarlines": true,
+  "lyrics": false
 }
 
