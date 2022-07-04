@@ -11,7 +11,7 @@
   "widthMarginLine": 0.025,
   "xMinimalPickupMeasureSpaceFraction": 0.125,
   "vMarginLineTop": 0.03,
-  "vMarginFirstLineTop": 0.015,
+  "vMarginFirstLineTop": 0.03,
   "vMarginBottomMinimal": 0.05,
   "alpha": 0.2,
   "facecolor": "blue",
@@ -27,12 +27,13 @@
   "lineWidth0": 1,
   "lineWidth1": 1,
   "lineWidth2": 0.2,
-  "heightBarline0Extension": 0.007,
   "xMarginNote": 0.001,
   "radiusCorners": 0.006,
   "mutationAspect": 0.3,
   "font": "Vulf Mono",
   "fontSizeAccidentalRelative": 0.7,
-  "hDistanceChordAddition": -0.1
+  "hDistanceChordAddition": -0.1,
+  "widthThickBarline": 0.002,
+  "timeSignatureWithBarlines": true
 }
 

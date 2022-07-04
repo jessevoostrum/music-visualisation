@@ -5,10 +5,13 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 from Visualiser import Visualiser
 
-dir_notes = '/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/projects/music_software/IFR_animation/notes/'
+# dir_notes = '/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/projects/music_software/IFR_animation/notes/'
+dir_notes = 'notes/'
 
 filename_bass = 'sample_songs_bass.txt'
-filename_standards = 'sample_songs.txt'
+# filename_standards = 'sample_songs.txt'
+filename_standards = 'standards.txt'
+
 
 dir_songs_bass = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/"
 dir_songs_standards = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
@@ -37,7 +40,11 @@ for line in lines:
 
     line = line.rstrip('\n')
 
-    streamObj = music21.converter.parse(path_songs + line)
+    try:
+        streamObj = music21.converter.parse(path_songs + line)
 
-    vis = Visualiser(streamObj, settings)
-    vis.generate("output/")
+        vis = Visualiser(streamObj, settings)
+
+        vis.generate("output-standards/")
+    except:
+        pass
