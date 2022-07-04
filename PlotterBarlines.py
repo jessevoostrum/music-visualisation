@@ -32,15 +32,15 @@ class PlotterBarlines:
             self.plotMeasureBarlines(measure)
 
             if self.settings["subdivision"] >= 1:
-                self.plotSubdivisionBarlines(measure, 1)
+                self.plotSubdivisionBarlines(measure, 1, self.settings["lineWidth1"])
 
             if self.settings["subdivision"] >= 2:
-                self.plotSubdivisionBarlines(measure, 2)
+                self.plotSubdivisionBarlines(measure, 0.25, self.settings["lineWidth2"])
 
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
 
-            self._plotTimeSignature(measure)
+            self._plotTimeSignature(measure, self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1])
 
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
@@ -72,13 +72,7 @@ class PlotterBarlines:
                 self.plotVBar(offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False, double=True)
 
 
-    def plotSubdivisionBarlines(self, measure, subdivision):
-        if subdivision == 1:
-            step = 1
-            lineWidth = self.settings["lineWidth1"]
-        elif subdivision == 2:
-            step = 0.25
-            lineWidth = self.settings["lineWidth2"]
+    def plotSubdivisionBarlines(self, measure, step, lineWidth):
 
         for t in np.arange(0, measure.quarterLength, step=step):
             if measure.number == 0:
@@ -210,7 +204,7 @@ class PlotterBarlines:
                 xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
                 yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-                yPos = yPosLineBase + self.settings["yMax"] # + self.settings["heightBarline0Extension"]
+                yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
                 page = self.CanvasCreator.getLinesToPage()[line]
 
 
@@ -222,39 +216,55 @@ class PlotterBarlines:
                     xPos -= self.settings["xShiftChords"]
 
                 fp = fp1
-                fontsize = 16
+                va = 'bottom'
                 if el.name == 'segno':
                     text = "𝄋"
+                    fontsize =  self.settings['fontSizeSegno']
                 elif el.name == 'coda':
                     text = '𝄌'
-                    fontsize=24
+                    fontsize = self.settings['fontSizeCoda']
                 else:
                     text = el.getText()
                     fp = fp2
                     fontsize = self.settings['fontSizeNotes']
+                    va = 'baseline'
 
                 self.axs[page].text(xPos, yPos, text,
                                     fontsize=fontsize,
                                     fontproperties=fp,
-                                    va='baseline', ha=ha)
+                                    va=va, ha=ha)
 
-    def _plotTimeSignature(self, measure):
-        if measure[music21.meter.TimeSignature]:
-            ts = measure[music21.meter.TimeSignature][0]
-            ts = f"{ts.numerator}/{ts.denominator}"
+    def _plotTimeSignature(self, measure, firstMeasure):
 
-            line, offsetLine = self.LocationFinder.getLocation(measure.offset, start=True)
-            page = self.CanvasCreator.getLinesToPage()[line]
+        if self.settings["timeSignatureWithBarlines"]:
 
-            yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
-            yPosHigh = yPosLineBase + self.settings["yMax"]
-            yPos = yPosHigh # + self.settings["yPosPlayer"] - (1 - self.settings["yLengthTitleAx"])
+            if measure[music21.meter.TimeSignature]:
+                if measure.number == 0:
+                    measure = firstMeasure
+                self.plotSubdivisionBarlines(measure, 1, self.settings["lineWidth2"])
 
-            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChords"]
+        else:
+            if measure[music21.meter.TimeSignature]:
 
-            self.axs[page].text(xPos, yPos, ts,
-                                fontsize=10,
-                                va='baseline', ha='left')
+                ts = measure[music21.meter.TimeSignature][0]
+                ts = f"{ts.numerator}/{ts.denominator}"
+
+                if measure.number == 0:
+                    measure = firstMeasure
+
+                line, offsetLine = self.LocationFinder.getLocation(measure.offset, start=True)
+                page = self.CanvasCreator.getLinesToPage()[line]
+
+                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+                yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
+
+
+                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength / 2)
+
+                self.axs[page].text(xPos, yPos, ts,
+                                    fontsize=10,
+                                    va='baseline', ha='center')
+
 
 
 
