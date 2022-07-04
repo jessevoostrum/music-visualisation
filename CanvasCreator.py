@@ -102,7 +102,7 @@ class CanvasCreator:
         if self.linesToPage[line] == 0:
             yPosLineBase -= self.settings["yLengthTitleAx"]
         else:
-            yPosLineBase -= self.settings["vMarginLineTop"]
+            yPosLineBase -= self.settings["vMarginFirstLineTop"]
         return yPosLineBase
 
 

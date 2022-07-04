@@ -26,12 +26,12 @@ class LocationFinder:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
+            # start new line when new section of song starts
             elif measure.flat.getElementsByClass(music21.expressions.RehearsalMark).first() and not measure.number == 1:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
             elif measure.getSpannerSites():
-
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
                     if int(spanner.number) > 1:
@@ -44,7 +44,6 @@ class LocationFinder:
                 xsStartLine.append(0)
 
             if measure.getSpannerSites():
-
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
                     if spanner.number == '1':

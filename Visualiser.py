@@ -101,8 +101,11 @@ class Visualiser:
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
-        pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
-        return pitchSpan[0], pitchSpan[1]
+        if p.getPitchSpan(self.streamObj):
+            pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
+            return pitchSpan[0], pitchSpan[1]
+        else:
+            return 1, 10
 
     def _getRangeYs(self):
         numTones = self.noteHighest - self.noteLowest + 1
@@ -145,6 +148,9 @@ class Visualiser:
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
         settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
+        settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
+        settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']
+        settings["heightBarline0Extension"] = settings['capsizeNumberNote']
         return settings
 
 
@@ -152,9 +158,9 @@ if __name__ == '__main__':
 
     path = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
     song = "Alone_Together_Lead_sheet_with_lyrics_.mxl"
-    song = "Misty.mxl"
+    # song = "Misty.mxl"
     s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/selection/Misty.mxl")
-    # s = music21.converter.parse(path+song)
+    s = music21.converter.parse(path+song)
     # s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
 
     # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
