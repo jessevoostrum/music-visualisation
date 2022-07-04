@@ -61,7 +61,8 @@ class PlotterNotes(Plotter):
         self.plotRectangle(el, page, xLength, xPos, yPos)
         self.plotNumber(el, page, xLength, xPos, yPos)
 
-                self.plotLyric(el, page, xLength, xPos, yPosLineBase)
+        if self.settings["lyrics"]:
+            self.plotLyric(el, page, xLength, xPos, yPosLineBase)
 
     def plotRectangle(self, el, page, xLength, xPos, yPos):
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
@@ -108,7 +109,7 @@ class PlotterNotes(Plotter):
         xPosCenter = xPos # + 0.5 * xLength
         yPos -= self.settings['barSpace'] * 0.5
         self.axs[page].text(xPosCenter, yPos, lyric,
-                            fontsize=7,
+                            fontsize=5,
                             va='baseline', ha='left')
 
     def adjustVisualParametersForGhostNote(self, el):
