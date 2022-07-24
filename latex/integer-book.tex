@@ -5,12 +5,13 @@
 \usepackage{fancyhdr}
 \usepackage{fontspec}
 \setmainfont[Mapping=tex-text-ms]{Vulf Mono Light Italic}
-\usepackage{hyperref}
+\usepackage[]{hyperref}
 \hypersetup{
     hidelinks,   
-    urlcolor=cyan,
     pdftitle={The Integer Book},
+    % bookmarksopenlevel=2      does not work with xelatex?
     }
+
 
 
 \pagestyle{plain}
@@ -39,7 +40,6 @@
         \makebox[\textwidth][c]{\includegraphics[width=18cm]{/Users/jvo/Documents/music-visualisation/output/logo2.png}}
     \end{figure}
 
-    % \includepdf[]{/Users/jvo/Documents/music-visualisation/output/logo.pdf}
 \end{titlepage}
 
 \tableofcontents
@@ -47,7 +47,7 @@
 
 \input{introduction.tex}
 
-\input{../inputTexFile2.txt}
+\input{../inputTexFile.txt}
 
 \end{document}
 
