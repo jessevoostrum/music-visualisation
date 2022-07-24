@@ -40,7 +40,11 @@ class PlotterBarlines:
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
 
-            self._plotTimeSignature(measure, self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1])
+            if measure.number == 0:
+                firstMeasure = self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1]
+            else:
+                firstMeasure = measure
+            self._plotTimeSignature(measure, firstMeasure)
 
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
