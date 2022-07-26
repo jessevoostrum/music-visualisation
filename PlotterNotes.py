@@ -49,13 +49,13 @@ class PlotterNotes(Plotter):
 
     def _plotNote(self, el, offset=None):
         if not offset:
-            offset = el.getOffsetInHierarchy(self.streamObj)  # + self.xExtensionNoteWhenTied
+            offset = el.getOffsetInHierarchy(self.streamObj)
         line, offsetLine = self.LocationFinder.getLocation(offset)
         yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
         yPos = yPosLineBase + yPosWithinLine
         page = self.linesToPage[line]
-        offsetLength = el.duration.quarterLength  # - 2 * self.xExtensionNoteWhenTied
+        offsetLength = el.duration.quarterLength
         xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
         xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
         self.plotRectangle(el, page, xLength, xPos, yPos)
@@ -106,7 +106,7 @@ class PlotterNotes(Plotter):
             syllabic = el.lyrics[0].syllabic
             if syllabic == 'begin' or syllabic == 'middle':
                 lyric += "-"
-        xPosCenter = xPos # + 0.5 * xLength
+        xPosCenter = xPos + self.settings["xShiftNumberNote"] / 2
         yPos -= self.settings['barSpace'] * 0.5
         self.axs[page].text(xPosCenter, yPos, lyric,
                             fontsize=5,
