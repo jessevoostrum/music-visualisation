@@ -41,9 +41,10 @@ class Visualiser:
     def __init__(self, streamObj, settings):
         self.streamObj = streamObj
 
-        self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
-
         self.settings = self._computeSettings(settings)
+
+
+        self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
 
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
@@ -151,7 +152,13 @@ class Visualiser:
         settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
         settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']
         settings["heightBarline0Extension"] = settings['capsizeNumberNote']
+        settings["lengthFirstMeasure"] = self._getLengthFirstMeasure()
+        settings["offsetLineMax"] = settings["lengthFirstMeasure"] * settings["measuresPerLine"]
         return settings
+
+    def _getLengthFirstMeasure(self):
+        length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
+        return length
 
 
 if __name__ == '__main__':
