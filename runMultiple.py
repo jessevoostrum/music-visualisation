@@ -34,6 +34,13 @@ else:
 with open(path_note) as f:
     lines = f.readlines()
 
+
+dirStandards = dir_songs_standards
+
+lines = glob.glob(dirStandards + '*' + '.mxl')
+lines = [os.path.basename(line) for line in lines]
+lines.sort()
+
 for line in lines:
 
     print(line)
