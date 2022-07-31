@@ -1,22 +1,6 @@
-"""Jesse van Oostrum, November 12021
-TODO:
-
-- center number within 8th note or move it more to the left?
-- for minor songs choice what is 1
-- font title
-- hammerOn pullOff
-- work further on glissandos and other suggestions Jim
-- multiple notes in chord
-- repetition barLines and A, B, C part markers more clearly
-- chord verbosity
-- rewrite CanvasCreator so that it only creates a page and location management is all done in Plotter
-
-rename
-- Barline, facecolor, linewidth, etc.
-- chordToneRatio
+"""Jesse van Oostrum"""
 
 
-"""
 import json
 import music21
 
