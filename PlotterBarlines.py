@@ -90,14 +90,10 @@ class PlotterBarlines:
 
     def plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
 
-        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
-        page = self.CanvasCreator.getLinesToPage()[line]
+        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
 
-        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"]
-
-        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
         if double:
             xPos -= 0.003
@@ -114,15 +110,11 @@ class PlotterBarlines:
 
 
     def _plotDots(self, offset, start):
-        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
-        page = self.CanvasCreator.getLinesToPage()[line]
+        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
 
-        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
         yPos = (yPosHigh + yPosLow)/2
-
-        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
 
         shift = - self.settings["widthThickBarline"] * 0.5  # - 0.0065
         if start:
@@ -137,10 +129,6 @@ class PlotterBarlines:
 
             self.axs[page].add_patch(patch)
 
-            # height = 0.008
-            # patch = Rectangle((xPos - 0.5 * self.settings["widthThickBarline"], yPos + i * distance - height/2), width=self.settings["widthThickBarline"], height=height, color='white', zorder=0.5)
-            # self.axs[page].add_patch(patch)
-
         margin = 0.007
         patch = Rectangle((xPos - 0.5 * self.settings["widthThickBarline"] - 0.0001, yPos - distance - margin),
                           width=self.settings["widthThickBarline"] + 0.0002, height=2 * distance + 2 * margin, color='white', zorder=0.5)
@@ -148,15 +136,13 @@ class PlotterBarlines:
         self.axs[page].add_patch(patch)
 
     def _plotHBar(self, offset, start):
-        line, offsetLine = self.LocationFinder.getLocation(offset, start=start)
-        page = self.CanvasCreator.getLinesToPage()[line]
+        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
 
-        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
 
         width = 0.008
-        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+
         if not start:
             xPos -= width
 
@@ -169,13 +155,10 @@ class PlotterBarlines:
             spanner = self.spannedMeasures[measure.number]
             offset = measure.offset
 
-            line, offsetLine = self.LocationFinder.getLocation(offset, start=True)
-            page = self.CanvasCreator.getLinesToPage()[line]
+            page, yPosLineBase, xPosStart = self.CanvasCreator.getLocation(offset, start=True)
 
-            yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
             yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
 
-            xPosStart = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
             xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
 
             lineWidth = self.settings["lineWidth0"]
@@ -202,16 +185,13 @@ class PlotterBarlines:
 
             if type(el).__module__ == 'music21.repeat' and music21.repeat.RepeatExpression in inspect.getmro(type(el)):
 
-                offsetMeasure = measure.offset
+                offset = measure.offset
 
-                line, offsetLine = self.LocationFinder.getLocation(offsetMeasure)
+                page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start=True)
 
-                offsetLine += el.getOffsetInHierarchy(measure)
-                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
+                xPos += self.CanvasCreator.getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
 
-                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
                 yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
-                page = self.CanvasCreator.getLinesToPage()[line]
 
 
                 if el.getOffsetInHierarchy(measure) < measure.duration.quarterLength * 0.5:
@@ -258,20 +238,15 @@ class PlotterBarlines:
                 if measure.number == 0:
                     measure = firstMeasure
 
-                line, offsetLine = self.LocationFinder.getLocation(measure.offset, start=True)
-                page = self.CanvasCreator.getLinesToPage()[line]
+                page, yPosLineBase, xPos = self.CanvasCreator.getLocation(measure.offset, start=True)
 
-                yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+                xPos += self.CanvasCreator.getXLengthFromOffsetLength(measure.quarterLength / 2)
+
                 yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
-
-
-                xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength / 2)
 
                 self.axs[page].text(xPos, yPos, ts,
                                     fontsize=10,
                                     va='baseline', ha='center')
-
-
 
 
     def _getSpannedMeasures(self):

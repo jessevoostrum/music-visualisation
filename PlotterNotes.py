@@ -35,7 +35,6 @@ class PlotterNotes(Plotter):
 
     def plotNotes(self):
 
-        # loop through elements in stream
         for el in self.streamObj.recurse():
 
             if type(el) == music21.note.Note:
@@ -50,13 +49,10 @@ class PlotterNotes(Plotter):
     def _plotNote(self, el, offset=None):
         if not offset:
             offset = el.getOffsetInHierarchy(self.streamObj)
-        line, offsetLine = self.LocationFinder.getLocation(offset)
-        yPosLineBase = self.CanvasCreator.getYPosLineBase(line)
+        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset)
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
         yPos = yPosLineBase + yPosWithinLine
-        page = self.linesToPage[line]
         offsetLength = el.duration.quarterLength
-        xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine)
         xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
         self.plotRectangle(el, page, xLength, xPos, yPos)
         self.plotNumber(el, page, xLength, xPos, yPos)

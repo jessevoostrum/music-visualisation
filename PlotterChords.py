@@ -22,11 +22,11 @@ class PlotterChords(Plotter):
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
         for chord in chords:
-            line, offsetLine = self.LocationFinder.getLocation(chord.offset)
-            xPos = self.CanvasCreator.getXPosFromOffsetLine(offsetLine) + self.settings["xShiftChords"]
+            offset = chord.offset
+            page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset)
 
-            yPos = self.yMin + self.CanvasCreator.getYPosLineBase(line)
-            page = self.CanvasCreator.getLinesToPage()[line]
+            xPos = xPos + self.settings["xShiftChords"]
+            yPos = self.yMin + yPosLineBase
 
             self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
