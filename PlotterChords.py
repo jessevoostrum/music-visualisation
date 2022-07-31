@@ -15,8 +15,6 @@ class PlotterChords(Plotter):
         self.LocationFinder = LocationFinder
         self.CanvasCreator = CanvasCreator
 
-        # self.axs = CanvasCreator.getAxs()
-
         self.yMin = self.settings["yMin"]
 
         self.key = settings["key"]
@@ -32,9 +30,9 @@ class PlotterChords(Plotter):
 
             self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-            lengthAddition = self._plotAddition(chord, xPos, yPos, page)
+            self._plotAddition(chord, xPos, yPos, page)
 
-            self._plotBass(chord, xPos, yPos, page, lengthAddition)
+            self._plotBass(chord, xPos, yPos, page)
 
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
@@ -60,7 +58,6 @@ class PlotterChords(Plotter):
                             # fontname='Arial',
                             fontweight=1)
 
-        # return lengthAddition
 
     def _findAddition(self, chordSymbol):
         addition = ""
@@ -99,8 +96,25 @@ class PlotterChords(Plotter):
 
         return addition
 
-    def _plotBass(self, chord, xPos, yPos, page, lengthAddition):
-        pass
+    def _plotBass(self, chordSymbol, xPos, yPos, page):
+        bass = None
+
+        if chordSymbol.bass() is not None:
+            if chordSymbol.root().name != chordSymbol.bass().name:
+                bass = '/' + self._getNumberWithAccidental(chordSymbol.bass())
+
+        fontSize = self.settings['fontSizeChords']
+
+
+        if bass:
+            self.axs[page].text(xPos + (1 + self.settings["hDistanceChordAddition"]) * self.settings["widthNumberRelative"] * fontSize,
+                            yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.3, bass,
+                            fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
+                            va='top', ha='left',
+                            # fontname='Arial',
+                            fontweight=1)
+
+
 
     def _findFigure(self, chordSymbol):
 

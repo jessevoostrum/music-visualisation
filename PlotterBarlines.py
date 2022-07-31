@@ -44,7 +44,9 @@ class PlotterBarlines:
                 firstMeasure = self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1]
             else:
                 firstMeasure = measure
-            self._plotTimeSignature(measure, firstMeasure)
+
+            if self.settings["subdivision"] == 0:
+                self._plotTimeSignature(measure, firstMeasure)
 
     def plotMeasureBarlines(self, measure):
         if not measure.number == 0:
@@ -69,11 +71,11 @@ class PlotterBarlines:
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'final':
 
-                self.plotVBar(offset, self.settings["lineWidth0"] + 1, self.settings["heightBarline0Extension"], start=False, rectangle=True)
+                self.plotVBar(offset, None, self.settings["heightBarline0Extension"], start=False, rectangle=True)
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
 
-                self.plotVBar(offset, self.settings["lineWidth0"], self.settings["heightBarline0Extension"], start=False, double=True)
+                self.plotVBar(offset, None, self.settings["heightBarline0Extension"], start=False, double=True)
 
 
     def plotSubdivisionBarlines(self, measure, step, lineWidth):
