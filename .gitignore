@@ -4,6 +4,8 @@ __pycache__/
 scratch/
 .idea/
 sheetMusic/
+*.ipynb_checkpoints/
+*output/
 
 
 ## Core latex/pdflatex auxiliary files:

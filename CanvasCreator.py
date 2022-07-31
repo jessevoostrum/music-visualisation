@@ -24,24 +24,25 @@ rcParams['font.weight'] = 'light'
 
 
 class CanvasCreator:
-    def __init__(self, settings, numLines, lengthPickupMeasure):
+    def __init__(self, settings, LocationFinder):
 
         self.settings = settings
+        self.LocationFinder = LocationFinder
 
         self.yMin = self.settings["yMin"]
         self.yMax = self.settings["yMax"]
-        self.heightAxs = self.yMax - self.yMin + settings["vMarginLineTop"]
+        self.heightLine = self.yMax - self.yMin + settings["vMarginLineTop"]
 
         self.offsetLineMax = settings["offsetLineMax"]
 
-        self.lengthPickupMeasure = lengthPickupMeasure
+        self.lengthPickupMeasure = LocationFinder.getLengthPickupMeasure()
 
         self.figs = []
         self.axs = []
         self.linesToPage = []
         self.linesToLineOnPage = []
 
-        self._createCanvas(numLines)
+        self._createCanvas(LocationFinder.getNumLines())
 
     def _createCanvas(self, numLines):
 
@@ -73,9 +74,9 @@ class CanvasCreator:
     def _getNumLinesPageMax(self, isFirstPage):
         """returns the number of lines that fits on the page"""
         if isFirstPage:
-            return math.floor((1 - self.settings["yLengthTitleAx"] - self.settings["vMarginBottomMinimal"]) / self.heightAxs)
+            return math.floor((1 - self.settings["yLengthTitleAx"] - self.settings["vMarginBottomMinimal"]) / self.heightLine)
         else:
-            return math.floor((1 - self.settings["vMarginFirstLineTop"] - self.settings["vMarginBottomMinimal"]) / self.heightAxs)
+            return math.floor((1 - self.settings["vMarginFirstLineTop"] - self.settings["vMarginBottomMinimal"]) / self.heightLine)
 
     def getAxs(self):
         return self.axs
@@ -94,7 +95,7 @@ class CanvasCreator:
 
     def getYPosLineBase(self, line):
         heightLine = self.settings["yMax"] - self.settings["yMin"]
-        yPosLineBase = 1 - self.linesToLineOnPage[line] * (heightLine + self.settings["vMarginLineTop"]) - self.settings["yMax"]
+        yPosLineBase = 1 - self.linesToLineOnPage[line] * self.heightLine - self.settings["yMax"] - self.settings["vMarginLineTop"]
         if self.linesToPage[line] == 0:
             yPosLineBase -= self.settings["yLengthTitleAx"]
         else:
@@ -125,3 +126,13 @@ class CanvasCreator:
         xPos = self.settings["widthMarginLine"] + self.getXLengthFromOffsetLength((self._getPickupMeasureSpace() + offsetLine))
 
         return xPos
+
+
+    def getLocation(self, offset, start=True):
+
+        line, offsetLine = self.LocationFinder.getLocation(offset, start)
+        yPosLineBase = self.getYPosLineBase(line)
+        page = self.linesToPage[line]
+        xPos = self.getXPosFromOffsetLine(offsetLine)
+
+        return page, yPosLineBase, xPos

@@ -63,7 +63,7 @@ class LocationFinder:
 
     def getLocation(self, offset, start=True):
         """ returns a tuple (line, x) given an offset"""
-
+        line = 0
         for idx, offsetStartLine in enumerate(self.offsetsStartLine):
             if start and offset >= offsetStartLine:
                 line = idx

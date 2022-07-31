@@ -28,10 +28,8 @@ class Visualiser:
 
         self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
 
-        self.CanvasCreator = CanvasCreator(settings,
-                                           self.LocationFinder.getNumLines(),
-                                           self.LocationFinder.getLengthPickupMeasure(),
-                                           )
+        self.CanvasCreator = CanvasCreator(settings, self.LocationFinder)
+
         self.PlotterNotes = PlotterNotes(self.streamObj, settings,
                                self.LocationFinder, self.CanvasCreator,
                                )
@@ -123,11 +121,19 @@ class Visualiser:
             if self.settings["setInMajorKey"]:
                 key = key1
             else:
-                key = self.streamObj.analyze('key')
+                try:
+                    key = self.streamObj.analyze('key')
+                except:
+                    key = music21.key.Key('C')
+                    print('key analysis failed')
                 if not (key == key1 or key == key1.relative):
                     print("analysed key does not correspond to keysignature")
         else:
-            key = self.streamObj.analyze('key')
+            try:
+                key = self.streamObj.analyze('key')
+            except:
+                key = music21.key.Key('C')
+                print('key analysis failed')
             print("no key signature found")
 
         if self.settings["setInMajorKey"] and key.mode == 'minor':
