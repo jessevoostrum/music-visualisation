@@ -38,18 +38,20 @@ class PlotterMetadata:
             height = self.settings["yPosComposer"]
 
         self.ax.text(self.xPosRight, height,
-                          self._getComposer(), fontsize=10, horizontalalignment='right',
+                          self._getComposer(), fontsize=self.settings["fontSizeMetadata"], horizontalalignment='right',
         verticalalignment='baseline')
 
     def _plotPlayer(self):
-        self.ax.text(self.xPosRight, self.settings["yPosComposer"],
-                          self._getPlayer(), fontsize=10, horizontalalignment='right',
+        self.ax.text(self.xPosRight, self.settings["yPosPlayer"],
+                          self._getPlayer(), fontsize=self.settings["fontSizeMetadata"], horizontalalignment='right',
                           verticalalignment='baseline')
 
     def _plotKey(self):
 
+        letter = self.key.tonic.name[0]
+
         self.ax.text(self.xPosLeft, self.settings["yPosPlayer"],
-                          f"1 = {self._getKeyLetter()} ", fontsize=10, horizontalalignment='left',
+                          f"1 = {self._getKeyLetter()} ", fontsize=self.settings["fontSizeMetadata"], horizontalalignment='left',
                           verticalalignment='baseline')
 
     def _getSongTitle(self):
@@ -78,16 +80,17 @@ class PlotterMetadata:
         return player
 
     def _getKeyLetter(self):
-        # letter = f"\mathrm{{{self.key.tonic.name[0]}}}"
         letter = self.key.tonic.name[0]
         accidental = self.key.tonic.accidental
         if accidental:
             if accidental.name == 'sharp':
-                # letter = f"{letter}^\\#"
                 letter = letter + "{}^\\#"
             elif accidental.name == 'flat':
-                # letter = f"{letter}^b"
                 letter = letter + "{}^b"
+
+        if self.key.mode == 'minor':
+            letter += '-'
+
         letter = f"$\\mathregular{{{letter}}}$"
 
         return letter

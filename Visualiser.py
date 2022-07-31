@@ -1,6 +1,4 @@
 """Jesse van Oostrum"""
-
-
 import json
 import music21
 

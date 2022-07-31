@@ -49,9 +49,10 @@ class PlotterChords(Plotter):
         addition = self._findAddition(chordSymbol)
 
         fontSize = self.settings['fontSizeChords']
+        widthNumber = self.settings["widthNumberRelative"] * fontSize
 
         if addition:
-            self.axs[page].text(xPos + (1 + self.settings["hDistanceChordAddition"]) * self.settings["widthNumberRelative"] * fontSize,
+            self.axs[page].text(xPos + widthNumber + self.settings["hDistanceChordAddition"],
                             yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.7, addition,
                             fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
                             va='baseline', ha='left',
@@ -114,52 +115,6 @@ class PlotterChords(Plotter):
                             # fontname='Arial',
                             fontweight=1)
 
-
-
-    def _findFigure(self, chordSymbol):
-
-        chordNumberWithAccidental = self._getNumberWithAccidental(chordSymbol.root())
-        addition = ""
-
-        kind = chordSymbol.chordKind
-
-        if kind in music21.harmony.CHORD_ALIASES:
-            kind = music21.harmony.CHORD_ALIASES[kind]
-
-        if kind in music21.harmony.CHORD_TYPES:
-            addition += chordTypes.getAbbreviationListGivenChordType(kind)[0]
-
-        bass = ""
-        if chordSymbol.bass() is not None:
-            if chordSymbol.root().name != chordSymbol.bass().name:
-                bass = '/' + self._getNumberWithAccidental(chordSymbol.bass())
-
-
-        for csMod in chordSymbol.chordStepModifications:
-            if csMod.interval is not None:
-                numAlter = csMod.interval.semitones
-                if numAlter > 0:
-                    s = '\\#\!'
-                else:
-                    s = 'b'
-                prefix = s * abs(numAlter)
-                if abs(numAlter) > 0:
-                    prefix = '\,{{}}^' + prefix
-
-                # print("numAlter", numAlter, "\n", "prefix", prefix)
-
-                # addition += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
-                addition += prefix + str(csMod.degree)
-            else:
-                # addition += ' ' + csMod.modType + ' ' + str(csMod.degree)
-                addition += str(csMod.degree)
-
-        if addition != "":
-            figure = '$' + chordNumberWithAccidental + '^{' + addition + '}'+ bass + '$'
-        else:
-            figure = '$' + chordNumberWithAccidental + bass + '$'
-
-        return figure
 
     def _getNumberWithAccidental(self, pitch):
         number, alteration = self.key.getScaleDegreeAndAccidentalFromPitch(pitch)
