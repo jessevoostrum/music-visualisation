@@ -13,7 +13,7 @@
   "xMinimalPickupMeasureSpaceFraction": 0.125,
   "vMarginLineTop": 0.03,
   "vMarginFirstLineTop": 0.03,
-  "vMarginBottomMinimal": 0.05,
+  "vMarginBottomMinimal": 0.02,
   "alpha": 0.2,
   "facecolor": "blue",
   "ptToInches": 0.01389,

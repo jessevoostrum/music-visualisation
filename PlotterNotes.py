@@ -9,7 +9,7 @@ from Plotter import Plotter
 
 class PlotterNotes(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator,  noteLowest, key):
+    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator,):
 
         super().__init__(CanvasCreator.getAxs())
 
@@ -24,12 +24,12 @@ class PlotterNotes(Plotter):
         self.linesToPage = CanvasCreator.getLinesToPage()
 
         self.barSpace = settings["barSpace"]
-        self.noteLowest = noteLowest
+        self.noteLowest = settings["noteLowest"]
 
         self.alpha = settings["alpha"]
         self.facecolor = settings["facecolor"]
 
-        self.key = key
+        self.key = settings["key"]
 
         self.yShiftNumbers = self.computeYShiftNumbers()
 

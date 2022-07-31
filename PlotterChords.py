@@ -5,7 +5,7 @@ from Plotter import Plotter
 
 class PlotterChords(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator, yMin, key):
+    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator):
         super().__init__(CanvasCreator.getAxs())
 
         self.streamObj = streamObj
@@ -17,9 +17,9 @@ class PlotterChords(Plotter):
 
         # self.axs = CanvasCreator.getAxs()
 
-        self.yMin = yMin
+        self.yMin = self.settings["yMin"]
 
-        self.key = key
+        self.key = settings["key"]
 
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
@@ -41,7 +41,7 @@ class PlotterChords(Plotter):
         number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         self.axs[page].text(xPos, yPos, number,
-                            va='bottom', size=self.settings['fontSizeChords'])
+                            va='baseline', size=self.settings['fontSizeChords'])
 
         self.plotAccidental(accidental, self.settings['fontSizeChords'], xPos, yPos, page)
 

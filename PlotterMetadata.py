@@ -6,7 +6,7 @@ import numpy as np
 
 class PlotterMetadata:
 
-    def __init__(self, streamObj, settings, ax, key):
+    def __init__(self, streamObj, settings, ax,):
 
         self.streamObj = streamObj
         self.settings = settings
@@ -15,7 +15,7 @@ class PlotterMetadata:
 
         self.offsetLineMax = settings["offsetLineMax"]
 
-        self.key = key
+        self.key = settings["key"]
 
         self.xPosLeft, self.xPosRight = self._computeXPos()
 

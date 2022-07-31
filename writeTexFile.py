@@ -5,12 +5,12 @@ import os
 
 dirStandards = '/Users/jvo/Documents/music-visualisation/output-standards/'
 
-# with open('notes/standards-pdf.txt', 'r') as reader:
-#     lines = reader.readlines()
-
 lines = glob.glob(dirStandards + '*' + '.pdf')
 lines = [os.path.basename(line) for line in lines]
 lines.sort()
+
+# with open('notes/standards-pdf.txt', 'r') as reader:
+#     lines = reader.readlines()
 
 s0 = Template('\includepdf[pages= $numPage,  pagecommand={\\vspace*{-4.2cm}\phantomsection\\addcontentsline{toc}{section}{$letter} \\vspace*{-4.2cm}\phantomsection\\addcontentsline{toc}{subsection}{$title}}]{$path}')
 s1 = Template('\includepdf[pages= $numPage,  pagecommand={\\vspace*{-4.2cm}\phantomsection\\addcontentsline{toc}{subsection}{$title}}]{$path}')
