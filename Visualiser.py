@@ -41,33 +41,26 @@ class Visualiser:
     def __init__(self, streamObj, settings):
         self.streamObj = streamObj
 
+        self.settings = settings
         self.settings = self._computeSettings(settings)
 
-
         self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
-
-        self.noteLowest, self.noteHighest = self._getRangeNotes()
-        self.chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
-        self.yMin, self.yMax = self._getRangeYs()
-        settings['yMin'], settings['yMax'] = self._getRangeYs()
 
         self.CanvasCreator = CanvasCreator(settings,
                                            self.LocationFinder.getNumLines(),
                                            self.LocationFinder.getLengthPickupMeasure(),
-                                           self.yMin, self.yMax)
-
-        key = self._getKey()
+                                           )
         self.PlotterNotes = PlotterNotes(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator, self.noteLowest,
-                               key)
+                               self.LocationFinder, self.CanvasCreator,
+                               )
         self.PlotterChords = PlotterChords(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator, self.yMin,
-                               key)
+                               self.LocationFinder, self.CanvasCreator,
+                               )
         self.PlotterBarlines = PlotterBarlines(self.streamObj, settings,
                                self.LocationFinder, self.CanvasCreator,
                                )
         self.PlotterMetadata = PlotterMetadata(self.streamObj, settings,
-                               self.CanvasCreator.getAxs()[0], key)
+                               self.CanvasCreator.getAxs()[0])
 
     def generate(self, directoryName):
         self.plot()
@@ -92,13 +85,35 @@ class Visualiser:
 
     def plot(self):
 
-        # plt.rcParams.update({"text.usetex": False})
         self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
-        # plt.rcParams.update({"text.usetex": True})
         self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarlines()
+
+
+
+    def _computeSettings(self, settings):
+        f = open('fontDimensions.json')
+        fontDimensions = json.load(f)
+        settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
+        settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
+        settings['capsizeNumberNote'] = fontDimensions[settings["font"]]["capsize"] * settings['fontSizeNotes']
+        settings['widthNumberNote'] = fontDimensions[settings["font"]]["width"] * settings['fontSizeNotes']
+        settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
+        settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
+        settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
+        settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
+        settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
+        settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']
+        settings["heightBarline0Extension"] = settings['capsizeNumberNote']
+        settings["lengthFirstMeasure"] = self._getLengthFirstMeasure()
+        settings["offsetLineMax"] = settings["lengthFirstMeasure"] * settings["measuresPerLine"]
+        settings["noteLowest"], settings["noteHighest"] = self._getRangeNotes()
+        settings['yMin'], settings['yMax'] = self._getRangeYs()
+        settings['key'] = self._getKey()
+
+        return settings
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
@@ -109,9 +124,10 @@ class Visualiser:
             return 1, 10
 
     def _getRangeYs(self):
-        numTones = self.noteHighest - self.noteLowest + 1
+        numTones = self.settings["noteHighest"] - self.settings["noteLowest"] + 1
         yMax = numTones * self.settings["barSpace"] * (1 - self.settings["overlapFactor"]) + self.settings["barSpace"] * self.settings["overlapFactor"]
-        if self.chords:
+        chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
+        if chords:
             yMin = - self.settings["chordToneRatio"] * self.settings["barSpace"]
         else:
             yMin = - self.settings["barSpace"] * .2  # why?
@@ -138,24 +154,6 @@ class Visualiser:
         return key
 
 
-    def _computeSettings(self, settings):
-        f = open('fontDimensions.json')
-        fontDimensions = json.load(f)
-        settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
-        settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
-        settings['capsizeNumberNote'] = fontDimensions[settings["font"]]["capsize"] * settings['fontSizeNotes']
-        settings['widthNumberNote'] = fontDimensions[settings["font"]]["width"] * settings['fontSizeNotes']
-        settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
-        settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
-        settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
-        settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
-        settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
-        settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']
-        settings["heightBarline0Extension"] = settings['capsizeNumberNote']
-        settings["lengthFirstMeasure"] = self._getLengthFirstMeasure()
-        settings["offsetLineMax"] = settings["lengthFirstMeasure"] * settings["measuresPerLine"]
-        return settings
-
     def _getLengthFirstMeasure(self):
         length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
         return length
@@ -163,25 +161,4 @@ class Visualiser:
 
 if __name__ == '__main__':
 
-    path = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
-    song = "Alone_Together_Lead_sheet_with_lyrics_.mxl"
-    # song = "Misty.mxl"
-    s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/selection/Misty.mxl")
-    s = music21.converter.parse(path+song)
-    # s = music21.converter.parse("/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/Use Me.mxl")
-
-    # s = music21.converter.parse("/Users/jvo/Dropbox/Jesse/music/bladmuziek/standards_musescore/There_Will_Never_Be_Another_You.mxl")
-
-    import json
-
-    f = open('settings.json')
-
-    settings = json.load(f)
-
-    # settings["offsetLineMax"] = 8
-    # settings["subdivision"] = 2
-    # settings["setInMajorKey"] = False
-
-    vis = Visualiser(s, settings)
-    vis.generate("output/")
-
+    pass

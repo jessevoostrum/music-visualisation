@@ -1,11 +1,7 @@
 """
-to do:
-- titleAx defined in method
-- inititiate self.figs=[], self.axs=[] and let create_canvas fill them
-- is it OK to introduce new attributes outside of init?
-- rewrite setXdimensions. let it return a variable. better for testing?
-- vPosAx not very nice
-- numLines vs numAxToMake
+summary:
+- associate lines to pages
+- give every line a location on the page
 """
 
 
@@ -28,13 +24,13 @@ rcParams['font.weight'] = 'light'
 
 
 class CanvasCreator:
-    def __init__(self, settings, numLines, lengthPickupMeasure, yMin, yMax):
+    def __init__(self, settings, numLines, lengthPickupMeasure):
 
         self.settings = settings
 
-        self.yMin = yMin
-        self.yMax = yMax
-        self.heightAxs = yMax - yMin + settings["vMarginLineTop"]
+        self.yMin = self.settings["yMin"]
+        self.yMax = self.settings["yMax"]
+        self.heightAxs = self.yMax - self.yMin + settings["vMarginLineTop"]
 
         self.offsetLineMax = settings["offsetLineMax"]
 
@@ -77,9 +73,9 @@ class CanvasCreator:
     def _getNumLinesPageMax(self, isFirstPage):
         """returns the number of lines that fits on the page"""
         if isFirstPage:
-            return math.floor((1 - self.settings["yLengthTitleAx"]) / self.heightAxs)
+            return math.floor((1 - self.settings["yLengthTitleAx"] - self.settings["vMarginBottomMinimal"]) / self.heightAxs)
         else:
-            return math.floor(1 / self.heightAxs)
+            return math.floor((1 - self.settings["vMarginFirstLineTop"] - self.settings["vMarginBottomMinimal"]) / self.heightAxs)
 
     def getAxs(self):
         return self.axs
