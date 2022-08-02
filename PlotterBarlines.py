@@ -27,7 +27,9 @@ class PlotterBarlines:
 
     def plotBarlines(self):
 
-        for measure in self.streamObj.recurse().getElementsByClass(music21.stream.Measure):
+        measures = self.streamObj[music21.stream.Measure]
+
+        for measure in measures:
 
             self.plotMeasureBarlines(measure)
 
@@ -40,7 +42,7 @@ class PlotterBarlines:
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
 
-            if measure.number == 0:
+            if measure.number == 0 and len(measures) > 1:
                 firstMeasure = self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1]
             else:
                 firstMeasure = measure

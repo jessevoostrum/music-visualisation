@@ -3,6 +3,7 @@
   "offsetLineMax": 16,
   "subdivision": 0,
   "fontSizeNotes": 10,
+  "fontSizeGraceNotesPerFontSizeNotes": 0.7,
   "fontSizeMetadata": 10,
   "barSpacePerFontSize":  0.001,
   "overlapFactor":  0.5,
