@@ -83,6 +83,7 @@ class Visualiser:
         settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
         settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
         settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
+        settings['fontSizeGraceNotes'] = settings['fontSizeGraceNotesPerFontSizeNotes'] * settings['fontSizeNotes']
         settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
         settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
         settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']

@@ -2,6 +2,8 @@ import json
 import music21
 from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle
+from itertools import tee, islice, chain
+
 
 from Plotter import Plotter
 
@@ -32,21 +34,22 @@ class PlotterNotes(Plotter):
         self.key = settings["key"]
 
         self.yShiftNumbers = self.computeYShiftNumbers()
+        self.graceNoteCounter = 0
 
     def plotNotes(self):
 
-        for el in self.streamObj.recurse():
+        for elPrev, el, elNext in self.previous_and_next(self.streamObj.recurse()):
 
             if type(el) == music21.note.Note:
 
-                self._plotNote(el)
+                self._plotNote(el, elNext)
 
             elif type(el) == music21.chord.Chord:
 
                 for note in el.notes:
-                    self._plotNote(note, offset=el.getOffsetInHierarchy(self.streamObj))
+                    self._plotNote(note, elNext, offset=el.getOffsetInHierarchy(self.streamObj))
 
-    def _plotNote(self, el, offset=None):
+    def _plotNote(self, el, elNext, offset=None):
         if not offset:
             offset = el.getOffsetInHierarchy(self.streamObj)
         page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset)
@@ -55,7 +58,7 @@ class PlotterNotes(Plotter):
         offsetLength = el.duration.quarterLength
         xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
         self.plotRectangle(el, page, xLength, xPos, yPos)
-        self.plotNumber(el, page, xLength, xPos, yPos)
+        self.plotNumber(el, elNext, page, xLength, xPos, yPos)
 
         if self.settings["lyrics"]:
             self.plotLyric(el, page, xLength, xPos, yPosLineBase)
@@ -78,23 +81,25 @@ class PlotterNotes(Plotter):
         self.axs[page].add_patch(rec)
         patch.set_clip_path(rec)
 
-    def plotNumber(self, el, page, xLengthBeforeExtension, xPos, yPos):
+    def plotNumber(self, el, elNext, page, xLengthBeforeExtension, xPos, yPos):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
 
-            xShiftNumbers = self.settings["xShiftNumberNote"]
-            if xLengthBeforeExtension < (2 * self.settings["xShiftNumberNote"] + self.settings["widthNumberNote"]) and (not el.tie):
-                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.settings["widthNumberNote"]
+            xShiftNumbers = self._computeXShiftNumbers(el, elNext, xLengthBeforeExtension)
 
             xPos += xShiftNumbers
             yPos += self.yShiftNumbers
 
+            fontSize = self.settings['fontSizeNotes']
+            if not el.duration.linked:
+                fontSize = self.settings['fontSizeGraceNotes']
+
             self.axs[page].text(xPos, yPos, number,
-                                fontsize=self.settings['fontSizeNotes'],
+                                fontsize=fontSize,
                                 va='baseline', ha='left')
 
-            self.plotAccidental(accidental, self.settings['fontSizeNotes'], xPos, yPos, page)
+            self.plotAccidental(accidental, fontSize, xPos, yPos, page)
 
     def plotLyric(self, el, page, xLength, xPos, yPos):
         lyric = el.lyric
@@ -132,6 +137,37 @@ class PlotterNotes(Plotter):
                 xPos -= xExtensionNoteWhenTied
         return xLength, xPos
 
+    def _computeXShiftNumbers(self, el, elNext, xLengthBeforeExtension):
+
+        if el.duration.linked:  # not grace note
+
+            xShiftNumbers = self.settings["xShiftNumberNote"]
+            if xLengthBeforeExtension < (2 * self.settings["xShiftNumberNote"] + self.settings["widthNumberNote"]) and (
+            not el.tie):
+                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.settings["widthNumberNote"]
+
+        # grace notes
+        elif el.beams.beamsList:  # multiple grace notes
+            if el.beams.getTypes()[0] == 'start':  #
+                xShiftNumbers = 0
+                self.graceNoteCounter += 1
+            elif el.beams.getTypes()[0] == 'continue':
+                if elNext.beams.getTypes()[0] == 'continue': # max of 4 grace notes supported
+                    xShiftNumbers = self.settings["xShiftNumberNote"] / 4
+                    self.graceNoteCounter += 1
+                elif elNext.beams.getTypes()[0] == 'stop':
+                    xShiftNumbers = self.settings["xShiftNumberNote"] * self.graceNoteCounter / (self.graceNoteCounter + 2)
+                    self.graceNoteCounter += 1
+            elif el.beams.getTypes()[0] == 'stop':
+                xShiftNumbers = self.settings["xShiftNumberNote"] * self.graceNoteCounter / (self.graceNoteCounter + 1)
+                self.graceNoteCounter = 0
+
+        else:      # one grace note
+            xShiftNumbers = 0
+
+
+        return xShiftNumbers
+
 
     def computeYShiftNumbers(self):
 
@@ -139,3 +175,8 @@ class PlotterNotes(Plotter):
 
         return yShiftNumbers
 
+    def previous_and_next(self, some_iterable):
+        prevs, items, nexts = tee(some_iterable, 3)
+        prevs = chain([None], prevs)
+        nexts = chain(islice(nexts, 1, None), [None])
+        return zip(prevs, items, nexts)
