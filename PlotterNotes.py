@@ -1,7 +1,7 @@
 import json
 import music21
 from matplotlib.patches import Polygon
-from matplotlib.patches import FancyBboxPatch, Rectangle
+from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from itertools import tee, islice, chain
 
 
@@ -21,9 +21,6 @@ class PlotterNotes(Plotter):
         self.LocationFinder = LocationFinder
         self.CanvasCreator = CanvasCreator
 
-        # self.axs = CanvasCreator.getAxs()
-        self.linesToLineOnPage = CanvasCreator.getLinesToLineOnPage()
-        self.linesToPage = CanvasCreator.getLinesToPage()
 
         self.barSpace = settings["barSpace"]
         self.noteLowest = settings["noteLowest"]
@@ -38,15 +35,24 @@ class PlotterNotes(Plotter):
 
     def plotNotes(self):
 
-        for elPrev, el, elNext in self.previous_and_next(self.streamObj.recurse()):
+        notes = self.streamObj[music21.note.Note]
+        chords = self.streamObj[music21.chord.Chord]
+
+        for idx in range(len(notes)):
+
+            el = notes[idx]
+            if idx < len(notes) - 1:
+                elNext = notes[idx+1]
+            else:
+                elNext = None
 
             if type(el) == music21.note.Note:
-
                 self._plotNote(el, elNext)
 
-            elif type(el) == music21.chord.Chord:
-
+        for el in chords:
+            if type(el) == music21.chord.Chord:
                 for note in el.notes:
+                    elNext = None
                     self._plotNote(note, elNext, offset=el.getOffsetInHierarchy(self.streamObj))
 
     def _plotNote(self, el, elNext, offset=None):
@@ -59,6 +65,8 @@ class PlotterNotes(Plotter):
         xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
         self.plotRectangle(el, page, xLength, xPos, yPos)
         self.plotNumber(el, elNext, page, xLength, xPos, yPos)
+
+        self.plotArticulation(el, elNext)
 
         if self.settings["lyrics"]:
             self.plotLyric(el, page, xLength, xPos, yPosLineBase)
@@ -174,6 +182,78 @@ class PlotterNotes(Plotter):
         yShiftNumbers = (self.barSpace - self.settings['capsizeNumberNote']) / 2
 
         return yShiftNumbers
+
+
+    def plotArticulation(self, el, elNext):
+        if elNext:
+            articulation = self.getArticulation(el, elNext)
+            if articulation:
+                offset = el.getOffsetInHierarchy(self.streamObj)
+                page, yPosLineBase, xPosStart = self.CanvasCreator.getLocation(offset)
+
+                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+                yPos1 = yPosLineBase + yPosWithinLine
+                yPosWithinLine = (elNext.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+                yPos2 = yPosLineBase + yPosWithinLine
+
+                yShrink = 0.1 * self.barSpace
+                yPosLow = min(yPos1, yPos2) + yShrink
+                yPosHigh = max(yPos1, yPos2) + self.barSpace - yShrink
+
+                yPosCenter = (yPosLow + yPosHigh) / 2
+
+
+                offsetLength = el.duration.quarterLength
+                xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
+                xPos = xPosStart + xLength
+
+
+                #self.axs[page].vlines(xPos, yPosLow, yPosHigh, alpha=.7)
+                width = 2 * self.settings["xMarginNote"]
+                patchLine = FancyBboxPatch((xPos - width/2, yPosLow),
+                                       width, yPosHigh - yPosLow,
+                                       boxstyle=f"round, pad=0, rounding_size=0.002",
+                                       mutation_aspect=0.15,
+                                       facecolor='blue', alpha=1,
+                                        linewidth=0
+                                       )
+                self.axs[page].add_patch(patchLine)
+
+                fontsize = 6
+                fontHeight = fontsize * 0.0008554
+                height = fontHeight
+
+                width = width * 2
+
+                patchRectangle = Rectangle((xPos - width/2, yPosCenter - height/2), width, height, facecolor='white', zorder=2 )
+                self.axs[page].add_patch(patchRectangle)
+
+                radius = self.barSpace
+                yxRatio =  self.settings["heightA4"] / self.settings["widthA4"]
+                patch = Ellipse((xPos, yPosCenter), width=radius * yxRatio, height=radius, facecolor='white', zorder=2, alpha=.0)
+
+                self.axs[page].add_patch(patch)
+
+                fontsize = 7
+                fontHeight = fontsize * 0.0008554
+                yPosBaseline = yPosCenter -  fontHeight / 2
+                self.axs[page].text(xPos, yPosBaseline, "H", ha='center', va='baseline', font='Arial', fontsize=7, fontstyle='normal', zorder=2)
+
+
+
+    def getArticulation(self, el, elNext):
+        articulation = None
+        if self.articulationInList(el.articulations, 'hammer on') and self.articulationInList(elNext.articulations, 'hammer on'):
+            articulation = 'hammer on'
+        if self.articulationInList(el.articulations, 'pull off') and self.articulationInList(elNext.articulations, 'pull off'):
+            articulation = 'pull off'
+        return articulation
+
+    def articulationInList(self, articulations, name):
+        for articulation in articulations:
+            if articulation.name == name:
+                return True
+        return False
 
     def previous_and_next(self, some_iterable):
         prevs, items, nexts = tee(some_iterable, 3)
