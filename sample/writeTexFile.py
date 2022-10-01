@@ -16,7 +16,7 @@ s0 = Template('\includepdf[pages= $numPage,  pagecommand={\\vspace*{-4.2cm}\phan
 s1 = Template('\includepdf[pages= $numPage,  pagecommand={\\vspace*{-4.2cm}\phantomsection\\addcontentsline{toc}{subsection}{$title}}]{$path}')
 s2 = Template('\includepdf[pages= $numPage, pagecommand={}]{$path}')
 
-with open('inputTexFile.txt', 'w') as writer:
+with open('../inputTexFile.txt', 'w') as writer:
 
     firstLetter = '_'
     for line in lines:

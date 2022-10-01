@@ -1,9 +1,6 @@
 import json
 import music21
 
-from Visualiser import Visualiser
-
-
 dir_songs_standards = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
 
 dir_notes = '/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/projects/music_software/IFR_animation/notes/'

@@ -2,13 +2,11 @@ import json
 import music21
 import glob
 import os
-from matplotlib.transforms import Bbox
-from matplotlib.backends.backend_pdf import PdfPages
 
-from Visualiser import Visualiser
+from sample.main import Visualiser
 
 # dir_notes = '/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/projects/music_software/IFR_animation/notes/'
-dir_notes = 'notes/'
+dir_notes = '../notes/'
 
 filename_bass = 'sample_songs_bass.txt'
 # filename_standards = 'sample_songs.txt'
