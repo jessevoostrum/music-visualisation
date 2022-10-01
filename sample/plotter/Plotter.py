@@ -1,7 +1,10 @@
 class Plotter:
 
-    def __init__(self, axs):
+    def __init__(self, streamObj, settings, LocationFinder, axs):
 
+        self.streamObj = streamObj
+        self.settings = settings
+        self.LocationFinder = LocationFinder
         self.axs = axs
 
     def plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):

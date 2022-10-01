@@ -4,9 +4,6 @@ summary:
 - give every line a location on the page
 """
 
-
-import math
-
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 from matplotlib import rcParams
@@ -35,34 +32,18 @@ class CanvasCreator:
 
         self.offsetLineMax = settings["offsetLineMax"]
 
-        self.lengthPickupMeasure = LocationFinder.getLengthPickupMeasure()
-
         self.figs = []
         self.axs = []
-        self.linesToPage = []
-        self.linesToLineOnPage = []
 
-        self._createCanvas(LocationFinder.getNumLines())
+        self._createCanvas(LocationFinder.getNumPages())
 
-    def _createCanvas(self, numLines):
+    def _createCanvas(self, numPages):
 
-        pageIndex = 0
-        isFirstPage = True
-        numLinesToMake = numLines
-        while numLinesToMake > 0:
+        for _ in range(numPages):
             fig, ax = plt.subplots(figsize=(self.settings["widthA4"], self.settings["heightA4"]))
             ax = self._formatAx(ax)
             self.figs.append(fig)
             self.axs.append(ax)
-            numLinesPage = min(self._getNumLinesPageMax(isFirstPage), numLinesToMake)
-            numLinesToMake -= numLinesPage
-            self.linesToLineOnPage += [LineOnPage for LineOnPage in range(numLinesPage)]
-            self.linesToPage += [pageIndex for _ in range(numLinesPage)]
-            isFirstPage = False   # TODO Use pageIndex
-            pageIndex += 1
-            if numLinesPage == 0:
-                print("ax too big")
-                break
 
     def _formatAx(self, ax):
         ax.set_ylim(0, 1)
@@ -71,68 +52,9 @@ class CanvasCreator:
         ax.set_position([0, 0, 1, 1])
         return ax
 
-    def _getNumLinesPageMax(self, isFirstPage):
-        """returns the number of lines that fits on the page"""
-        if isFirstPage:
-            return math.floor((1 - self.settings["yLengthTitleAx"] - self.settings["vMarginBottomMinimal"]) / self.heightLine)
-        else:
-            return math.floor((1 - self.settings["vMarginFirstLineTop"] - self.settings["vMarginBottomMinimal"]) / self.heightLine)
-
     def getAxs(self):
         return self.axs
 
     def getFigs(self):
         return self.figs
 
-    def getLinesToLineOnPage(self):
-        return self.linesToLineOnPage
-
-    def getLinesToPage(self):
-        return self.linesToPage
-
-
-    # these functions could be moved to a general plotter class?
-
-    def getYPosLineBase(self, line):
-        heightLine = self.settings["yMax"] - self.settings["yMin"]
-        yPosLineBase = 1 - self.linesToLineOnPage[line] * self.heightLine - self.settings["yMax"] - self.settings["vMarginLineTop"]
-        if self.linesToPage[line] == 0:
-            yPosLineBase -= self.settings["yLengthTitleAx"]
-        else:
-            yPosLineBase -= self.settings["vMarginFirstLineTop"]
-        return yPosLineBase
-
-
-    def _getPickupMeasureSpace(self):
-        xPickupMeasureSpace = max(self.lengthPickupMeasure, self.settings["xMinimalPickupMeasureSpace"])
-
-        return xPickupMeasureSpace
-
-
-    def getXLengthFromOffsetLength(self, offsetLength):
-
-        offsetLengthLine = self.offsetLineMax + 2 * self._getPickupMeasureSpace()
-
-        plotSpace = 1 - 2 * self.settings["widthMarginLine"]
-
-        xPerOffset = plotSpace / offsetLengthLine
-
-        xLength = offsetLength * xPerOffset
-
-        return xLength
-
-
-    def getXPosFromOffsetLine(self, offsetLine):
-        xPos = self.settings["widthMarginLine"] + self.getXLengthFromOffsetLength((self._getPickupMeasureSpace() + offsetLine))
-
-        return xPos
-
-
-    def getLocation(self, offset, start=True):
-
-        line, offsetLine = self.LocationFinder.getLocation(offset, start)
-        yPosLineBase = self.getYPosLineBase(line)
-        page = self.linesToPage[line]
-        xPos = self.getXPosFromOffsetLine(offsetLine)
-
-        return page, yPosLineBase, xPos

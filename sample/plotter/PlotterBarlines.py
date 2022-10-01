@@ -4,23 +4,19 @@ from matplotlib.patches import Ellipse, Rectangle
 import matplotlib.font_manager as fm
 import numpy as np
 
+from sample.plotter.Plotter import Plotter
+
 
 fp1=fm.FontProperties(fname="/Users/jvo/Downloads/freefont-20120503/FreeSerif.ttf")
 fp1=fm.FontProperties(fname="/Users/jvo/Downloads/symbola/Symbola.ttf")
 
 fp2=fm.FontProperties(fname="/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
 
-class PlotterBarlines:
+class PlotterBarlines(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator):
+    def __init__(self, streamObj, settings, LocationFinder, axs):
 
-        self.streamObj = streamObj
-        self.settings = settings
-
-        self.LocationFinder = LocationFinder
-        self.CanvasCreator = CanvasCreator
-
-        self.axs = CanvasCreator.getAxs()
+        super().__init__(streamObj, settings, LocationFinder, axs)
 
         self.spannedMeasures = self._getSpannedMeasures()
 
@@ -92,7 +88,7 @@ class PlotterBarlines:
 
     def plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
 
-        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"]
@@ -112,7 +108,7 @@ class PlotterBarlines:
 
 
     def _plotDots(self, offset, start):
-        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
@@ -138,7 +134,7 @@ class PlotterBarlines:
         self.axs[page].add_patch(patch)
 
     def _plotHBar(self, offset, start):
-        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start)
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
         yPosLow = yPosLineBase + self.settings["yMin"]
         yPosHigh = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"]
@@ -157,11 +153,11 @@ class PlotterBarlines:
             spanner = self.spannedMeasures[measure.number]
             offset = measure.offset
 
-            page, yPosLineBase, xPosStart = self.CanvasCreator.getLocation(offset, start=True)
+            page, yPosLineBase, xPosStart = self.LocationFinder.getLocation(offset, start=True)
 
             yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
 
-            xPosEnd = xPosStart + self.CanvasCreator.getXLengthFromOffsetLength(measure.quarterLength)
+            xPosEnd = xPosStart + self.LocationFinder.getXLengthFromOffsetLength(measure.quarterLength)
 
             lineWidth = self.settings["lineWidth0"]
             self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
@@ -189,9 +185,9 @@ class PlotterBarlines:
 
                 offset = measure.offset
 
-                page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset, start=True)
+                page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
 
-                xPos += self.CanvasCreator.getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
+                xPos += self.LocationFinder.getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
 
                 yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
 
@@ -240,9 +236,9 @@ class PlotterBarlines:
                 if measure.number == 0:
                     measure = firstMeasure
 
-                page, yPosLineBase, xPos = self.CanvasCreator.getLocation(measure.offset, start=True)
+                page, yPosLineBase, xPos = self.LocationFinder.getLocation(measure.offset, start=True)
 
-                xPos += self.CanvasCreator.getXLengthFromOffsetLength(measure.quarterLength / 2)
+                xPos += self.LocationFinder.getXLengthFromOffsetLength(measure.quarterLength / 2)
 
                 yPos = yPosLineBase + self.settings["yMax"] + self.settings["heightBarline0Extension"] - self.settings['capsizeNumberNote']
 

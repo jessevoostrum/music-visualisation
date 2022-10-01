@@ -1,19 +1,12 @@
 import music21
-import chordTypes
-from Plotter import Plotter
+import sample.chordTypes as chordTypes
+from sample.plotter.Plotter import Plotter
 
 
 class PlotterChords(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator):
-        super().__init__(CanvasCreator.getAxs())
-
-        self.streamObj = streamObj
-
-        self.settings = settings
-
-        self.LocationFinder = LocationFinder
-        self.CanvasCreator = CanvasCreator
+    def __init__(self, streamObj, settings, LocationFinder, axs):
+        super().__init__(streamObj, settings, LocationFinder, axs)
 
         self.yMin = self.settings["yMin"]
 
@@ -23,7 +16,7 @@ class PlotterChords(Plotter):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
         for chord in chords:
             offset = chord.offset
-            page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset)
+            page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
 
             xPos = xPos + self.settings["xShiftChords"]
             yPos = self.yMin + yPosLineBase

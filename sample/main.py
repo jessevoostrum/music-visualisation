@@ -5,16 +5,11 @@ import music21
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
-from matplotlib import rc
 
-
-
+from sample.plotter.PlotterMain import PlotterMain
 from LocationFinder import LocationFinder
 from CanvasCreator import CanvasCreator
-from sample.plotter.PlotterNotes import PlotterNotes
-from sample.plotter.PlotterChords import PlotterChords
-from sample.plotter.PlotterBarlines import PlotterBarlines
-from sample.plotter.PlotterMetadata import PlotterMetadata
+
 
 
 class Visualiser:
@@ -26,33 +21,24 @@ class Visualiser:
         self.settings = settings
         self.settings = self._computeSettings(settings)
 
-        self.LocationFinder = LocationFinder(self.streamObj, settings["offsetLineMax"])
+        self.LocationFinder = LocationFinder(self.streamObj, settings)
 
         self.CanvasCreator = CanvasCreator(settings, self.LocationFinder)
 
-        self.PlotterNotes = PlotterNotes(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator,
-                               )
-        self.PlotterChords = PlotterChords(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator,
-                               )
-        self.PlotterBarlines = PlotterBarlines(self.streamObj, settings,
-                               self.LocationFinder, self.CanvasCreator,
-                               )
-        self.PlotterMetadata = PlotterMetadata(self.streamObj, settings,
-                               self.CanvasCreator.getAxs()[0])
+        self.PlotterMain = PlotterMain(streamObj, settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
     def generate(self, directoryName):
         self.plot()
 
-        title = self.PlotterMetadata._getSongTitle()
+        # title = self.PlotterMetadata._getSongTitle() # TODO fix this
+        title = "abc"
         figs = self.CanvasCreator.getFigs()
 
         pathName = directoryName + f"{title}.pdf"
 
         with PdfPages(pathName) as pdf:
             for fig in figs:
-                yPosLowest = self.CanvasCreator.getYPosLineBase(-1)
+                yPosLowest = self.LocationFinder.getYPosLineBase(-1)
                 yLengthAboveTitle = 1 - self.settings["yPosTitle"]
                 if len(figs) == 1 and yPosLowest >= 0.55:
                     heightStart = self.settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
@@ -65,11 +51,7 @@ class Visualiser:
 
     def plot(self):
 
-        self.PlotterMetadata.plotMetadata()
-        rc('text.latex', preamble=r'\usepackage{amssymb}')
-        self.PlotterNotes.plotNotes()
-        self.PlotterChords.plotChords()
-        self.PlotterBarlines.plotBarlines()
+        self.PlotterMain.plot()
 
 
 

@@ -5,21 +5,15 @@ from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from itertools import tee, islice, chain
 
 
-from Plotter import Plotter
+from sample.plotter.Plotter import Plotter
 
 
 
 class PlotterNotes(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, CanvasCreator,):
+    def __init__(self, streamObj, settings, LocationFinder, axs,):
 
-        super().__init__(CanvasCreator.getAxs())
-
-        self.streamObj = streamObj
-        self.settings = settings
-
-        self.LocationFinder = LocationFinder
-        self.CanvasCreator = CanvasCreator
+        super().__init__(streamObj, settings, LocationFinder, axs)
 
 
         self.barSpace = settings["barSpace"]
@@ -58,11 +52,11 @@ class PlotterNotes(Plotter):
     def _plotNote(self, el, elNext, offset=None):
         if not offset:
             offset = el.getOffsetInHierarchy(self.streamObj)
-        page, yPosLineBase, xPos = self.CanvasCreator.getLocation(offset)
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
         yPos = yPosLineBase + yPosWithinLine
         offsetLength = el.duration.quarterLength
-        xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
+        xLength = self.LocationFinder.getXLengthFromOffsetLength(offsetLength)
         self.plotRectangle(el, page, xLength, xPos, yPos)
         self.plotNumber(el, elNext, page, xLength, xPos, yPos)
 
@@ -189,7 +183,7 @@ class PlotterNotes(Plotter):
             articulation = self.getArticulation(el, elNext)
             if articulation:
                 offset = el.getOffsetInHierarchy(self.streamObj)
-                page, yPosLineBase, xPosStart = self.CanvasCreator.getLocation(offset)
+                page, yPosLineBase, xPosStart = self.LocationFinder.getLocation(offset)
 
                 yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
                 yPos1 = yPosLineBase + yPosWithinLine
@@ -204,7 +198,7 @@ class PlotterNotes(Plotter):
 
 
                 offsetLength = el.duration.quarterLength
-                xLength = self.CanvasCreator.getXLengthFromOffsetLength(offsetLength)
+                xLength = self.LocationFinder.getXLengthFromOffsetLength(offsetLength)
                 xPos = xPosStart + xLength
 
 
