@@ -3,15 +3,17 @@ from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle
 import numpy as np
 
+from sample.plotter.Plotter import Plotter
 
-class PlotterMetadata:
 
-    def __init__(self, streamObj, settings, ax,):
 
-        self.streamObj = streamObj
-        self.settings = settings
+class PlotterMetadata(Plotter):
 
-        self.ax = ax
+    def __init__(self, streamObj, settings, LocationFinder, axs):  #this class does actually not need LocationFinder
+
+        super().__init__(streamObj, settings, LocationFinder, axs)
+
+        self.ax = axs[0]
 
         self.offsetLineMax = settings["offsetLineMax"]
 
