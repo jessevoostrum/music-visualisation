@@ -11,10 +11,10 @@ from matplotlib import rc
 
 from LocationFinder import LocationFinder
 from CanvasCreator import CanvasCreator
-from PlotterNotes import PlotterNotes
-from PlotterChords import PlotterChords
-from PlotterBarlines import PlotterBarlines
-from PlotterMetadata import PlotterMetadata
+from sample.plotter.PlotterNotes import PlotterNotes
+from sample.plotter.PlotterChords import PlotterChords
+from sample.plotter.PlotterBarlines import PlotterBarlines
+from sample.plotter.PlotterMetadata import PlotterMetadata
 
 
 class Visualiser:
@@ -74,7 +74,7 @@ class Visualiser:
 
 
     def _computeSettings(self, settings):
-        f = open('fontDimensions.json')
+        f = open('sample/fontDimensions.json')
         fontDimensions = json.load(f)
         settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
         settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
