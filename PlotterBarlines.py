@@ -161,7 +161,7 @@ class PlotterBarlines:
 
             yPosHigh = yPosLineBase + self.settings["yMax"]  #TODO(add extension)
 
-            xPosEnd = self.CanvasCreator.getXPosFromOffsetLine(offsetLine + measure.quarterLength)
+            xPosEnd = xPosStart + self.CanvasCreator.getXLengthFromOffsetLength(measure.quarterLength)
 
             lineWidth = self.settings["lineWidth0"]
             self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
