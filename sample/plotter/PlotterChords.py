@@ -8,9 +8,9 @@ class PlotterChords(Plotter):
     def __init__(self, streamObj, settings, LocationFinder, axs):
         super().__init__(streamObj, settings, LocationFinder, axs)
 
-        self.yMin = self.settings["yMin"]
+        self.yMin = self.Settings.yMin
 
-        self.key = settings["key"]
+        self.key = self.Settings.key
 
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
@@ -18,7 +18,7 @@ class PlotterChords(Plotter):
             offset = chord.offset
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
 
-            xPos = xPos + self.settings["xShiftChords"]
+            xPos = xPos + self.Settings.xShiftChords
             yPos = self.yMin + yPosLineBase
 
             self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
@@ -32,22 +32,22 @@ class PlotterChords(Plotter):
         number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         self.axs[page].text(xPos, yPos, number,
-                            va='baseline', size=self.settings['fontSizeChords'])
+                            va='baseline', size=self.Settings.fontSizeChords)
 
-        self.plotAccidental(accidental, self.settings['fontSizeChords'], xPos, yPos, page)
+        self.plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
 
     def _plotAddition(self, chordSymbol, xPos, yPos, page):
 
         addition = self._findAddition(chordSymbol)
 
-        fontSize = self.settings['fontSizeChords']
-        widthNumber = self.settings["widthNumberRelative"] * fontSize
+        fontSize = self.Settings.fontSizeChords
+        widthNumber = self.Settings.widthNumberRelative * fontSize
 
         if addition:
-            self.axs[page].text(xPos + widthNumber + self.settings["hDistanceChordAddition"],
-                            yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.7, addition,
-                            fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
+            self.axs[page].text(xPos + widthNumber + self.Settings.hDistanceChordAddition,
+                            yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7, addition,
+                            fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
                             va='baseline', ha='left',
                             # fontname='Arial',
                             fontweight=1)
@@ -97,13 +97,13 @@ class PlotterChords(Plotter):
             if chordSymbol.root().name != chordSymbol.bass().name:
                 bass = '/' + self._getNumberWithAccidental(chordSymbol.bass())
 
-        fontSize = self.settings['fontSizeChords']
+        fontSize = self.Settings.fontSizeChords
 
 
         if bass:
-            self.axs[page].text(xPos + (1 + self.settings["hDistanceChordAddition"]) * self.settings["widthNumberRelative"] * fontSize,
-                            yPos + self.settings['capsizeNumberRelative'] * fontSize * 0.3, bass,
-                            fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
+            self.axs[page].text(xPos + (1 + self.Settings.hDistanceChordAddition) * self.Settings.widthNumberRelative * fontSize,
+                            yPos + self.Settings.capsizeNumberRelative * fontSize * 0.3, bass,
+                            fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
                             va='top', ha='left',
                             # fontname='Arial',
                             fontweight=1)

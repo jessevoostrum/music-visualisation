@@ -15,9 +15,9 @@ class PlotterMetadata(Plotter):
 
         self.ax = axs[0]
 
-        self.offsetLineMax = settings["offsetLineMax"]
+        self.offsetLineMax = self.Settings.offsetLineMax
 
-        self.key = settings["key"]
+        self.key = self.Settings.key
 
         self.xPosLeft, self.xPosRight = self._computeXPos()
 
@@ -29,31 +29,31 @@ class PlotterMetadata(Plotter):
         self._plotKey()
 
     def _plotTitle(self):
-        self.ax.text(0.5, self.settings["yPosTitle"],
+        self.ax.text(0.5, self.Settings.yPosTitle,
                           self._getSongTitle(), fontsize=16, horizontalalignment='center',
         verticalalignment='top')
 
     def _plotComposer(self):
         if self._getPlayer() == "":
-            height = self.settings["yPosPlayer"]
+            height = self.Settings.yPosPlayer
         else:
-            height = self.settings["yPosComposer"]
+            height = self.Settings.yPosComposer
 
         self.ax.text(self.xPosRight, height,
-                          self._getComposer(), fontsize=self.settings["fontSizeMetadata"], horizontalalignment='right',
+                          self._getComposer(), fontsize=self.Settings.fontSizeMetadata, horizontalalignment='right',
         verticalalignment='baseline')
 
     def _plotPlayer(self):
-        self.ax.text(self.xPosRight, self.settings["yPosPlayer"],
-                          self._getPlayer(), fontsize=self.settings["fontSizeMetadata"], horizontalalignment='right',
+        self.ax.text(self.xPosRight, self.Settings.yPosPlayer,
+                          self._getPlayer(), fontsize=self.Settings.fontSizeMetadata, horizontalalignment='right',
                           verticalalignment='baseline')
 
     def _plotKey(self):
 
         letter = self.key.tonic.name[0]
 
-        self.ax.text(self.xPosLeft, self.settings["yPosPlayer"],
-                          f"1 = {self._getKeyLetter()} ", fontsize=self.settings["fontSizeMetadata"], horizontalalignment='left',
+        self.ax.text(self.xPosLeft, self.Settings.yPosPlayer,
+                          f"1 = {self._getKeyLetter()} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
     def _getSongTitle(self):
@@ -98,12 +98,12 @@ class PlotterMetadata(Plotter):
         return letter
 
     def _computeXPos(self):
-        offsetLengthLine = self.offsetLineMax + 2 * self.settings["xMinimalPickupMeasureSpace"]
-        plotSpace = 1 - 2 * self.settings["widthMarginLine"]
+        offsetLengthLine = self.offsetLineMax + 2 * self.Settings.xMinimalPickupMeasureSpace
+        plotSpace = 1 - 2 * self.Settings.widthMarginLine
 
         xPerOffset = plotSpace / offsetLengthLine
 
-        xPosLeft = self.settings["widthMarginLine"] + self.settings["xMinimalPickupMeasureSpace"] * xPerOffset
-        xPosRight = self.settings["widthMarginLine"] + (self.settings["xMinimalPickupMeasureSpace"] + self.settings["offsetLineMax"]) * xPerOffset
+        xPosLeft = self.Settings.widthMarginLine + self.Settings.xMinimalPickupMeasureSpace * xPerOffset
+        xPosRight = self.Settings.widthMarginLine + (self.Settings.xMinimalPickupMeasureSpace + self.Settings.offsetLineMax) * xPerOffset
 
         return xPosLeft, xPosRight

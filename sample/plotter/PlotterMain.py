@@ -6,6 +6,9 @@ from sample.plotter.PlotterChords import PlotterChords
 from sample.plotter.PlotterBarlines import PlotterBarlines
 from sample.plotter.PlotterMetadata import PlotterMetadata
 
+class Dog:
+    def __int__(self, age):
+        self.age = age
 
 class PlotterMain:
 
@@ -25,7 +28,7 @@ class PlotterMain:
         PC = PlotterChords(self.streamObj, self.settings, self.LocationFinder, self.axs)
         PB = PlotterBarlines(self.streamObj, self.settings, self.LocationFinder, self.axs)
         PM = PlotterMetadata(self.streamObj, self.settings, self.LocationFinder, self.axs)
-
+        #
         PM.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
         PN.plotNotes()

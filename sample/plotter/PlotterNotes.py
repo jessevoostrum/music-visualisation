@@ -11,18 +11,18 @@ from sample.plotter.Plotter import Plotter
 
 class PlotterNotes(Plotter):
 
-    def __init__(self, streamObj, settings, LocationFinder, axs,):
+    def __init__(self, streamObj, Settings, LocationFinder, axs,):
 
-        super().__init__(streamObj, settings, LocationFinder, axs)
+        super().__init__(streamObj, Settings, LocationFinder, axs)
 
 
-        self.barSpace = settings["barSpace"]
-        self.noteLowest = settings["noteLowest"]
+        self.barSpace = Settings.barSpace
+        self.noteLowest = Settings.noteLowest
 
-        self.alpha = settings["alpha"]
-        self.facecolor = settings["facecolor"]
+        self.alpha = Settings.alpha
+        self.facecolor = Settings.facecolor
 
-        self.key = settings["key"]
+        self.key = Settings.key
 
         self.yShiftNumbers = self.computeYShiftNumbers()
         self.graceNoteCounter = 0
@@ -53,7 +53,7 @@ class PlotterNotes(Plotter):
         if not offset:
             offset = el.getOffsetInHierarchy(self.streamObj)
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
-        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
         yPos = yPosLineBase + yPosWithinLine
         offsetLength = el.duration.quarterLength
         xLength = self.LocationFinder.getXLengthFromOffsetLength(offsetLength)
@@ -62,19 +62,19 @@ class PlotterNotes(Plotter):
 
         self.plotArticulation(el, elNext)
 
-        if self.settings["lyrics"]:
+        if self.Settings.lyrics:
             self.plotLyric(el, page, xLength, xPos, yPosLineBase)
 
     def plotRectangle(self, el, page, xLength, xPos, yPos):
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
-        xPos += self.settings["xMarginNote"]
-        xLength -= 2 * self.settings["xMarginNote"]
+        xPos += self.Settings.xMarginNote
+        xLength -= 2 * self.Settings.xMarginNote
         xLength, xPos = self.extendNotesWhenTied(el, xLength, xPos)
         alpha, facecolor, hatch = self.adjustVisualParametersForGhostNote(el)
         patch = FancyBboxPatch((xPos, yPos),
                                xLength, self.barSpace,
-                               boxstyle=f"round, pad=0, rounding_size={self.settings['radiusCorners']}",
-                               mutation_aspect=self.settings["mutationAspect"],
+                               boxstyle=f"round, pad=0, rounding_size={self.Settings.radiusCorners}",
+                               mutation_aspect=self.Settings.mutationAspect,
                                fc=facecolor, alpha=alpha,
                                edgecolor='black', linewidth=0,
                                hatch=hatch
@@ -93,9 +93,9 @@ class PlotterNotes(Plotter):
             xPos += xShiftNumbers
             yPos += self.yShiftNumbers
 
-            fontSize = self.settings['fontSizeNotes']
+            fontSize = self.Settings.fontSizeNotes
             if not el.duration.linked:
-                fontSize = self.settings['fontSizeGraceNotes']
+                fontSize = self.Settings.fontSizeGraceNotes
 
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=fontSize,
@@ -109,8 +109,8 @@ class PlotterNotes(Plotter):
             syllabic = el.lyrics[0].syllabic
             if syllabic == 'begin' or syllabic == 'middle':
                 lyric += "-"
-        xPosCenter = xPos + self.settings["xShiftNumberNote"] / 2
-        yPos -= self.settings['barSpace'] * 0.5
+        xPosCenter = xPos + self.Settings.xShiftNumberNote / 2
+        yPos -= self.Settings.barSpace * 0.5
         self.axs[page].text(xPosCenter, yPos, lyric,
                             fontsize=5,
                             va='baseline', ha='left')
@@ -127,7 +127,7 @@ class PlotterNotes(Plotter):
         return alpha, facecolor, hatch
 
     def extendNotesWhenTied(self, el, xLength, xPos):
-        xExtensionNoteWhenTied = self.settings["radiusCorners"] + self.settings["xMarginNote"]
+        xExtensionNoteWhenTied = self.Settings.radiusCorners + self.Settings.xMarginNote
         if el.tie:
             if el.tie.type == 'start':
                 xLength += xExtensionNoteWhenTied
@@ -143,10 +143,10 @@ class PlotterNotes(Plotter):
 
         if el.duration.linked:  # not grace note
 
-            xShiftNumbers = self.settings["xShiftNumberNote"]
-            if xLengthBeforeExtension < (2 * self.settings["xShiftNumberNote"] + self.settings["widthNumberNote"]) and (
+            xShiftNumbers = self.Settings.xShiftNumberNote
+            if xLengthBeforeExtension < (2 * self.Settings.xShiftNumberNote + self.Settings.widthNumberNote) and (
             not el.tie):
-                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.settings["widthNumberNote"]
+                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.Settings.widthNumberNote
 
         # grace notes
         elif el.beams.beamsList:  # multiple grace notes
@@ -155,13 +155,13 @@ class PlotterNotes(Plotter):
                 self.graceNoteCounter += 1
             elif el.beams.getTypes()[0] == 'continue':
                 if elNext.beams.getTypes()[0] == 'continue': # max of 4 grace notes supported
-                    xShiftNumbers = self.settings["xShiftNumberNote"] / 4
+                    xShiftNumbers = self.Settings.xShiftNumberNote / 4
                     self.graceNoteCounter += 1
                 elif elNext.beams.getTypes()[0] == 'stop':
-                    xShiftNumbers = self.settings["xShiftNumberNote"] * self.graceNoteCounter / (self.graceNoteCounter + 2)
+                    xShiftNumbers = self.Settings.xShiftNumberNote * self.graceNoteCounter / (self.graceNoteCounter + 2)
                     self.graceNoteCounter += 1
             elif el.beams.getTypes()[0] == 'stop':
-                xShiftNumbers = self.settings["xShiftNumberNote"] * self.graceNoteCounter / (self.graceNoteCounter + 1)
+                xShiftNumbers = self.Settings.xShiftNumberNote * self.graceNoteCounter / (self.graceNoteCounter + 1)
                 self.graceNoteCounter = 0
 
         else:      # one grace note
@@ -173,7 +173,7 @@ class PlotterNotes(Plotter):
 
     def computeYShiftNumbers(self):
 
-        yShiftNumbers = (self.barSpace - self.settings['capsizeNumberNote']) / 2
+        yShiftNumbers = (self.barSpace - self.Settings.capsizeNumberNote) / 2
 
         return yShiftNumbers
 
@@ -185,9 +185,9 @@ class PlotterNotes(Plotter):
                 offset = el.getOffsetInHierarchy(self.streamObj)
                 page, yPosLineBase, xPosStart = self.LocationFinder.getLocation(offset)
 
-                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
                 yPos1 = yPosLineBase + yPosWithinLine
-                yPosWithinLine = (elNext.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.settings["overlapFactor"])
+                yPosWithinLine = (elNext.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
                 yPos2 = yPosLineBase + yPosWithinLine
 
                 yShrink = 0.1 * self.barSpace
@@ -203,7 +203,7 @@ class PlotterNotes(Plotter):
 
 
                 #self.axs[page].vlines(xPos, yPosLow, yPosHigh, alpha=.7)
-                width = 2 * self.settings["xMarginNote"]
+                width = 2 * self.Settings.xMarginNote
                 patchLine = FancyBboxPatch((xPos - width/2, yPosLow),
                                        width, yPosHigh - yPosLow,
                                        boxstyle=f"round, pad=0, rounding_size=0.002",
@@ -223,7 +223,7 @@ class PlotterNotes(Plotter):
                 self.axs[page].add_patch(patchRectangle)
 
                 radius = self.barSpace
-                yxRatio =  self.settings["heightA4"] / self.settings["widthA4"]
+                yxRatio =  self.Settings.heightA4 / self.Settings.widthA4
                 patch = Ellipse((xPos, yPosCenter), width=radius * yxRatio, height=radius, facecolor='white', zorder=2, alpha=.0)
 
                 self.axs[page].add_patch(patch)
