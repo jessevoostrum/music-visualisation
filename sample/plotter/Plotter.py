@@ -1,9 +1,9 @@
 class Plotter:
 
-    def __init__(self, streamObj, settings, LocationFinder, axs):
+    def __init__(self, streamObj, Settings, LocationFinder, axs):
 
         self.streamObj = streamObj
-        self.settings = settings
+        self.Settings = Settings
         self.LocationFinder = LocationFinder
         self.axs = axs
 
@@ -19,12 +19,12 @@ class Plotter:
             if not front:
                 relativeLocation = 1 - relativeLocation
 
-            xPosAccidental = xPos + relativeLocation * self.settings["widthNumberRelative"] * fontSize
+            xPosAccidental = xPos + relativeLocation * self.Settings.widthNumberRelative * fontSize
 
             if symbolAccidental:
                 self.axs[page].text(xPosAccidental,
-                                    yPos + 0.7 * self.settings['capsizeNumberRelative'] * fontSize, symbolAccidental,
-                                    fontsize=self.settings['fontSizeAccidentalRelative'] * fontSize,
+                                    yPos + 0.7 * self.Settings.capsizeNumberRelative * fontSize, symbolAccidental,
+                                    fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
                                     va='baseline', ha='right', fontname='Vulf Mono', #fontweight=1
                                     )
 
