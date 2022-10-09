@@ -30,8 +30,8 @@ class PlotterMetadata(Plotter):
 
     def _plotTitle(self):
         self.ax.text(0.5, self.Settings.yPosTitle,
-                          self._getSongTitle(), fontsize=16, horizontalalignment='center',
-        verticalalignment='top')
+                     self.getSongTitle(), fontsize=16, horizontalalignment='center',
+                     verticalalignment='top')
 
     def _plotComposer(self):
         if self._getPlayer() == "":
@@ -56,7 +56,7 @@ class PlotterMetadata(Plotter):
                           f"1 = {self._getKeyLetter()} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
-    def _getSongTitle(self):
+    def getSongTitle(self):
         try:
             songTitle = self.streamObj.metadata.title
         except:

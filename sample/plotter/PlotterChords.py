@@ -34,7 +34,7 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos, number,
                             va='baseline', size=self.Settings.fontSizeChords)
 
-        self.plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
+        self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
 
     def _plotAddition(self, chordSymbol, xPos, yPos, page):
