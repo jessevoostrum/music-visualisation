@@ -44,6 +44,17 @@ class LocationFinder:
             yPosLineBase -= self.Settings.vMarginFirstLineTop
         return yPosLineBase
 
+    def _countLinesLyrics(self):
+        maxNumLines =  0
+        for el in self.streamObj[music21.note.Note]:
+            if el.lyric:
+                numLines = el.lyric.count('\n') + 1
+                if numLines > maxNumLines:
+                    maxNumLines = numLines
+
+        return maxNumLines
+
+
     def _getOffsetsAndXsStartLine(self, offsetLineMax):
         offsetsStartLine = []
         xsStartLine = []

@@ -28,7 +28,7 @@ class PlotterNotes(Plotter):
         self.graceNoteCounter = 0
 
         self.lastLyricEnd = 0
-        self.yPosLast = 0
+        self.yPosLineBaseLast = 0
 
     def plotNotes(self):
 
@@ -106,7 +106,7 @@ class PlotterNotes(Plotter):
 
             self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
-    def _plotLyric(self, el, page, xLength, xPos, yPos):
+    def _plotLyric(self, el, page, xLength, xPos, yPosLineBase):
 
         lyric = el.lyric
         if el.lyric:
@@ -115,17 +115,18 @@ class PlotterNotes(Plotter):
                 lyric += "-"
         xPosCenter = xPos + self.Settings.xShiftNumberNote / 4
 
-        if xPosCenter < self.lastLyricEnd and self.yPosLast == yPos:
+        if xPosCenter < self.lastLyricEnd and self.yPosLineBaseLast == yPosLineBase:
             xPosCenter = self.lastLyricEnd + self.Settings.widthNumberNote * 0.3
 
-        self.yPosLast = yPos
-        yPos -= self.Settings.barSpace * 0.5
+        self.yPosLineBaseLast = yPosLineBase
+
+        yPos = yPosLineBase
 
         self.renderer = self.axs[page].figure.canvas.get_renderer()
 
         plottedLyric = self.axs[page].text(xPosCenter, yPos, lyric,
                             fontsize=5,
-                            va='baseline', ha='left')
+                            va='top', ha='left')
         lyricStart = xPosCenter
 
         bb = plottedLyric.get_window_extent(renderer=self.renderer).transformed(self.axs[page].transData.inverted())
@@ -135,6 +136,8 @@ class PlotterNotes(Plotter):
         if lyric:
             if lyric[-1] == "-":
                 self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
+        if lyric:
+            print(lyric.count('\n'))
 
     def _adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor

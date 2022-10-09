@@ -1,8 +1,5 @@
 """Jesse van Oostrum"""
 
-
-
-
 from sample.plotter.PlotterMain import PlotterMain
 from LocationFinder import LocationFinder
 from CanvasCreator import CanvasCreator
@@ -31,6 +28,7 @@ class Visualiser:
         yPosLowest = self.LocationFinder.getYPosLineBase(-1)
 
         self.CanvasCreator.saveFig(title, pathName, yPosLowest)
+
 
 if __name__ == '__main__':
 
