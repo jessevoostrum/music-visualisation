@@ -21,11 +21,10 @@ class Visualiser:
         self.streamObj = streamObj
 
         self.Settings = Settings(streamObj, settings)
-        self.settings = self.Settings.getSettings()
 
-        self.LocationFinder = LocationFinder(self.streamObj, settings)
+        self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
-        self.CanvasCreator = CanvasCreator(settings, self.LocationFinder)
+        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder)
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
@@ -41,10 +40,10 @@ class Visualiser:
         with PdfPages(pathName) as pdf:
             for fig in figs:
                 yPosLowest = self.LocationFinder.getYPosLineBase(-1)
-                yLengthAboveTitle = 1 - self.settings["yPosTitle"]
+                yLengthAboveTitle = 1 - self.Settings.yPosTitle
                 if len(figs) == 1 and yPosLowest >= 0.55:
-                    heightStart = self.settings["heightA4"] * (yPosLowest - yLengthAboveTitle)
-                    bbox = Bbox([[0, heightStart], [self.settings["widthA4"], self.settings["heightA4"]]])
+                    heightStart = self.Settings.heightA4 * (yPosLowest - yLengthAboveTitle)
+                    bbox = Bbox([[0, heightStart], [self.Settings.widthA4, self.Settings.heightA4]])
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:
                     pdf.savefig(fig)
