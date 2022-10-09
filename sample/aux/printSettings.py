@@ -1,6 +1,6 @@
 import json
 
-f = open('settings.json')
+f = open('../settings.json')
 settings = json.load(f)
 
 
