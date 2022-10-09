@@ -19,7 +19,7 @@ class Visualiser:
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
-        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder)
+        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
@@ -31,7 +31,6 @@ class Visualiser:
         yPosLowest = self.LocationFinder.getYPosLineBase(-1)
 
         self.CanvasCreator.saveFig(title, pathName, yPosLowest)
-
 
 if __name__ == '__main__':
 

@@ -24,10 +24,9 @@ rcParams['font.weight'] = 'light'
 
 
 class CanvasCreator:
-    def __init__(self, Settings, LocationFinder):
+    def __init__(self, Settings, numPages):
 
         self.Settings = Settings
-        self.LocationFinder = LocationFinder
 
         self.yMin = self.Settings.yMin
         self.yMax = self.Settings.yMax
@@ -38,7 +37,7 @@ class CanvasCreator:
         self.figs = []
         self.axs = []
 
-        self._createCanvas(LocationFinder.getNumPages())
+        self._createCanvas(numPages)
 
     def saveFig(self, title, pathName, yPosLowest):
 
