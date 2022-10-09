@@ -1,11 +1,14 @@
 \documentclass{article}
 
-\usepackage[bottom=90pt, footskip=70pt]{geometry}
-%this means that the baseline of the footer is 20pt above the bottom of the page
+\usepackage[bottom=90pt, footskip=70pt]{geometry}  % this means that the baseline of the footer is 20pt above the bottom of the page
+
+
 \usepackage{pdfpages}
-\usepackage{fancyhdr}
-\usepackage{fontspec}
-\setmainfont[Mapping=tex-text-ms]{Vulf Mono Light Italic}
+% \usepackage{fancyhdr}
+
+% \usepackage{fontspec}
+% \setmainfont[Mapping=tex-text-ms]{Vulf Mono Light Italic}
+
 \usepackage[]{hyperref}
 \hypersetup{
     hidelinks,   
@@ -14,44 +17,21 @@
     }
 
 
+\renewcommand\familydefault{\sfdefault}
 
-\pagestyle{plain}
-
-% \fancyhead[L,C, R]{}
-% \fancyfoot[L, R]{}
-% \fancyfoot[C]{\thepage}
-% \renewcommand{\headrulewidth}{0.4pt}
-% \renewcommand{\footrulewidth}{2pt}
-
-% \setlength{\footskip}{90pt}  % controls the length between text block and page number, alternatively the geometry package can be used to set these parameters
 
 
 \begin{document}
 
-\begin{titlepage}
-    \centering
-	{\Huge The Integer Book\par}
-	\vspace{2cm}
-    {\large by\par}
-    \vspace{1cm}
-	{\Large Jesse van Oostrum}
-    \vspace{7cm}
-    \begin{figure}[h]
-        \centering
-        \makebox[\textwidth][c]{\includegraphics[width=18cm]{/Users/jvo/Documents/music-visualisation/output/logo2.png}}
-    \end{figure}
-
-\end{titlepage}
+\includepdf[]{/Users/jvo/Documents/music-visualisation/latex/front-page.pdf}
 
 \tableofcontents
 \newpage
 
 \input{introduction.tex}
 
-% \input{../inputTexFile2.txt}
+\input{../inputTexFile.txt}
 
 \end{document}
 
 
-
-% \includepdf[pages=-, addtotoc={1,section,1,Autumn Leaves,p1}, pagecommand={}]{/Users/jvo/Documents/music-visualisation/output/Autumn Leaves.pdf}
