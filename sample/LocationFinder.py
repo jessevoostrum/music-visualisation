@@ -34,7 +34,7 @@ class LocationFinder:
         return page, yPosLineBase, xPos
 
     def getNumPages(self):
-        return len(self.linesToPage)
+        return self.linesToPage[-1] + 1
 
     def getYPosLineBase(self, line):
         yPosLineBase = 1 - self.linesToLineOnPage[line] * self.heightLine - self.Settings.yMax - self.Settings.vMarginLineTop
