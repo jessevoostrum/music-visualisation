@@ -1,5 +1,5 @@
 import music21
-import sample.chordTypes as chordTypes
+import sample.aux.chordTypes as chordTypes
 from sample.plotter.Plotter import Plotter
 
 
