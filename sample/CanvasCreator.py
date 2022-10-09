@@ -21,16 +21,16 @@ rcParams['font.weight'] = 'light'
 
 
 class CanvasCreator:
-    def __init__(self, settings, LocationFinder):
+    def __init__(self, Settings, LocationFinder):
 
-        self.settings = settings
+        self.Settings = Settings
         self.LocationFinder = LocationFinder
 
-        self.yMin = self.settings["yMin"]
-        self.yMax = self.settings["yMax"]
-        self.heightLine = self.yMax - self.yMin + settings["vMarginLineTop"]
+        self.yMin = self.Settings.yMin
+        self.yMax = self.Settings.yMax
+        self.heightLine = self.yMax - self.yMin + Settings.vMarginLineTop
 
-        self.offsetLineMax = settings["offsetLineMax"]
+        self.offsetLineMax = Settings.offsetLineMax
 
         self.figs = []
         self.axs = []
@@ -40,7 +40,7 @@ class CanvasCreator:
     def _createCanvas(self, numPages):
 
         for _ in range(numPages):
-            fig, ax = plt.subplots(figsize=(self.settings["widthA4"], self.settings["heightA4"]))
+            fig, ax = plt.subplots(figsize=(self.Settings.widthA4, self.Settings.heightA4))
             ax = self._formatAx(ax)
             self.figs.append(fig)
             self.axs.append(ax)

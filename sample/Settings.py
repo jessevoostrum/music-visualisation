@@ -13,7 +13,6 @@ class Settings:
     def __init__(self, streamObj, settings):
         self.streamObj = streamObj
         self.settings = settings
-        self.settings = self._computeSettings(settings)
 
         # self.font_settings = FontSettings(settings['fontSettings'])
 
@@ -84,28 +83,6 @@ class Settings:
     def getSettings(self):
         return self.settings
 
-    def _computeSettings(self, settings):
-        f = open('sample/fontDimensions.json')
-        fontDimensions = json.load(f)
-        settings["capsizeNumberRelative"] = fontDimensions[settings["font"]]["capsize"]
-        settings["widthNumberRelative"] = fontDimensions[settings["font"]]["width"]
-        settings['capsizeNumberNote'] = fontDimensions[settings["font"]]["capsize"] * settings['fontSizeNotes']
-        settings['widthNumberNote'] = fontDimensions[settings["font"]]["width"] * settings['fontSizeNotes']
-        settings['fontSizeNoteAccidental'] = settings['fontSizeAccidentalRelative'] * settings['fontSizeNotes']
-        settings['barSpace'] = settings['barSpacePerFontSize'] * settings['fontSizeNotes']
-        settings['fontSizeChords'] = settings['fontSizeChordsPerFontSizeNotes'] * settings['fontSizeNotes']
-        settings['fontSizeGraceNotes'] = settings['fontSizeGraceNotesPerFontSizeNotes'] * settings['fontSizeNotes']
-        settings["xMinimalPickupMeasureSpace"] = settings["xMinimalPickupMeasureSpaceFraction"] * settings["offsetLineMax"]
-        settings["fontSizeSegno"] = settings["capsizeNumberRelative"] / fontDimensions["segno"] * settings['fontSizeNotes']
-        settings["fontSizeCoda"] = settings["capsizeNumberRelative"] / fontDimensions["coda"] * settings['fontSizeNotes']
-        settings["heightBarline0Extension"] = settings['capsizeNumberNote']
-        settings["lengthFirstMeasure"] = self._getLengthFirstMeasure()
-        settings["offsetLineMax"] = settings["lengthFirstMeasure"] * settings["measuresPerLine"]
-        settings["noteLowest"], settings["noteHighest"] = self._getRangeNotes()
-        settings['yMin'], settings['yMax'] = self._getRangeYs()
-        settings['key'] = self._getKey()
-
-        return settings
 
     def _getRangeNotes(self):
         p = music21.analysis.discrete.Ambitus()
@@ -116,13 +93,13 @@ class Settings:
             return 1, 10
 
     def _getRangeYs(self):
-        numTones = self.settings["noteHighest"] - self.settings["noteLowest"] + 1
-        yMax = numTones * self.settings["barSpace"] * (1 - self.settings["overlapFactor"]) + self.settings["barSpace"] * self.settings["overlapFactor"]
+        numTones = self.noteHighest - self.noteLowest + 1
+        yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
         chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
         if chords:
-            yMin = - self.settings["chordToneRatio"] * self.settings["barSpace"]
+            yMin = - self.chordToneRatio * self.barSpace
         else:
-            yMin = - self.settings["barSpace"] * .2  # why?
+            yMin = - self.barSpace * .2  # why?
         return yMin, yMax
 
     def _getKey(self):
@@ -130,7 +107,7 @@ class Settings:
             key = self.streamObj[music21.key.Key].first()
         elif self.streamObj[music21.key.KeySignature].first():
             key1 = self.streamObj[music21.key.KeySignature].first().asKey()
-            if self.settings["setInMajorKey"]:
+            if self.setInMajorKey:
                 key = key1
             else:
                 try:
@@ -148,7 +125,7 @@ class Settings:
                 print('key analysis failed')
             print("no key signature found")
 
-        if self.settings["setInMajorKey"] and key.mode == 'minor':
+        if self.setInMajorKey and key.mode == 'minor':
             key = key.relative
 
         return key
