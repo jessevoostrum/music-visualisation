@@ -7,7 +7,7 @@ class Plotter:
         self.LocationFinder = LocationFinder
         self.axs = axs
 
-    def plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):
+    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':

@@ -24,7 +24,7 @@ class PlotterNotes(Plotter):
 
         self.key = Settings.key
 
-        self.yShiftNumbers = self.computeYShiftNumbers()
+        self.yShiftNumbers = self._computeYShiftNumbers()
         self.graceNoteCounter = 0
 
     def plotNotes(self):
@@ -56,21 +56,21 @@ class PlotterNotes(Plotter):
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
         yPos = yPosLineBase + yPosWithinLine
         offsetLength = el.duration.quarterLength
-        xLength = self.LocationFinder.getXLengthFromOffsetLength(offsetLength)
-        self.plotRectangle(el, page, xLength, xPos, yPos)
-        self.plotNumber(el, elNext, page, xLength, xPos, yPos)
+        xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
+        self._plotRectangle(el, page, xLength, xPos, yPos)
+        self._plotNumber(el, elNext, page, xLength, xPos, yPos)
 
-        self.plotArticulation(el, elNext)
+        self._plotArticulation(el, elNext)
 
         if self.Settings.lyrics:
-            self.plotLyric(el, page, xLength, xPos, yPosLineBase)
+            self._plotLyric(el, page, xLength, xPos, yPosLineBase)
 
-    def plotRectangle(self, el, page, xLength, xPos, yPos):
+    def _plotRectangle(self, el, page, xLength, xPos, yPos):
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
         xPos += self.Settings.xMarginNote
         xLength -= 2 * self.Settings.xMarginNote
-        xLength, xPos = self.extendNotesWhenTied(el, xLength, xPos)
-        alpha, facecolor, hatch = self.adjustVisualParametersForGhostNote(el)
+        xLength, xPos = self._extendNotesWhenTied(el, xLength, xPos)
+        alpha, facecolor, hatch = self._adjustVisualParametersForGhostNote(el)
         patch = FancyBboxPatch((xPos, yPos),
                                xLength, self.barSpace,
                                boxstyle=f"round, pad=0, rounding_size={self.Settings.radiusCorners}",
@@ -83,7 +83,7 @@ class PlotterNotes(Plotter):
         self.axs[page].add_patch(rec)
         patch.set_clip_path(rec)
 
-    def plotNumber(self, el, elNext, page, xLengthBeforeExtension, xPos, yPos):
+    def _plotNumber(self, el, elNext, page, xLengthBeforeExtension, xPos, yPos):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
@@ -101,9 +101,9 @@ class PlotterNotes(Plotter):
                                 fontsize=fontSize,
                                 va='baseline', ha='left')
 
-            self.plotAccidental(accidental, fontSize, xPos, yPos, page)
+            self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
-    def plotLyric(self, el, page, xLength, xPos, yPos):
+    def _plotLyric(self, el, page, xLength, xPos, yPos):
         lyric = el.lyric
         if el.lyric:
             syllabic = el.lyrics[0].syllabic
@@ -115,7 +115,7 @@ class PlotterNotes(Plotter):
                             fontsize=5,
                             va='baseline', ha='left')
 
-    def adjustVisualParametersForGhostNote(self, el):
+    def _adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor
         alpha = self.alpha
         hatch = None
@@ -126,7 +126,7 @@ class PlotterNotes(Plotter):
             hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
         return alpha, facecolor, hatch
 
-    def extendNotesWhenTied(self, el, xLength, xPos):
+    def _extendNotesWhenTied(self, el, xLength, xPos):
         xExtensionNoteWhenTied = self.Settings.radiusCorners + self.Settings.xMarginNote
         if el.tie:
             if el.tie.type == 'start':
@@ -171,16 +171,16 @@ class PlotterNotes(Plotter):
         return xShiftNumbers
 
 
-    def computeYShiftNumbers(self):
+    def _computeYShiftNumbers(self):
 
         yShiftNumbers = (self.barSpace - self.Settings.capsizeNumberNote) / 2
 
         return yShiftNumbers
 
 
-    def plotArticulation(self, el, elNext):
+    def _plotArticulation(self, el, elNext):
         if elNext:
-            articulation = self.getArticulation(el, elNext)
+            articulation = self._getArticulation(el, elNext)
             if articulation:
                 offset = el.getOffsetInHierarchy(self.streamObj)
                 page, yPosLineBase, xPosStart = self.LocationFinder.getLocation(offset)
@@ -198,7 +198,7 @@ class PlotterNotes(Plotter):
 
 
                 offsetLength = el.duration.quarterLength
-                xLength = self.LocationFinder.getXLengthFromOffsetLength(offsetLength)
+                xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
                 xPos = xPosStart + xLength
 
 
@@ -235,21 +235,23 @@ class PlotterNotes(Plotter):
 
 
 
-    def getArticulation(self, el, elNext):
+    def _getArticulation(self, el, elNext):
         articulation = None
-        if self.articulationInList(el.articulations, 'hammer on') and self.articulationInList(elNext.articulations, 'hammer on'):
+        if self._articulationInList(el.articulations, 'hammer on') and self._articulationInList(elNext.articulations,
+                                                                                                'hammer on'):
             articulation = 'hammer on'
-        if self.articulationInList(el.articulations, 'pull off') and self.articulationInList(elNext.articulations, 'pull off'):
+        if self._articulationInList(el.articulations, 'pull off') and self._articulationInList(elNext.articulations,
+                                                                                               'pull off'):
             articulation = 'pull off'
         return articulation
 
-    def articulationInList(self, articulations, name):
+    def _articulationInList(self, articulations, name):
         for articulation in articulations:
             if articulation.name == name:
                 return True
         return False
 
-    def previous_and_next(self, some_iterable):
+    def _previous_and_next(self, some_iterable):
         prevs, items, nexts = tee(some_iterable, 3)
         prevs = chain([None], prevs)
         nexts = chain(islice(nexts, 1, None), [None])

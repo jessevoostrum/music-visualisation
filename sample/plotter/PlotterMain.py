@@ -21,16 +21,16 @@ class PlotterMain:
 
         self.axs = axs
 
+        self.PlotterNotes = PlotterNotes(self.streamObj, self.settings, self.LocationFinder, self.axs)
+        self.PlotterChords = PlotterChords(self.streamObj, self.settings, self.LocationFinder, self.axs)
+        self.PlotterBarlines = PlotterBarlines(self.streamObj, self.settings, self.LocationFinder, self.axs)
+        self.PlotterMetadata = PlotterMetadata(self.streamObj, self.settings, self.LocationFinder, self.axs)
 
     def plot(self):
 
-        PN = PlotterNotes(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        PC = PlotterChords(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        PB = PlotterBarlines(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        PM = PlotterMetadata(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        #
-        PM.plotMetadata()
+        self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
-        PN.plotNotes()
-        PC.plotChords()
-        PB.plotBarlines()
+        self.PlotterNotes.plotNotes()
+        self.PlotterChords.plotChords()
+        self.PlotterBarlines.plotBarlines()
+

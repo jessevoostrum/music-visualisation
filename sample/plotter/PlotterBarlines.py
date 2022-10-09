@@ -7,10 +7,10 @@ import numpy as np
 from sample.plotter.Plotter import Plotter
 
 
-fp1=fm.FontProperties(fname="/Users/jvo/Downloads/freefont-20120503/FreeSerif.ttf")
-fp1=fm.FontProperties(fname="/Users/jvo/Downloads/symbola/Symbola.ttf")
+fp1 = fm.FontProperties(fname="/Users/jvo/Downloads/freefont-20120503/FreeSerif.ttf")
+fp1 = fm.FontProperties(fname="/Users/jvo/Downloads/symbola/Symbola.ttf")
+fp2 = fm.FontProperties(fname="/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
 
-fp2=fm.FontProperties(fname="/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
 
 class PlotterBarlines(Plotter):
 
@@ -20,20 +20,19 @@ class PlotterBarlines(Plotter):
 
         self.spannedMeasures = self._getSpannedMeasures()
 
-
     def plotBarlines(self):
 
         measures = self.streamObj[music21.stream.Measure]
 
         for measure in measures:
 
-            self.plotMeasureBarlines(measure)
+            self._plotMeasureBarlines(measure)
 
             if self.Settings.subdivision >= 1:
-                self.plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth1)
+                self._plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth1)
 
             if self.Settings.subdivision >= 2:
-                self.plotSubdivisionBarlines(measure, 0.25, self.Settings.lineWidth2)
+                self._plotSubdivisionBarlines(measure, 0.25, self.Settings.lineWidth2)
 
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
@@ -46,12 +45,12 @@ class PlotterBarlines(Plotter):
             if self.Settings.subdivision == 0:
                 self._plotTimeSignature(measure, firstMeasure)
 
-    def plotMeasureBarlines(self, measure):
+    def _plotMeasureBarlines(self, measure):
         if not measure.number == 0:
-            self.plotVBar(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
+            self._plotVBar(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
         offsetEndMeasure = measure.offset + measure.quarterLength
-        self.plotVBar(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
+        self._plotVBar(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
 
         for barLine in measure[music21.bar.Barline]:
             offset = measure.offset + barLine.offset
@@ -63,20 +62,19 @@ class PlotterBarlines(Plotter):
                 else:
                     start = False
 
-                self.plotVBar(offset, self.Settings.lineWidth0 + 1, self.Settings.heightBarline0Extension, start, rectangle=True)
+                self._plotVBar(offset, self.Settings.lineWidth0 + 1, self.Settings.heightBarline0Extension, start,
+                               rectangle=True)
                 self._plotDots(offset, start)
                 self._plotHBar(offset, start)
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'final':
-
-                self.plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, rectangle=True)
+                self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, rectangle=True)
 
             if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
+                self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, double=True)
 
-                self.plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, double=True)
 
-
-    def plotSubdivisionBarlines(self, measure, step, lineWidth):
+    def _plotSubdivisionBarlines(self, measure, step, lineWidth):
 
         for t in np.arange(0, measure.quarterLength, step=step):
             if measure.number == 0:
@@ -84,9 +82,9 @@ class PlotterBarlines(Plotter):
             elif measure.number >= 1:
                 offset = measure.offset + t
 
-            self.plotVBar(offset, lineWidth, 0, True)
+            self._plotVBar(offset, lineWidth, 0, True)
 
-    def plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
+    def _plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
 
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
@@ -157,7 +155,7 @@ class PlotterBarlines(Plotter):
 
             yPosHigh = yPosLineBase + self.Settings.yMax  #TODO(add extension)
 
-            xPosEnd = xPosStart + self.LocationFinder.getXLengthFromOffsetLength(measure.quarterLength)
+            xPosEnd = xPosStart + self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength)
 
             lineWidth = self.Settings.lineWidth0
             self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
@@ -176,7 +174,6 @@ class PlotterBarlines(Plotter):
 
                 pass
 
-
     def _plotRepeatExpressions(self, measure):
 
         for el in measure.recurse():
@@ -187,7 +184,7 @@ class PlotterBarlines(Plotter):
 
                 page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
 
-                xPos += self.LocationFinder.getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
+                xPos += self.LocationFinder._getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
 
                 yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
 
@@ -225,7 +222,7 @@ class PlotterBarlines(Plotter):
             if measure[music21.meter.TimeSignature]:
                 if measure.number == 0:
                     measure = firstMeasure
-                self.plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth2)
+                self._plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth2)
 
         else:
             if measure[music21.meter.TimeSignature]:
@@ -238,14 +235,13 @@ class PlotterBarlines(Plotter):
 
                 page, yPosLineBase, xPos = self.LocationFinder.getLocation(measure.offset, start=True)
 
-                xPos += self.LocationFinder.getXLengthFromOffsetLength(measure.quarterLength / 2)
+                xPos += self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength / 2)
 
                 yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
 
                 self.axs[page].text(xPos, yPos, ts,
                                     fontsize=10,
                                     va='baseline', ha='center')
-
 
     def _getSpannedMeasures(self):
         includedMeasuresDict = {}

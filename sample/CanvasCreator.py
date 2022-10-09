@@ -8,6 +8,9 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 from matplotlib import rcParams
 
+from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.transforms import Bbox
+
 # Add every font at the specified location
 font_dir = ['/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop']
 for font in font_manager.findSystemFonts(font_dir):
@@ -36,6 +39,20 @@ class CanvasCreator:
         self.axs = []
 
         self._createCanvas(LocationFinder.getNumPages())
+
+    def saveFig(self, title, pathName, yPosLowest):
+
+        with PdfPages(pathName) as pdf:
+            for fig in self.figs:
+                yLengthAboveTitle = 1 - self.Settings.yPosTitle
+                if len(self.figs) == 1 and yPosLowest >= 0.55:
+                    heightStart = self.Settings.heightA4 * (yPosLowest - yLengthAboveTitle)
+                    bbox = Bbox([[0, heightStart], [self.Settings.widthA4, self.Settings.heightA4]])
+                    pdf.savefig(fig, bbox_inches=bbox)
+                else:
+                    pdf.savefig(fig)
+
+        plt.close("all")
 
     def _createCanvas(self, numPages):
 

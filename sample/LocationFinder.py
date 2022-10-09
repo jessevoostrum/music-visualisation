@@ -17,12 +17,32 @@ class LocationFinder:
 
         self.offsetLineMax = Settings.offsetLineMax
 
-        self.lengthPickupMeasure = self.getLengthPickupMeasure()
+        self.lengthPickupMeasure = -self.xsStartLine[0]
 
         self.linesToPage = []
         self.linesToLineOnPage = []
 
-        self._divideLinesOverPages(self.getNumLines())
+        self._divideLinesOverPages(numLines=len(self.offsetsStartLine))
+
+    def getLocation(self, offset, start=True):
+
+        line, offsetLine = self._getLineAndOffsetLine(offset, start)
+        yPosLineBase = self.getYPosLineBase(line)
+        page = self.linesToPage[line]
+        xPos = self._getXPosFromOffsetLine(offsetLine)
+
+        return page, yPosLineBase, xPos
+
+    def getNumPages(self):
+        return len(self.linesToPage)
+
+    def getYPosLineBase(self, line):
+        yPosLineBase = 1 - self.linesToLineOnPage[line] * self.heightLine - self.Settings.yMax - self.Settings.vMarginLineTop
+        if self.linesToPage[line] == 0:
+            yPosLineBase -= self.Settings.yLengthTitleAx
+        else:
+            yPosLineBase -= self.Settings.vMarginFirstLineTop
+        return yPosLineBase
 
     def _getOffsetsAndXsStartLine(self, offsetLineMax):
         offsetsStartLine = []
@@ -91,7 +111,6 @@ class LocationFinder:
         else:
             return math.floor((1 - self.Settings.vMarginFirstLineTop - self.Settings.vMarginBottomMinimal) / self.heightLine)
 
-
     def _getMeasures(self):
         p = music21.graph.plot.PlotStream(self.streamObj)
         offsetMap = music21.graph.axis.OffsetAxis(p, 'x').getOffsetMap()
@@ -99,7 +118,6 @@ class LocationFinder:
         return measures
 
     def _getLineAndOffsetLine(self, offset, start=True):
-        """ returns a tuple (line, x) given an offset"""
         line = 0
         for idx, offsetStartLine in enumerate(self.offsetsStartLine):
             if start and offset >= offsetStartLine:
@@ -108,47 +126,16 @@ class LocationFinder:
                 line = idx
             else:
                 break
+        offsetLine = offset - self.offsetsStartLine[line] + self.xsStartLine[line]
 
-        x = offset - self.offsetsStartLine[line] + self.xsStartLine[line]
-
-        return line, x
-
-    def getNumLines(self):
-        return len(self.offsetsStartLine)
-
-    def getLengthPickupMeasure(self):
-        return - self.xsStartLine[0]
-
-    # unused?
-    def getXMax(self):
-        if len(self.offsetsStartLine) > 1:
-            return self.offsetsStartLine[1] - self.getLengthPickupMeasure()
-        else:
-            return self.streamObj.duration.quarterLength - self.getLengthPickupMeasure()
-
-    def getLinesToPage(self):
-        return self.linesToPage
-
-    def getLinesToLineOnPage(self, linesToLineOnPage):
-        return self.linesToLineOnPage
-
-    # these functions could be moved to a general plotter class?
-
-    def getYPosLineBase(self, line):
-        heightLine = self.Settings.yMax - self.Settings.yMin
-        yPosLineBase = 1 - self.linesToLineOnPage[line] * self.heightLine - self.Settings.yMax - self.Settings.vMarginLineTop
-        if self.linesToPage[line] == 0:
-            yPosLineBase -= self.Settings.yLengthTitleAx
-        else:
-            yPosLineBase -= self.Settings.vMarginFirstLineTop
-        return yPosLineBase
+        return line, offsetLine
 
     def _getPickupMeasureSpace(self):
         xPickupMeasureSpace = max(self.lengthPickupMeasure, self.Settings.xMinimalPickupMeasureSpace)
 
         return xPickupMeasureSpace
 
-    def getXLengthFromOffsetLength(self, offsetLength):
+    def _getXLengthFromOffsetLength(self, offsetLength):
 
         offsetLengthLine = self.offsetLineMax + 2 * self._getPickupMeasureSpace()
 
@@ -160,20 +147,9 @@ class LocationFinder:
 
         return xLength
 
-    def getXPosFromOffsetLine(self, offsetLine):
-        xPos = self.Settings.widthMarginLine + self.getXLengthFromOffsetLength(
+    def _getXPosFromOffsetLine(self, offsetLine):
+        xPos = self.Settings.widthMarginLine + self._getXLengthFromOffsetLength(
             (self._getPickupMeasureSpace() + offsetLine))
 
         return xPos
 
-    def getLocation(self, offset, start=True):
-
-        line, offsetLine = self._getLineAndOffsetLine(offset, start)
-        yPosLineBase = self.getYPosLineBase(line)
-        page = self.linesToPage[line]
-        xPos = self.getXPosFromOffsetLine(offsetLine)
-
-        return page, yPosLineBase, xPos
-
-    def getNumPages(self):
-        return len(self.linesToPage)
