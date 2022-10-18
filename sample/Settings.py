@@ -22,10 +22,11 @@ class Settings:
         self.fontSizeNotes = settings['fontSizeNotes']
         self.fontSizeGraceNotesPerFontSizeNotes = settings['fontSizeGraceNotesPerFontSizeNotes']
         self.fontSizeMetadata = settings['fontSizeMetadata']
+        self.fontSizeLyrics = settings['fontSizeLyrics']
+        self.fontSizeChordsPerFontSizeNotes = settings['fontSizeChordsPerFontSizeNotes']
         self.barSpacePerFontSize = settings['barSpacePerFontSize']
         self.overlapFactor = settings['overlapFactor']
         self.chordToneRatio = settings['chordToneRatio']
-        self.fontSizeChordsPerFontSizeNotes = settings['fontSizeChordsPerFontSizeNotes']
         self.widthA4 = settings['widthA4']
         self.heightA4 = settings['heightA4']
         self.widthMarginLine = settings['widthMarginLine']
@@ -64,14 +65,16 @@ class Settings:
         self.widthNumberRelative = fontDimensions[self.font]["width"]
         self.capsizeNumberNote = fontDimensions[self.font]["capsize"] * self.fontSizeNotes
         self.widthNumberNote = fontDimensions[self.font]["width"] * self.fontSizeNotes
+        self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
+        self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
+        self.lyricHeightMax = fontDimensions["firstLineHeight"] * self.fontSizeLyrics + (self._countLinesLyrics() - 1) * fontDimensions["extraLineHeight"] * self.fontSizeLyrics
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
         self.barSpace = self.barSpacePerFontSize * self.fontSizeNotes
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
-        self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
-        self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
+
         self.heightBarline0Extension = self.capsizeNumberNote
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
@@ -97,10 +100,25 @@ class Settings:
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
         chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
         if chords:
-            yMin = - self.chordToneRatio * self.barSpace
+            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNumberNote * 1.3
+            yMarginTopChord = self.fontSizeChords * 1
+            if self.lyrics:
+                yMin = - (chordHeight + self.lyricHeightMax)
+            else:
+                yMin = - self.chordToneRatio * self.barSpace
         else:
             yMin = - self.barSpace * .2  # why?
         return yMin, yMax
+
+    def _countLinesLyrics(self):
+        maxNumLines = 0
+        for el in self.streamObj[music21.note.Note]:
+            if el.lyric:
+                numLines = el.lyric.count('\n') + 1
+                if numLines > maxNumLines:
+                    maxNumLines = numLines
+
+        return maxNumLines
 
     def _getKey(self):
         if self.streamObj[music21.key.Key].first():
