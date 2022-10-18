@@ -125,7 +125,7 @@ class PlotterNotes(Plotter):
         self.renderer = self.axs[page].figure.canvas.get_renderer()
 
         plottedLyric = self.axs[page].text(xPosCenter, yPos, lyric,
-                            fontsize=5,
+                            fontsize=self.Settings.fontSizeLyrics,
                             va='top', ha='left')
         lyricStart = xPosCenter
 
@@ -136,8 +136,7 @@ class PlotterNotes(Plotter):
         if lyric:
             if lyric[-1] == "-":
                 self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
-        if lyric:
-            print(lyric.count('\n'))
+        
 
     def _adjustVisualParametersForGhostNote(self, el):
         facecolor = self.facecolor
