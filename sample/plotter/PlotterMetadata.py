@@ -58,7 +58,7 @@ class PlotterMetadata(Plotter):
 
     def getSongTitle(self):
         try:
-            songTitle = self.streamObj.metadata.title
+            songTitle = self.streamObj.metadata.bestTitle
         except:
             songTitle = "no title"
         return songTitle

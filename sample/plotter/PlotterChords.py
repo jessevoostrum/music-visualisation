@@ -14,8 +14,14 @@ class PlotterChords(Plotter):
 
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
-        for chord in chords:
+        for i, chord, in enumerate(chords):
             offset = chord.offset
+
+            if i > 0:
+                offsetPreviousChord = chords[i-1].offset
+                if offset == offsetPreviousChord:
+                    continue
+
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
 
             xPos = xPos + self.Settings.xShiftChords
