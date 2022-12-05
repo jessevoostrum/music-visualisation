@@ -53,7 +53,7 @@ class PlotterNotes(Plotter):
                     self._plotNote(note, elNext, offset=el.getOffsetInHierarchy(self.streamObj))
 
     def _plotNote(self, el, elNext, offset=None):
-        if not offset:
+        if offset is None:
             offset = el.getOffsetInHierarchy(self.streamObj)
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)

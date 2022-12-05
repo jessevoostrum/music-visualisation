@@ -17,7 +17,6 @@ class Settings:
         # self.font_settings = FontSettings(settings['fontSettings'])
 
         self.measuresPerLine = settings['measuresPerLine']
-        self.offsetLineMax = settings['offsetLineMax']
         self.subdivision = settings['subdivision']
         self.fontSizeNotes = settings['fontSizeNotes']
         self.fontSizeGraceNotesPerFontSizeNotes = settings['fontSizeGraceNotesPerFontSizeNotes']
@@ -73,11 +72,11 @@ class Settings:
         self.barSpace = self.barSpacePerFontSize * self.fontSizeNotes
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
-        self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
 
         self.heightBarline0Extension = self.capsizeNumberNote
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
+        self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
         self.key = self._getKey()
