@@ -1,9 +1,9 @@
 """Jesse van Oostrum"""
 
 from sample.plotter.PlotterMain import PlotterMain
-from LocationFinder import LocationFinder
-from CanvasCreator import CanvasCreator
-from Settings import Settings
+from sample.LocationFinder import LocationFinder
+from sample.CanvasCreator import CanvasCreator
+from sample.Settings import Settings
 
 
 class Visualiser:

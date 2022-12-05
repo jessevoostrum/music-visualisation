@@ -72,7 +72,7 @@ class LocationFinder:
             elif measure.getSpannerSites():
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
-                    if int(spanner.number) > 1:
+                    if int(spanner.number[0]) > 1:
                         if spanner.isFirst(measure):
                             offsetsStartLine.append(measure.offset)
                             xsStartLine.append(xPosSpanner)
@@ -84,7 +84,7 @@ class LocationFinder:
             if measure.getSpannerSites():
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
-                    if spanner.number == '1':
+                    if spanner.number[0] == '1':
                         if spanner.isFirst(measure):
                             xPosSpanner = measure.offset - offsetsStartLine[-1] + xsStartLine[-1]
 
