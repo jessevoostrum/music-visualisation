@@ -2,7 +2,10 @@ import json
 import music21
 from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
+from matplotlib import cm
 from itertools import tee, islice, chain
+import colorcet as cc
+
 
 
 from sample.plotter.Plotter import Plotter
@@ -60,6 +63,9 @@ class PlotterNotes(Plotter):
         yPos = yPosLineBase + yPosWithinLine
         offsetLength = el.duration.quarterLength
         xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
+
+
+
         self._plotRectangle(el, page, xLength, xPos, yPos)
         self._plotNumber(el, elNext, page, xLength, xPos, yPos)
 
@@ -73,7 +79,9 @@ class PlotterNotes(Plotter):
         xPos += self.Settings.xMarginNote
         xLength -= 2 * self.Settings.xMarginNote
         xLength, xPos = self._extendNotesWhenTied(el, xLength, xPos)
-        alpha, facecolor, hatch = self._adjustVisualParametersForGhostNote(el)
+
+
+        alpha, facecolor, hatch = self._adjustVisualParameters(el)
         patch = FancyBboxPatch((xPos, yPos),
                                xLength, self.barSpace,
                                boxstyle=f"round, pad=0, rounding_size={self.Settings.radiusCorners}",
@@ -138,9 +146,21 @@ class PlotterNotes(Plotter):
                 self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
         
 
-    def _adjustVisualParametersForGhostNote(self, el):
-        facecolor = self.facecolor
-        alpha = self.alpha
+    def _adjustVisualParameters(self, el):
+
+        pitchKey = self.key.getTonic().ps
+        pitchNote = el.pitch.ps
+        relativePitch = (pitchNote - pitchKey) % 12
+        colormapIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch) / 12
+
+        # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
+        facecolor = cc.cm.colorwheel(colormapIndex)
+        alpha = .5
+
+        # facecolor = self.facecolor
+        # alpha = self.alpha
+
+
         hatch = None
         # ghost note
         if el.notehead == 'x':
@@ -148,6 +168,10 @@ class PlotterNotes(Plotter):
             alpha = 0.15
             hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
         return alpha, facecolor, hatch
+
+    def _relativePitchToCircleOfFifthsIndex(self, relativePitch):
+        pitchesCircleOfFifths = [(i*7) % 12 for i in range(12)]
+        return pitchesCircleOfFifths.index(relativePitch)
 
     def _extendNotesWhenTied(self, el, xLength, xPos):
         xExtensionNoteWhenTied = self.Settings.radiusCorners + self.Settings.xMarginNote
