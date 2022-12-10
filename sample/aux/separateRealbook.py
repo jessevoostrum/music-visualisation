@@ -7,6 +7,12 @@ import music21
 def separateBookIntoSongs(book):
     s = book
 
+    # renumber measure
+    for i, measure in enumerate(s[music21.stream.Measure]):
+
+        measure.number = i + 1
+        measure.informSites()
+
     offsetsStartPage = [0] + [el.getOffsetInHierarchy(s) for el in s[music21.layout.PageLayout]]
 
     metadataPerPage = [[page, None, None] for page in range(1, len(offsetsStartPage) + 1)]
@@ -92,7 +98,7 @@ lines = glob.glob(dirBooks + '*' + '.mxl')
 lines = [os.path.basename(line) for line in lines]
 lines.sort()
 
-for line in lines[3:4]:
+for line in lines[4:]:
 
     print(line)
 
@@ -104,10 +110,6 @@ for line in lines[3:4]:
 
     for song in songs:
         print(song.metadata.title)
-        if song.metadata.title == 'Dearly beloved':
-            print('hello')
-            pass
-        song.write("musicxml", dirSongs + f"{song.metadata.title}.mxl")
         cleanSong(song)
         song.write("musicxml", dirSongs + f"{song.metadata.title}.mxl")
 
