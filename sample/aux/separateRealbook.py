@@ -43,18 +43,18 @@ def separateBookIntoSongs(book):
         if measures[i].offset in offsetsStartSong:
             measureNumbersStartSong.append(measures[i].number)
 
-    lastMeasureNumber = s[music21.stream.Measure][-1].number
     measureNumbersStartEndSong = []
 
     for measureNumberStart, measureNumberStartNext in zip(measureNumbersStartSong, measureNumbersStartSong[1:]):
-        measureNumbersStartEndSong.append((measureNumberStart, measureNumberStartNext))
+        measureNumbersStartEndSong.append((measureNumberStart, measureNumberStartNext - 1))
 
+    lastMeasureNumber = s[music21.stream.Measure][-1].number
     measureNumbersStartEndSong.append((measureNumbersStartSong[-1], lastMeasureNumber))
 
     songs = []
 
     for measureNumberStart, measureNumberEnd in measureNumbersStartEndSong:
-        songs.append(s.measures(measureNumberStart, measureNumberEnd - 1))
+        songs.append(s.measures(measureNumberStart, measureNumberEnd))
 
     for i, song in enumerate(songs):
         song.insert(0, music21.metadata.Metadata())
@@ -76,13 +76,13 @@ def cleanSong(song):
     # check for pickup measure
     secondMeasure = s[music21.stream.Measure][1]
     if secondMeasure.quarterLength > firstMeasure.quarterLength:
-        pickupMeasure = True
+        songHasPickupMeasure = True
     else:
-        pickupMeasure = False
+        songHasPickupMeasure = False
 
     # renumber measure
     for i, measure in enumerate(s[music21.stream.Measure]):
-        if pickupMeasure:
+        if songHasPickupMeasure:
             measureNumber = i
         else:
             measureNumber = i + 1
@@ -90,28 +90,31 @@ def cleanSong(song):
         measure.number = measureNumber
         measure.informSites()
 
+        return song
 
-dirBooks = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/realbooks/"
-dirSongs = "/Users/jvo/Documents/music-visualisation/output/output-standards-ultime/"
+if __name__ == '__main__':
 
-lines = glob.glob(dirBooks + '*' + '.mxl')
-lines = [os.path.basename(line) for line in lines]
-lines.sort()
+    dirBooks = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/realbooks/"
+    dirSongs = "/Users/jvo/Documents/music-visualisation/output/output-standards-ultime/"
 
-for line in lines[4:]:
+    lines = glob.glob(dirBooks + '*' + '.mxl')
+    lines = [os.path.basename(line) for line in lines]
+    lines.sort()
 
-    print(line)
+    for line in lines[1:2]:
 
-    line = line.rstrip('\n')
+        print(line)
 
-    book = music21.converter.parse(dirBooks + line)
+        line = line.rstrip('\n')
 
-    songs = separateBookIntoSongs(book)
+        book = music21.converter.parse(dirBooks + line)
 
-    for song in songs:
-        print(song.metadata.title)
-        cleanSong(song)
-        song.write("musicxml", dirSongs + f"{song.metadata.title}.mxl")
+        songs = separateBookIntoSongs(book)
+
+        for song in songs:
+            print(song.metadata.title)
+            song = cleanSong(song)
+            song.write("musicxml", dirSongs + f"{song.metadata.title}.mxl")
 
 
 

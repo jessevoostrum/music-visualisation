@@ -22,9 +22,6 @@ class PlotterNotes(Plotter):
         self.barSpace = Settings.barSpace
         self.noteLowest = Settings.noteLowest
 
-        self.alpha = Settings.alpha
-        self.facecolor = Settings.facecolor
-
         self.key = Settings.key
 
         self.yShiftNumbers = self._computeYShiftNumbers()
@@ -148,20 +145,29 @@ class PlotterNotes(Plotter):
 
     def _adjustVisualParameters(self, el):
 
-        pitchKey = self.key.getTonic().ps
-        pitchNote = el.pitch.ps
-        relativePitch = (pitchNote - pitchKey) % 12
-        colormapIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch) / 12
-
-        # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
-        facecolor = cc.cm.colorwheel(colormapIndex)
-        alpha = .5
-
-        # facecolor = self.facecolor
-        # alpha = self.alpha
-
-
+        facecolor = self.Settings.facecolor
+        alpha = self.Settings.alpha
         hatch = None
+
+
+        if self.Settings.coloursCircleOfFifths:
+
+            pitchKey = self.key.getTonic().ps
+            pitchNote = el.pitch.ps
+            relativePitch = (pitchNote - pitchKey) % 12
+            colormapIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch) / 12
+
+            # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
+            facecolor = cc.cm.colorwheel(colormapIndex)
+            alpha = .5
+
+        elif self.Settings.coloursVoices:
+            if el.containerHierarchy():
+                container = el.containerHierarchy()[0]
+                if type(container) == music21.stream.Voice:
+                    if container.id == '2':
+                        facecolor = self.Settings.facecolor2
+
         # ghost note
         if el.notehead == 'x':
             facecolor = 'grey'
