@@ -1,0 +1,14 @@
+{
+  "_comment": "the distances are given in A4 distance per pt",
+  "Vulf Mono": {
+    "capsize":  0.00075,
+    "width": 0.00124
+  },
+  "Arial": {
+    "capsize": 0.008554
+  },
+  "segno": 0.000542,
+  "coda": 0.000407,
+  "firstLineHeight": 0.00105,
+  "extraLineHeight": 0.0016
+}
