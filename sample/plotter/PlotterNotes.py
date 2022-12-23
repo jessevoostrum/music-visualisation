@@ -18,7 +18,6 @@ class PlotterNotes(Plotter):
 
         super().__init__(streamObj, Settings, LocationFinder, axs)
 
-
         self.barSpace = Settings.barSpace
         self.noteLowest = Settings.noteLowest
 
@@ -56,27 +55,37 @@ class PlotterNotes(Plotter):
         if offset is None:
             offset = el.getOffsetInHierarchy(self.streamObj)
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
-        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
+        yPosWithinLine = self._yPosWithinLine(el)
         yPos = yPosLineBase + yPosWithinLine
         offsetLength = el.duration.quarterLength
         xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
 
+        slope = None
+        if self._isGlissando(el):
+            slope = self._plotParallelogram(page, el, elNext, xPos, xLength,  yPos, yPosLineBase)
 
+        else:
+            self._plotRectangle(page, el, elNext, xPos, xLength,  yPos)
 
-        self._plotRectangle(el, page, xLength, xPos, yPos)
-        self._plotNumber(el, elNext, page, xLength, xPos, yPos)
+        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope)
 
         self._plotArticulation(el, elNext)
 
         if self.Settings.lyrics:
-            self._plotLyric(el, page, xLength, xPos, yPosLineBase)
+            self._plotLyric(page, el, xPos, yPosLineBase)
 
-    def _plotRectangle(self, el, page, xLength, xPos, yPos):
+    def _yPosWithinLine(self, el):
+        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
+        return yPosWithinLine
+
+    def _plotRectangle(self, page, el, elNext, xPos, xLength,  yPos):
+        if self._isGlissando(el):
+            return
+
         rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
         xPos += self.Settings.xMarginNote
         xLength -= 2 * self.Settings.xMarginNote
         xLength, xPos = self._extendNotesWhenTied(el, xLength, xPos)
-
 
         alpha, facecolor, hatch = self._adjustVisualParameters(el)
         patch = FancyBboxPatch((xPos, yPos),
@@ -91,14 +100,80 @@ class PlotterNotes(Plotter):
         self.axs[page].add_patch(rec)
         patch.set_clip_path(rec)
 
-    def _plotNumber(self, el, elNext, page, xLengthBeforeExtension, xPos, yPos):
+    def _isGlissando(self, el):
+        if el.getSpannerSites():
+            sp = el.getSpannerSites()[0]
+            return type(sp) == music21.spanner.Glissando
+        else:
+            return False
+
+    def _isStartGlissando(self, el):
+        if self._isGlissando(el):
+            sp = el.getSpannerSites()[0]
+            return sp.isFirst(el)
+        else:
+            return False
+
+    def _isEndGlissando(self, el):
+        if self._isGlissando(el):
+            sp = el.getSpannerSites()[0]
+            return sp.isLast(el)
+        else:
+            return False
+
+    def _plotParallelogram(self, page, el, elNext, xPos, xLength,  yPos, yPosLineBase):
+        # see https://stackoverflow.com/questions/19270673/matplotlib-radius-in-polygon-edges-is-it-possible for
+        # rounded corners
+
+        sp = el.getSpannerSites()[0]
+        alpha, facecolor, hatch = self._adjustVisualParameters(el)
+
+        if self._isStartGlissando(el):
+            noteTarget = sp.getLast()
+
+            yTarget = self._yPosWithinLine(noteTarget) + yPosLineBase
+            yMiddle = (yTarget + yPos) / 2
+
+            leftBottom = [xPos, yPos]
+            leftTop = [xPos, yPos + self.barSpace]
+            rightBottom = [xPos + xLength, yMiddle + self.barSpace]
+            rightTop = [xPos + xLength, yMiddle]
+
+        else:
+            noteOrigin = sp.getFirst()
+            yOrigin = self._yPosWithinLine(noteOrigin) + yPosLineBase
+
+            yMiddle = (yOrigin + yPos) / 2
+
+            leftBottom = [xPos, yMiddle]
+            leftTop = [xPos, yMiddle + self.barSpace]
+            rightBottom = [xPos + xLength, yPos + self.barSpace]
+            rightTop = [xPos + xLength, yPos]
+
+        patch = Polygon([leftBottom, leftTop, rightBottom, rightTop], facecolor=facecolor, alpha=alpha)
+        self.axs[page].add_patch(patch)
+
+        slope = (rightBottom[1] - leftBottom[1]) / xLength
+        return slope
+
+    def _plotNumber(self, page, el, elNext, xPos, xLengthBeforeExtension, yPos, slope):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
-
             xShiftNumbers = self._computeXShiftNumbers(el, elNext, xLengthBeforeExtension)
 
-            xPos += xShiftNumbers
+            slopeFactor = .4
+            horizontalAlignment = 'left'
+            if self._isStartGlissando(el):
+                yPos += slope * self.barSpace * slopeFactor
+                pass
+            elif self._isEndGlissando(el):
+                xPos += xLengthBeforeExtension
+                yPos -= slope * self.barSpace * slopeFactor
+                horizontalAlignment = 'right'
+            else:
+                xPos += xShiftNumbers
+
             yPos += self.yShiftNumbers
 
             fontSize = self.Settings.fontSizeNotes
@@ -107,11 +182,11 @@ class PlotterNotes(Plotter):
 
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=fontSize,
-                                va='baseline', ha='left')
+                                va='baseline', ha=horizontalAlignment)
 
             self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
-    def _plotLyric(self, el, page, xLength, xPos, yPosLineBase):
+    def _plotLyric(self, page, el, xPos, yPosLineBase):
 
         lyric = el.lyric
         if el.lyric:
@@ -190,6 +265,12 @@ class PlotterNotes(Plotter):
             elif el.tie.type == 'stop':
                 xLength += xExtensionNoteWhenTied
                 xPos -= xExtensionNoteWhenTied
+        elif self._isEndGlissando(el):
+            if self._isStartGlissando(el):
+                xLength += xExtensionNoteWhenTied
+            elif self._isEndGlissando(el):
+                xLength += xExtensionNoteWhenTied
+                xPos -= xExtensionNoteWhenTied
         return xLength, xPos
 
     def _computeXShiftNumbers(self, el, elNext, xLengthBeforeExtension):
@@ -238,9 +319,9 @@ class PlotterNotes(Plotter):
                 offset = el.getOffsetInHierarchy(self.streamObj)
                 page, yPosLineBase, xPosStart = self.LocationFinder.getLocation(offset)
 
-                yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
+                yPosWithinLine = self._yPosWithinLine(el)
                 yPos1 = yPosLineBase + yPosWithinLine
-                yPosWithinLine = (elNext.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
+                yPosWithinLine = self._yPosWithinLine(elNext)
                 yPos2 = yPosLineBase + yPosWithinLine
 
                 yShrink = 0.1 * self.barSpace
@@ -309,3 +390,5 @@ class PlotterNotes(Plotter):
         prevs = chain([None], prevs)
         nexts = chain(islice(nexts, 1, None), [None])
         return zip(prevs, items, nexts)
+
+
