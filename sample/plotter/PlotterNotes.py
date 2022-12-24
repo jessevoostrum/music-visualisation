@@ -6,6 +6,9 @@ from matplotlib import cm
 from itertools import tee, islice, chain
 import colorcet as cc
 
+from sample.plotter.patches import Parallelogram
+
+
 
 
 from sample.plotter.Plotter import Plotter
@@ -88,17 +91,18 @@ class PlotterNotes(Plotter):
         xLength, xPos = self._extendNotesWhenTied(el, xLength, xPos)
 
         alpha, facecolor, hatch = self._adjustVisualParameters(el)
-        patch = FancyBboxPatch((xPos, yPos),
-                               xLength, self.barSpace,
-                               boxstyle=f"round, pad=0, rounding_size={self.Settings.radiusCorners}",
-                               mutation_aspect=self.Settings.mutationAspect,
-                               fc=facecolor, alpha=alpha,
-                               edgecolor='black', linewidth=0,
-                               hatch=hatch
-                               )
+
+        leftBottom = [xPos, yPos]
+        leftTop = [xPos, yPos + self.barSpace]
+        rightBottom = [xPos + xLength, yPos]
+        rightTop = [xPos + xLength, yPos + self.barSpace]
+
+        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape='rounded')
+
         self.axs[page].add_patch(patch)
-        self.axs[page].add_patch(rec)
-        patch.set_clip_path(rec)
+
+
+
 
     def _isGlissando(self, el):
         if el.getSpannerSites():
