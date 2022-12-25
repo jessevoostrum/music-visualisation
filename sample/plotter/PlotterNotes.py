@@ -7,12 +7,7 @@ from itertools import tee, islice, chain
 import colorcet as cc
 
 from sample.plotter.patches import Parallelogram
-
-
-
-
 from sample.plotter.Plotter import Plotter
-
 
 
 class PlotterNotes(Plotter):
@@ -65,10 +60,9 @@ class PlotterNotes(Plotter):
 
         slope = None
         if self._isGlissando(el):
-            slope = self._plotParallelogram(page, el, elNext, xPos, xLength,  yPos, yPosLineBase)
-
-        else:
-            self._plotRectangle(page, el, elNext, xPos, xLength,  yPos)
+            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase)
+        elif not self._isGraceNote(el):
+            self._plotRectangle(page, el, xPos, xLength,  yPos)
 
         self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope)
 
@@ -77,18 +71,23 @@ class PlotterNotes(Plotter):
         if self.Settings.lyrics:
             self._plotLyric(page, el, xPos, yPosLineBase)
 
-    def _yPosWithinLine(self, el):
-        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
-        return yPosWithinLine
+    def _plotRectangle(self, page, el, xPos, xLength,  yPos):
 
-    def _plotRectangle(self, page, el, elNext, xPos, xLength,  yPos):
-        if self._isGlissando(el):
-            return
+        if not el.tie:
+            shape = 'rounded'
+            xPos += self.Settings.xMarginNote
+            xLength -= 2 * self.Settings.xMarginNote
 
-        rec = Rectangle((xPos, yPos), xLength, self.barSpace, facecolor="none", edgecolor="none")
-        xPos += self.Settings.xMarginNote
-        xLength -= 2 * self.Settings.xMarginNote
-        xLength, xPos = self._extendNotesWhenTied(el, xLength, xPos)
+        elif el.tie:
+            if el.tie.type == 'start':
+                shape = 'leftRounded'
+                xPos += self.Settings.xMarginNote
+                xLength -= self.Settings.xMarginNote
+            elif el.tie.type == 'continue':
+                shape = 'straight'
+            else:       # if el.tie.type == 'stop'
+                shape = 'rightRounded'
+                xLength -= self.Settings.xMarginNote
 
         alpha, facecolor, hatch = self._adjustVisualParameters(el)
 
@@ -97,37 +96,11 @@ class PlotterNotes(Plotter):
         rightBottom = [xPos + xLength, yPos]
         rightTop = [xPos + xLength, yPos + self.barSpace]
 
-        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape='rounded')
+        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape=shape)
 
         self.axs[page].add_patch(patch)
 
-
-
-
-    def _isGlissando(self, el):
-        if el.getSpannerSites():
-            sp = el.getSpannerSites()[0]
-            return type(sp) == music21.spanner.Glissando
-        else:
-            return False
-
-    def _isStartGlissando(self, el):
-        if self._isGlissando(el):
-            sp = el.getSpannerSites()[0]
-            return sp.isFirst(el)
-        else:
-            return False
-
-    def _isEndGlissando(self, el):
-        if self._isGlissando(el):
-            sp = el.getSpannerSites()[0]
-            return sp.isLast(el)
-        else:
-            return False
-
-    def _plotParallelogram(self, page, el, elNext, xPos, xLength,  yPos, yPosLineBase):
-        # see https://stackoverflow.com/questions/19270673/matplotlib-radius-in-polygon-edges-is-it-possible for
-        # rounded corners
+    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase):
 
         sp = el.getSpannerSites()[0]
         alpha, facecolor, hatch = self._adjustVisualParameters(el)
@@ -138,10 +111,15 @@ class PlotterNotes(Plotter):
             yTarget = self._yPosWithinLine(noteTarget) + yPosLineBase
             yMiddle = (yTarget + yPos) / 2
 
+            xPos += self.Settings.xMarginNote
+            xLength -= self.Settings.xMarginNote
+
             leftBottom = [xPos, yPos]
             leftTop = [xPos, yPos + self.barSpace]
-            rightBottom = [xPos + xLength, yMiddle + self.barSpace]
-            rightTop = [xPos + xLength, yMiddle]
+            rightBottom = [xPos + xLength, yMiddle]
+            rightTop = [xPos + xLength, yMiddle + self.barSpace]
+
+            shape = 'leftRounded'
 
         else:
             noteOrigin = sp.getFirst()
@@ -149,40 +127,45 @@ class PlotterNotes(Plotter):
 
             yMiddle = (yOrigin + yPos) / 2
 
+            xLength -= self.Settings.xMarginNote
+
             leftBottom = [xPos, yMiddle]
             leftTop = [xPos, yMiddle + self.barSpace]
-            rightBottom = [xPos + xLength, yPos + self.barSpace]
-            rightTop = [xPos + xLength, yPos]
+            rightBottom = [xPos + xLength, yPos]
+            rightTop = [xPos + xLength, yPos + self.barSpace]
 
-        patch = Polygon([leftBottom, leftTop, rightBottom, rightTop], facecolor=facecolor, alpha=alpha)
+            shape = 'rightRounded'
+
+        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape=shape)
         self.axs[page].add_patch(patch)
 
         slope = (rightBottom[1] - leftBottom[1]) / xLength
         return slope
 
-    def _plotNumber(self, page, el, elNext, xPos, xLengthBeforeExtension, yPos, slope):
+    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
-            xShiftNumbers = self._computeXShiftNumbers(el, elNext, xLengthBeforeExtension)
+            if not self._isGraceNote(el):
+                xShiftNumbers = self._computeXShiftNumbers(el, xLength)
+                fontSize = self.Settings.fontSizeNotes
+            else:
+                xShiftNumbers = self._computeXShiftNumbersGraceNote(el, elNext)
+                fontSize = self.Settings.fontSizeGraceNotes
 
-            slopeFactor = .4
             horizontalAlignment = 'left'
+            slopeFactor = .4
             if self._isStartGlissando(el):
                 yPos += slope * self.barSpace * slopeFactor
                 pass
             elif self._isEndGlissando(el):
-                xPos += xLengthBeforeExtension
+                xPos += xLength
                 yPos -= slope * self.barSpace * slopeFactor
                 horizontalAlignment = 'right'
             else:
                 xPos += xShiftNumbers
 
             yPos += self.yShiftNumbers
-
-            fontSize = self.Settings.fontSizeNotes
-            if not el.duration.linked:
-                fontSize = self.Settings.fontSizeGraceNotes
 
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=fontSize,
@@ -220,7 +203,6 @@ class PlotterNotes(Plotter):
         if lyric:
             if lyric[-1] == "-":
                 self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
-        
 
     def _adjustVisualParameters(self, el):
 
@@ -254,40 +236,55 @@ class PlotterNotes(Plotter):
             hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
         return alpha, facecolor, hatch
 
+    def _yPosWithinLine(self, el):
+        yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
+        return yPosWithinLine
+
+    def _isGlissando(self, el):
+        if el.getSpannerSites():
+            sp = el.getSpannerSites()[0]
+            return type(sp) == music21.spanner.Glissando
+        else:
+            return False
+
+    def _isStartGlissando(self, el):
+        if self._isGlissando(el):
+            sp = el.getSpannerSites()[0]
+            return sp.isFirst(el)
+        else:
+            return False
+
+    def _isEndGlissando(self, el):
+        if self._isGlissando(el):
+            sp = el.getSpannerSites()[0]
+            return sp.isLast(el)
+        else:
+            return False
+
+    def _isGraceNote(self, el):
+        return not el.duration.linked
+
     def _relativePitchToCircleOfFifthsIndex(self, relativePitch):
         pitchesCircleOfFifths = [(i*7) % 12 for i in range(12)]
         return pitchesCircleOfFifths.index(relativePitch)
 
-    def _extendNotesWhenTied(self, el, xLength, xPos):
-        xExtensionNoteWhenTied = self.Settings.radiusCorners + self.Settings.xMarginNote
-        if el.tie:
-            if el.tie.type == 'start':
-                xLength += xExtensionNoteWhenTied
-            elif el.tie.type == 'continue':
-                xLength += 2 * xExtensionNoteWhenTied
-                xPos -= xExtensionNoteWhenTied
-            elif el.tie.type == 'stop':
-                xLength += xExtensionNoteWhenTied
-                xPos -= xExtensionNoteWhenTied
-        elif self._isEndGlissando(el):
-            if self._isStartGlissando(el):
-                xLength += xExtensionNoteWhenTied
-            elif self._isEndGlissando(el):
-                xLength += xExtensionNoteWhenTied
-                xPos -= xExtensionNoteWhenTied
-        return xLength, xPos
 
-    def _computeXShiftNumbers(self, el, elNext, xLengthBeforeExtension):
+    def _computeXShiftNumbers(self, el,xLength):
 
-        if el.duration.linked:  # not grace note
+        xShiftNumbers = self.Settings.xShiftNumberNote
+        if xLength < (2 * self.Settings.xShiftNumberNote + self.Settings.widthNumberNote) and (not el.tie):
+            xShiftNumbers = 0.5 * xLength - 0.5 * self.Settings.widthNumberNote
 
-            xShiftNumbers = self.Settings.xShiftNumberNote
-            if xLengthBeforeExtension < (2 * self.Settings.xShiftNumberNote + self.Settings.widthNumberNote) and (
-            not el.tie):
-                xShiftNumbers = 0.5 * xLengthBeforeExtension - 0.5 * self.Settings.widthNumberNote
+        return xShiftNumbers
 
-        # grace notes
-        elif el.beams.beamsList:  # multiple grace notes
+    def _computeXShiftNumbersGraceNote(self, el, elNext):
+
+        # single grace note
+        if not el.beams.beamsList:
+            xShiftNumbers = 0
+
+        # multiple grace notes
+        else:
             if el.beams.getTypes()[0] == 'start':  #
                 xShiftNumbers = 0
                 self.graceNoteCounter += 1
@@ -301,10 +298,6 @@ class PlotterNotes(Plotter):
             elif el.beams.getTypes()[0] == 'stop':
                 xShiftNumbers = self.Settings.xShiftNumberNote * self.graceNoteCounter / (self.graceNoteCounter + 1)
                 self.graceNoteCounter = 0
-
-        else:      # one grace note
-            xShiftNumbers = 0
-
 
         return xShiftNumbers
 
