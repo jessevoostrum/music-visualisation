@@ -21,7 +21,6 @@ class PlotterNotes(Plotter):
 
         self.key = Settings.key
 
-        self.yShiftNumbers = self._computeYShiftNumbers()
         self.graceNoteCounter = 0
 
         self.lastLyricEnd = 0
@@ -155,17 +154,21 @@ class PlotterNotes(Plotter):
 
             horizontalAlignment = 'left'
             slopeFactor = .4
+
+            xShiftNumbersGlissando = 0.002
             if self._isStartGlissando(el):
-                yPos += slope * self.barSpace * slopeFactor
-                pass
+                yPos += slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
+                xPos += xShiftNumbersGlissando
+
             elif self._isEndGlissando(el):
                 xPos += xLength
-                yPos -= slope * self.barSpace * slopeFactor
+                xPos -= xShiftNumbersGlissando
+                yPos -= slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
                 horizontalAlignment = 'right'
             else:
                 xPos += xShiftNumbers
 
-            yPos += self.yShiftNumbers
+            yPos += self._computeYShiftNumbers()
 
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=fontSize,
