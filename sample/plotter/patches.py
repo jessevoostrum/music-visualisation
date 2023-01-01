@@ -5,6 +5,11 @@ import numpy as np
 
 def Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha=1, facecolor='blue', hatch=None, shape='straight'):
 
+    leftBottom = np.array(leftBottom)
+    leftTop = np.array(leftTop)
+    rightBottom = np.array(rightBottom)
+    rightTop = np.array(rightTop)
+
     deltaX = rightBottom[0] - leftBottom[0]
     deltaY = rightBottom[1] - leftBottom[1]
     if deltaX > 0:

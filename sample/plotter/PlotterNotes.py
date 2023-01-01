@@ -153,7 +153,6 @@ class PlotterNotes(Plotter):
                 fontSize = self.Settings.fontSizeGraceNotes
 
             horizontalAlignment = 'left'
-            slopeFactor = .4
 
             xShiftNumbersGlissando = 0.002
             if self._isStartGlissando(el):
