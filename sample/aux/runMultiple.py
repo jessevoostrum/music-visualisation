@@ -39,6 +39,11 @@ dirSongs = dir_songs_bass
 
 settings["measuresPerLine"] = 2
 settings["subdivision"] = 2
+settings["setInMajorKey"] = False
+settings["lyrics"] = False
+settings['coloursVoices'] = False
+settings['coloursCircleOfFifths'] = False
+settings['thickBarlines'] = False
 
 lines = glob.glob(dirSongs + '*' + '.mxl')
 lines = [os.path.basename(line) for line in lines]

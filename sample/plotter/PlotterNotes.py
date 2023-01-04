@@ -228,9 +228,9 @@ class PlotterNotes(Plotter):
             # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
             facecolor = cc.cm.colorwheel(colormapIndex)
             alpha = self._alpha(circleOfFifthIndex)
-            if circleOfFifthIndex == 0:
-                facecolor = (0,0,1,1)
-                alpha = 0.2
+            # if circleOfFifthIndex == 0:
+            #     facecolor = (0,0,1,1)
+            #     alpha = 0.2
 
         elif self.Settings.coloursVoices:
             if el.containerHierarchy():
@@ -279,8 +279,8 @@ class PlotterNotes(Plotter):
         return pitchesCircleOfFifths.index(relativePitch)
 
     def _alpha(self, circleOfFifthIndex):
-        lowestAlpha = 0.3
-        highestAlpha = 0.5
+        lowestAlpha = 0.2
+        highestAlpha = 0.4
         firstAlphas = np.linspace(lowestAlpha, highestAlpha, 6, endpoint=False)
         lastAlphas = np.linspace(highestAlpha, lowestAlpha, 6, endpoint=False)
         alphas = np.concatenate((firstAlphas, lastAlphas))
