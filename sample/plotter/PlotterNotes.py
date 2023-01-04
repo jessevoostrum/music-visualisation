@@ -5,6 +5,7 @@ from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from matplotlib import cm
 from itertools import tee, islice, chain
 import colorcet as cc
+import numpy as np
 
 from sample.plotter.patches import Parallelogram
 from sample.plotter.Plotter import Plotter
@@ -221,11 +222,15 @@ class PlotterNotes(Plotter):
             pitchKey = self.key.getTonic().ps
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
-            colormapIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch) / 12
+            circleOfFifthIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch)
+            colormapIndex = circleOfFifthIndex / 12
 
             # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
             facecolor = cc.cm.colorwheel(colormapIndex)
-            alpha = .5
+            alpha = self._alpha(circleOfFifthIndex)
+            if circleOfFifthIndex == 0:
+                facecolor = (0,0,1,1)
+                alpha = 0.2
 
         elif self.Settings.coloursVoices:
             if el.containerHierarchy():
@@ -273,6 +278,14 @@ class PlotterNotes(Plotter):
         pitchesCircleOfFifths = [(i*7) % 12 for i in range(12)]
         return pitchesCircleOfFifths.index(relativePitch)
 
+    def _alpha(self, circleOfFifthIndex):
+        lowestAlpha = 0.3
+        highestAlpha = 0.5
+        firstAlphas = np.linspace(lowestAlpha, highestAlpha, 6, endpoint=False)
+        lastAlphas = np.linspace(highestAlpha, lowestAlpha, 6, endpoint=False)
+        alphas = np.concatenate((firstAlphas, lastAlphas))
+        alpha = alphas[circleOfFifthIndex]
+        return alpha
 
     def _computeXShiftNumbers(self, el,xLength):
 
