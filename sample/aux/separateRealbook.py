@@ -101,7 +101,7 @@ if __name__ == '__main__':
     lines = [os.path.basename(line) for line in lines]
     lines.sort()
 
-    for line in lines[1:2]:
+    for line in lines[-1:]:
 
         print(line)
 
