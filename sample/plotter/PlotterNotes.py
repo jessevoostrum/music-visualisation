@@ -88,6 +88,9 @@ class PlotterNotes(Plotter):
                 shape = 'rightRounded'
                 xLength -= self.Settings.xMarginNote
 
+        if self._isVibrato(el):
+            shape = 'squiggly'
+
         alpha, facecolor, hatch = self._adjustVisualParameters(el)
 
         leftBottom = [xPos, yPos]
@@ -381,6 +384,13 @@ class PlotterNotes(Plotter):
     def _articulationInList(self, articulations, name):
         for articulation in articulations:
             if articulation.name == name:
+                return True
+        return False
+
+    def _isVibrato(self, el):
+        for TrillExtension in self.streamObj[music21.expressions.TrillExtension]:
+            firstSpannedElement = TrillExtension.getSpannedElements()[0]
+            if firstSpannedElement.id == el.id:
                 return True
         return False
 
