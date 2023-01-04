@@ -41,6 +41,7 @@
   "hDistanceChordAddition": -0.001,
   "widthThickBarline": 0.002,
   "timeSignatureWithBarlines": true,
-  "lyrics": false
+  "lyrics": false,
+  "thickBarlines": true
 }
 

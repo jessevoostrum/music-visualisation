@@ -59,6 +59,7 @@ class Settings:
         self.widthThickBarline = settings['widthThickBarline']
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
         self.lyrics = settings['lyrics']
+        self.thickBarlines = settings['thickBarlines']
 
         f = open('sample/fontDimensions.json')
         fontDimensions = json.load(f)

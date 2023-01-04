@@ -49,29 +49,31 @@ class PlotterBarlines(Plotter):
         if not measure.number == 0:
             self._plotVBar(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
-        offsetEndMeasure = measure.offset + measure.quarterLength
-        self._plotVBar(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
+            offsetEndMeasure = measure.offset + measure.quarterLength
+            self._plotVBar(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
 
-        for barLine in measure[music21.bar.Barline]:
-            offset = measure.offset + barLine.offset
+        if self.Settings.thickBarlines:
 
-            if type(barLine) == music21.bar.Repeat:
+            for barLine in measure[music21.bar.Barline]:
+                offset = measure.offset + barLine.offset
 
-                if barLine.direction == 'start':
-                    start = True
-                else:
-                    start = False
+                if type(barLine) == music21.bar.Repeat:
 
-                self._plotVBar(offset, self.Settings.lineWidth0 + 1, self.Settings.heightBarline0Extension, start,
-                               rectangle=True)
-                self._plotDots(offset, start)
-                self._plotHBar(offset, start)
+                    if barLine.direction == 'start':
+                        start = True
+                    else:
+                        start = False
 
-            if type(barLine) == music21.bar.Barline and barLine.type == 'final':
-                self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, rectangle=True)
+                    self._plotVBar(offset, self.Settings.lineWidth0 + 1, self.Settings.heightBarline0Extension, start,
+                                   rectangle=True)
+                    self._plotDots(offset, start)
+                    self._plotHBar(offset, start)
 
-            if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
-                self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, double=True)
+                if type(barLine) == music21.bar.Barline and barLine.type == 'final':
+                    self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, rectangle=True)
+
+                if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
+                    self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, double=True)
 
 
     def _plotSubdivisionBarlines(self, measure, step, lineWidth):
