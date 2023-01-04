@@ -380,7 +380,11 @@ class PlotterNotes(Plotter):
                 fontsize = 7
                 fontHeight = fontsize * 0.0008554
                 yPosBaseline = yPosCenter -  fontHeight / 2
-                self.axs[page].text(xPos, yPosBaseline, "H", ha='center', va='baseline', font='Arial', fontsize=7, fontstyle='normal', zorder=2)
+                if articulation == 'hammer on':
+                    letter = "H"
+                else:
+                    letter = "P"
+                self.axs[page].text(xPos, yPosBaseline, letter, ha='center', va='baseline', font='Arial', fontsize=7, fontstyle='normal', zorder=2)
 
 
 
