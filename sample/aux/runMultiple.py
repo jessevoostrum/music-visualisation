@@ -15,6 +15,7 @@ from sample.main import Visualiser
 
 dir_songs_bass = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/"
 dir_songs_standards = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
+dir_songs_testsuite = "/Users/jvo/Documents/music-visualisation/testsuite/"
 
 f = open('sample/settings.json')
 settings = json.load(f)
@@ -35,17 +36,19 @@ settings = json.load(f)
 #     lines = f.readlines()
 
 
-dirSongs = dir_songs_bass
+dirSongs = dir_songs_testsuite
 
-settings["measuresPerLine"] = 2
-settings["subdivision"] = 2
-settings["setInMajorKey"] = False
+settings["measuresPerLine"] = 4
+settings["subdivision"] = 0
+settings["setInMajorKey"] = True
 settings["lyrics"] = False
 settings['coloursVoices'] = False
 settings['coloursCircleOfFifths'] = False
 settings['thickBarlines'] = False
 
-lines = glob.glob(dirSongs + '*' + '.mxl')
+lines1 = glob.glob(dirSongs + '*' + '.mxl')
+lines2 = glob.glob(dirSongs + '*' + '.musicxml')
+lines = lines1 + lines2
 lines = [os.path.basename(line) for line in lines]
 lines.sort()
 
@@ -60,6 +63,6 @@ for line in lines:
 
         vis = Visualiser(streamObj, settings)
 
-        vis.generate("output/")
+        vis.generate("output/testsuite/")
     except:
         pass
