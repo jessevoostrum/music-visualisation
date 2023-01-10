@@ -17,8 +17,6 @@ class PlotterMetadata(Plotter):
 
         self.offsetLineMax = self.Settings.offsetLineMax
 
-        self.key = self.Settings.key
-
         self.xPosLeft, self.xPosRight = self._computeXPos()
 
 
@@ -50,10 +48,9 @@ class PlotterMetadata(Plotter):
 
     def _plotKey(self):
 
-        letter = self.key.tonic.name[0]
-
+        key = self.Settings.getKey(0)
         self.ax.text(self.xPosLeft, self.Settings.yPosPlayer,
-                          f"1 = {self._getKeyLetter(self.key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
+                          f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
     def getSongTitle(self):

@@ -30,15 +30,6 @@ class Plotter:
                                     va='baseline', ha='right', fontname='Vulf Mono', #fontweight=1
                                     )
 
-    def _getKey(self, offset):
-        for key in self.streamObj[music21.key.Key]:
-            offsetKey = key.getOffsetInHierarchy(self.streamObj)
-            if offset >= offsetKey:
-                lastKey = key
-            else:
-                break
-        return lastKey
-
 
     def _getKeyLetter(self, key):
         letter = key.tonic.name[0]
