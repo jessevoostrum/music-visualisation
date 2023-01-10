@@ -3,10 +3,13 @@ import json
 from types import SimpleNamespace
 import music21
 
-class FontSettings:
+from sample.plotter.Plotter import Plotter
 
-    def __init__(self, settings):
-        self.settings = settings
+
+# class FontSettings:
+#
+#     def __init__(self, settings):
+#         self.settings = settings
 
 class Settings:
 
@@ -81,10 +84,9 @@ class Settings:
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
-        self.key = self._getKey()
 
-
-        if self.key.mode == 'major':
+        key = self.getKey(0)
+        if key.mode == 'major':
             self.facecolor = settings['facecolor']
             self.facecolor2 = settings['facecolor2']
 
@@ -95,6 +97,36 @@ class Settings:
 
     def getSettings(self):
         return self.settings
+
+    def getKey(self, offset):
+        lastKey = None
+        if self.streamObj[music21.key.Key, music21.key.KeySignature]:
+            for key in self.streamObj[music21.key.Key, music21.key.KeySignature]:
+                key = self._preprocessKey(key)
+                offsetKey = key.getOffsetInHierarchy(self.streamObj)
+                if offset >= offsetKey:
+                    lastKey = key
+                else:
+                    break
+
+        if not lastKey:
+            print('no key signature')
+            try:
+                lastKey = self.streamObj.analyze('key')
+            except:
+                lastKey = music21.key.Key('C')
+                print('key analysis failed')
+
+        return lastKey
+
+    def _preprocessKey(self, key):
+        if type(key) == music21.key.KeySignature:
+            key = key.asKey()
+
+        if self.setInMajorKey and key.mode == 'minor':
+            key = key.relative
+
+        return key
 
 
     def _getRangeNotes(self):
@@ -129,34 +161,6 @@ class Settings:
                     maxNumLines = numLines
 
         return maxNumLines
-
-    def _getKey(self):
-        if self.streamObj[music21.key.Key].first():
-            key = self.streamObj[music21.key.Key].first()
-        elif self.streamObj[music21.key.KeySignature].first():
-            key1 = self.streamObj[music21.key.KeySignature].first().asKey()
-            if self.setInMajorKey:
-                key = key1
-            else:
-                try:
-                    key = self.streamObj.analyze('key')
-                except:
-                    key = music21.key.Key('C')
-                    print('key analysis failed')
-                if not (key == key1 or key == key1.relative):
-                    print("analysed key does not correspond to keysignature")
-        else:
-            try:
-                key = self.streamObj.analyze('key')
-            except:
-                key = music21.key.Key('C')
-                print('key analysis failed')
-            print("no key signature found")
-
-        if self.setInMajorKey and key.mode == 'minor':
-            key = key.relative
-
-        return key
 
 
     def _getLengthFirstMeasure(self):

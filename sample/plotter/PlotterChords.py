@@ -10,8 +10,6 @@ class PlotterChords(Plotter):
 
         self.yMin = self.Settings.yMin
 
-        self.key = self.Settings.key
-
     def plotChords(self):
         chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
         for i, chord, in enumerate(chords):
@@ -36,7 +34,7 @@ class PlotterChords(Plotter):
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
-        key = self._getKey(offsetEl)
+        key = self.Settings.getKey(offsetEl)
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         self.axs[page].text(xPos, yPos, number,

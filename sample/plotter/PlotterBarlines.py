@@ -220,13 +220,13 @@ class PlotterBarlines(Plotter):
                                     va=va, ha=ha)
 
     def _plotKey(self, measure):
-        if measure[music21.key.Key] and measure.number > 1:
+        if measure[music21.key.Key, music21.key.KeySignature] and measure.number > 1:
             offset = measure.getOffsetInHierarchy(self.streamObj)
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
             yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
 
             xPos += self.Settings.xShiftNumberNote
-            key = self._getKey(offset)
+            key = self.Settings.getKey(offset)
             self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
                                 va='baseline', ha='left')
 

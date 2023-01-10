@@ -20,8 +20,6 @@ class PlotterNotes(Plotter):
         self.barSpace = Settings.barSpace
         self.noteLowest = Settings.noteLowest
 
-        self.key = Settings.key
-
         self.graceNoteCounter = 0
 
         self.lastLyricEnd = 0
@@ -148,7 +146,7 @@ class PlotterNotes(Plotter):
     def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope):
         if not (el.tie and not (el.tie.type == 'start')):
             offsetEl = el.getOffsetInHierarchy(self.streamObj)
-            key = self._getKey(offsetEl)
+            key = self.Settings.getKey(offsetEl)
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
             if not self._isGraceNote(el):
@@ -221,6 +219,7 @@ class PlotterNotes(Plotter):
 
         if self.Settings.coloursCircleOfFifths:
 
+            key = self.Settings.getKey(el.getOffsetInHierarchy(self.streamObj))
             pitchKey = self.key.getTonic().ps
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
