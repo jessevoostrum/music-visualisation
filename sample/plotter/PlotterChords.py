@@ -35,7 +35,9 @@ class PlotterChords(Plotter):
 
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
-        number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+        offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
+        key = self._getKey(offsetEl)
+        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         self.axs[page].text(xPos, yPos, number,
                             va='baseline', size=self.Settings.fontSizeChords)
