@@ -147,7 +147,9 @@ class PlotterNotes(Plotter):
 
     def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope):
         if not (el.tie and not (el.tie.type == 'start')):
-            number, accidental = self.key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
+            offsetEl = el.getOffsetInHierarchy(self.streamObj)
+            key = self._getKey(offsetEl)
+            number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
             if not self._isGraceNote(el):
                 xShiftNumbers = self._computeXShiftNumbers(el, xLength)

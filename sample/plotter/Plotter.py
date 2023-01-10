@@ -1,3 +1,5 @@
+import music21
+
 class Plotter:
 
     def __init__(self, streamObj, Settings, LocationFinder, axs):
@@ -28,3 +30,28 @@ class Plotter:
                                     va='baseline', ha='right', fontname='Vulf Mono', #fontweight=1
                                     )
 
+    def _getKey(self, offset):
+        for key in self.streamObj[music21.key.Key]:
+            offsetKey = key.getOffsetInHierarchy(self.streamObj)
+            if offset >= offsetKey:
+                lastKey = key
+            else:
+                break
+        return lastKey
+
+
+    def _getKeyLetter(self, key):
+        letter = key.tonic.name[0]
+        accidental = key.tonic.accidental
+        if accidental:
+            if accidental.name == 'sharp':
+                letter = letter + "{}^\\#"
+            elif accidental.name == 'flat':
+                letter = letter + "{}^b"
+
+        if key.mode == 'minor':
+            letter += '-'
+
+        letter = f"$\\mathregular{{{letter}}}$"
+
+        return letter

@@ -45,6 +45,8 @@ class PlotterBarlines(Plotter):
             if self.Settings.subdivision == 0:
                 self._plotTimeSignature(measure, firstMeasure)
 
+            self._plotKey(measure)
+
     def _plotMeasureBarlines(self, measure):
         if not measure.number == 0:
             self._plotVBar(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
@@ -216,6 +218,17 @@ class PlotterBarlines(Plotter):
                                     fontsize=fontsize,
                                     fontproperties=fp,
                                     va=va, ha=ha)
+
+    def _plotKey(self, measure):
+        if measure[music21.key.Key] and measure.number > 1:
+            offset = measure.getOffsetInHierarchy(self.streamObj)
+            page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
+            yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
+
+            xPos += self.Settings.xShiftNumberNote
+            key = self._getKey(offset)
+            self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
+                                va='baseline', ha='left')
 
     def _plotTimeSignature(self, measure, firstMeasure):
 

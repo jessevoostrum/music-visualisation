@@ -53,7 +53,7 @@ class PlotterMetadata(Plotter):
         letter = self.key.tonic.name[0]
 
         self.ax.text(self.xPosLeft, self.Settings.yPosPlayer,
-                          f"1 = {self._getKeyLetter()} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
+                          f"1 = {self._getKeyLetter(self.key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
     def getSongTitle(self):
@@ -81,21 +81,6 @@ class PlotterMetadata(Plotter):
             pass
         return player
 
-    def _getKeyLetter(self):
-        letter = self.key.tonic.name[0]
-        accidental = self.key.tonic.accidental
-        if accidental:
-            if accidental.name == 'sharp':
-                letter = letter + "{}^\\#"
-            elif accidental.name == 'flat':
-                letter = letter + "{}^b"
-
-        if self.key.mode == 'minor':
-            letter += '-'
-
-        letter = f"$\\mathregular{{{letter}}}$"
-
-        return letter
 
     def _computeXPos(self):
         offsetLengthLine = self.offsetLineMax + 2 * self.Settings.xMinimalPickupMeasureSpace
