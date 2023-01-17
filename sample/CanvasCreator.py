@@ -12,14 +12,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
 
 # Add every font at the specified location
-font_dir = ['/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/OH no Type Company Order #e6cd109/Vulf Mono/Desktop']
-for font in font_manager.findSystemFonts(font_dir):
-    font_manager.fontManager.addfont(font)
 
-# Set font family globally
-rcParams['font.family'] = 'Vulf Mono'
-rcParams['font.style'] = 'italic'
-rcParams['font.weight'] = 'light'
 
 
 
@@ -27,6 +20,16 @@ class CanvasCreator:
     def __init__(self, Settings, numPages):
 
         self.Settings = Settings
+
+        fontDir = self.Settings.fontDirectory
+        if fontDir:
+            for font in font_manager.findSystemFonts(fontDir):
+                font_manager.fontManager.addfont(font)
+
+        # Set font family globally
+        rcParams['font.family'] = self.Settings.font
+        rcParams['font.style'] = self.Settings.fontStyle
+        rcParams['font.weight'] = self.Settings.fontWeight
 
         self.yMin = self.Settings.yMin
         self.yMax = self.Settings.yMax
@@ -38,6 +41,8 @@ class CanvasCreator:
         self.axs = []
 
         self._createCanvas(numPages)
+
+
 
     def saveFig(self, title, pathName, yPosLowest):
 

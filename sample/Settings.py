@@ -55,6 +55,9 @@ class Settings:
         self.radiusCorners = settings['radiusCorners']
         self.mutationAspect = settings['mutationAspect']
         self.font = settings['font']
+        self.fontDirectory = settings['fontDirectory']
+        self.fontStyle = settings["fontStyle"]
+        self.fontWeight = settings["fontWeight"]
         self.fontSizeAccidentalRelative = settings['fontSizeAccidentalRelative']
         self.hDistanceChordAddition = settings['hDistanceChordAddition']
         self.widthThickBarline = settings['widthThickBarline']
@@ -64,11 +67,15 @@ class Settings:
 
         f = open('sample/fontDimensions.json')
         fontDimensions = json.load(f)
+        if self.font in fontDimensions:
+            fD = fontDimensions[self.font]
+        else:
+            fD = fontDimensions["DejaVu Sans"]
 
-        self.capsizeNumberRelative = fontDimensions[self.font]["capsize"]
-        self.widthNumberRelative = fontDimensions[self.font]["width"]
-        self.capsizeNumberNote = fontDimensions[self.font]["capsize"] * self.fontSizeNotes
-        self.widthNumberNote = fontDimensions[self.font]["width"] * self.fontSizeNotes
+        self.capsizeNumberRelative = fD["capsize"]
+        self.widthNumberRelative = fD["width"]
+        self.capsizeNumberNote = fD["capsize"] * self.fontSizeNotes
+        self.widthNumberNote = fD["width"] * self.fontSizeNotes
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
         self.lyricHeightMax = fontDimensions["firstLineHeight"] * self.fontSizeLyrics + (self._countLinesLyrics() - 1) * fontDimensions["extraLineHeight"] * self.fontSizeLyrics

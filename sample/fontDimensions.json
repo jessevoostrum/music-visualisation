@@ -4,8 +4,21 @@
     "capsize":  0.00075,
     "width": 0.00124
   },
+  "DejaVu Sans": {
+    "capsize": 0.0008725,
+    "width": 0.001075
+  },
+  "Courier New": {
+    "capsize": 0.0006843,
+    "width": 0.00101
+  },
+  "Helvetica": {
+    "capsize": 0.0008554,
+    "width": 0.0009346
+  },
   "Arial": {
-    "capsize": 0.008554
+    "capsize": 0.0008554,
+    "width": 0.0009346
   },
   "segno": 0.000542,
   "coda": 0.000407,
