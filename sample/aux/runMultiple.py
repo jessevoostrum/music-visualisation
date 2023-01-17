@@ -45,6 +45,8 @@ settings["lyrics"] = False
 settings['coloursVoices'] = False
 settings['coloursCircleOfFifths'] = False
 settings['thickBarlines'] = False
+settings['fontDirectory'] = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/Vulf Mono/Vulf Mono/Desktop"
+
 
 lines1 = glob.glob(dirSongs + '*' + '.mxl')
 lines2 = glob.glob(dirSongs + '*' + '.musicxml')
