@@ -12,7 +12,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
 
 # Add every font at the specified location
-font_dir = ['/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop']
+font_dir = ['/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/OH no Type Company Order #e6cd109/Vulf Mono/Desktop']
 for font in font_manager.findSystemFonts(font_dir):
     font_manager.fontManager.addfont(font)
 
