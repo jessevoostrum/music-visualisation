@@ -102,8 +102,8 @@ class Settings:
         lastKey = None
         if self.streamObj[music21.key.Key, music21.key.KeySignature]:
             for key in self.streamObj[music21.key.Key, music21.key.KeySignature]:
-                key = self._preprocessKey(key)
                 offsetKey = key.getOffsetInHierarchy(self.streamObj)
+                key = self._preprocessKey(key)
                 if offset >= offsetKey:
                     lastKey = key
                 else:

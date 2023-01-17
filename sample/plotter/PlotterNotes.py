@@ -158,18 +158,20 @@ class PlotterNotes(Plotter):
 
             horizontalAlignment = 'left'
 
-            xShiftNumbersGlissando = 0.002
-            if self._isStartGlissando(el):
-                yPos += slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
-                xPos += xShiftNumbersGlissando
-
-            elif self._isEndGlissando(el):
-                xPos += xLength
-                xPos -= xShiftNumbersGlissando
-                yPos -= slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
-                horizontalAlignment = 'right'
-            else:
+            if not self._isGlissando(el):
                 xPos += xShiftNumbers
+
+            else:
+                xShiftNumbersGlissando = 0.002
+                if self._isStartGlissando(el):
+                    yPos += slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
+                    xPos += xShiftNumbersGlissando
+
+                elif self._isEndGlissando(el):
+                    xPos += xLength
+                    xPos -= xShiftNumbersGlissando
+                    yPos -= slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
+                    horizontalAlignment = 'right'
 
             yPos += self._computeYShiftNumbers()
 
