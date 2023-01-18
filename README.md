@@ -1,9 +1,9 @@
 # music-visualisation
 
-requirements:
+### requirements
 - music21
 - matplotlib
 
-example  
+### example  
 An example usage of the code is found in example/example.py
 
