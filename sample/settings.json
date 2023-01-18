@@ -29,7 +29,7 @@
   "yLengthTitleAx": 0.07,
   "yPosTitle": 0.965,
   "yPosComposer": 0.935,
-  "yPosPlayer": 0.92,
+  "yPosArranger": 0.92,
   "lineWidth0": 1,
   "lineWidth1": 1,
   "lineWidth2": 0.2,
@@ -45,6 +45,7 @@
   "widthThickBarline": 0.002,
   "timeSignatureWithBarlines": true,
   "lyrics": false,
-  "thickBarlines": true
+  "thickBarlines": true,
+  "printArranger": true
 }
 

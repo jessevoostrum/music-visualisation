@@ -47,7 +47,7 @@ class Settings:
         self.yLengthTitleAx = settings['yLengthTitleAx']
         self.yPosTitle = settings['yPosTitle']
         self.yPosComposer = settings['yPosComposer']
-        self.yPosPlayer = settings['yPosPlayer']
+        self.yPosArranger = settings['yPosArranger']
         self.lineWidth0 = settings['lineWidth0']
         self.lineWidth1 = settings['lineWidth1']
         self.lineWidth2 = settings['lineWidth2']
@@ -64,6 +64,7 @@ class Settings:
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
         self.lyrics = settings['lyrics']
         self.thickBarlines = settings['thickBarlines']
+        self.printArranger = settings['printArranger']
 
         f = open('sample/fontDimensions.json')
         fontDimensions = json.load(f)
@@ -149,7 +150,7 @@ class Settings:
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
         chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
         if chords:
-            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNumberNote * 1.3
+            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNumberNote * 1.4
             yMarginTopChord = self.fontSizeChords * 1
             if self.lyrics:
                 yMin = - (chordHeight + self.lyricHeightMax)
