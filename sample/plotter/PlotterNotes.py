@@ -182,6 +182,8 @@ class PlotterNotes(Plotter):
             self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
     def _plotLyric(self, page, el, xPos, yPosLineBase):
+        """lyrics are plotted with vertical_alignment='top' at yPosLineBass.
+        By multiple lines, the lyric already contains a newline command within it"""
 
         lyric = el.lyric
         if el.lyric:
@@ -190,7 +192,9 @@ class PlotterNotes(Plotter):
                 lyric += "-"
         xPosCenter = xPos + self.Settings.xShiftNumberNote / 4
 
-        if xPosCenter < self.lastLyricEnd and self.yPosLineBaseLast == yPosLineBase:
+        sameLineAsLastElement = self.yPosLineBaseLast == yPosLineBase
+
+        if xPosCenter < self.lastLyricEnd and sameLineAsLastElement:
             xPosCenter = self.lastLyricEnd + self.Settings.widthNumberNote * 0.3
 
         self.yPosLineBaseLast = yPosLineBase

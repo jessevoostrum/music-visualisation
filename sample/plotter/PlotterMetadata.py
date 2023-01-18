@@ -23,7 +23,7 @@ class PlotterMetadata(Plotter):
     def plotMetadata(self):
         self._plotTitle()
         self._plotComposer()
-        self._plotPlayer()
+        self._plotArranger()
         self._plotKey()
 
     def _plotTitle(self):
@@ -32,8 +32,8 @@ class PlotterMetadata(Plotter):
                      verticalalignment='top')
 
     def _plotComposer(self):
-        if self._getPlayer() == "":
-            height = self.Settings.yPosPlayer
+        if self._getArranger() == "" or not self.Settings.printArranger:
+            height = self.Settings.yPosArranger
         else:
             height = self.Settings.yPosComposer
 
@@ -41,15 +41,16 @@ class PlotterMetadata(Plotter):
                           self._getComposer(), fontsize=self.Settings.fontSizeMetadata, horizontalalignment='right',
         verticalalignment='baseline')
 
-    def _plotPlayer(self):
-        self.ax.text(self.xPosRight, self.Settings.yPosPlayer,
-                          self._getPlayer(), fontsize=self.Settings.fontSizeMetadata, horizontalalignment='right',
+    def _plotArranger(self):
+        if self.Settings.printArranger:
+            self.ax.text(self.xPosRight, self.Settings.yPosArranger,
+                          self._getArranger(), fontsize=self.Settings.fontSizeMetadata, horizontalalignment='right',
                           verticalalignment='baseline')
 
     def _plotKey(self):
 
         key = self.Settings.getKey(0)
-        self.ax.text(self.xPosLeft, self.Settings.yPosPlayer,
+        self.ax.text(self.xPosLeft, self.Settings.yPosArranger,
                           f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
@@ -67,7 +68,7 @@ class PlotterMetadata(Plotter):
             composer = "no composer"
         return composer
 
-    def _getPlayer(self):
+    def _getArranger(self):
         player = ""
         try:
             contributors = self.streamObj.metadata.contributors
