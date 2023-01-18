@@ -6,6 +6,10 @@ scratch/
 sheetMusic/
 *.ipynb_checkpoints/
 *output/
+testsuite/
+*.txt
+
+sample/runSingle.py
 
 
 ## Core latex/pdflatex auxiliary files:
