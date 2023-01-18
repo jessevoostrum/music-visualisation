@@ -1,19 +1,9 @@
-"""
-summary:
-- associate lines to pages
-- give every line a location on the page
-"""
-
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 from matplotlib import rcParams
 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
-
-# Add every font at the specified location
-
-
 
 
 class CanvasCreator:

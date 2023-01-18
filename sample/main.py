@@ -1,19 +1,30 @@
 """Jesse van Oostrum"""
-import music21.stream
+import json
+import os
+
+import music21
 
 from sample.plotter.PlotterMain import PlotterMain
 from sample.LocationFinder import LocationFinder
 from sample.CanvasCreator import CanvasCreator
 from sample.Settings import Settings
 
+# print(os.getcwd())
 
 class Visualiser:
     """class for making visualisations from a music21 stream"""
 
-    def __init__(self, streamObj, settings):
+    def __init__(self, pathToSong, pathToRoot, settings=None):
+
+        streamObj = music21.converter.parse(pathToSong)
+
         self.streamObj = self._preprocessStreamObj(streamObj)
 
-        self.Settings = Settings(streamObj, settings)
+        if not settings:
+            f = open(pathToRoot + '/sample/settings.json')
+            settings = json.load(f)
+
+        self.Settings = Settings(streamObj, settings, pathToRoot)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
@@ -21,7 +32,7 @@ class Visualiser:
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
-    def generate(self, directoryName):
+    def generate(self, directoryName=""):
         self.PlotterMain.plot()
 
         title = self.PlotterMain.PlotterMetadata.getSongTitle()
@@ -45,5 +56,8 @@ class Visualiser:
 
 
 if __name__ == '__main__':
+    pathToSong = "../example/All_Of_Me.mxl"
 
-    pass
+    vis = Visualiser(pathToSong)
+    vis.generate()
+

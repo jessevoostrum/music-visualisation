@@ -13,7 +13,7 @@ from sample.plotter.Plotter import Plotter
 
 class Settings:
 
-    def __init__(self, streamObj, settings):
+    def __init__(self, streamObj, settings, pathToRoot):
         self.streamObj = streamObj
         self.settings = settings
 
@@ -66,7 +66,7 @@ class Settings:
         self.thickBarlines = settings['thickBarlines']
         self.printArranger = settings['printArranger']
 
-        f = open('sample/fontDimensions.json')
+        f = open(pathToRoot + '/sample/fontDimensions.json')
         fontDimensions = json.load(f)
         if self.font in fontDimensions:
             fD = fontDimensions[self.font]
