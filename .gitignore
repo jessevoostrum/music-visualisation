@@ -8,6 +8,7 @@ sheetMusic/
 *output/
 testsuite/
 *.txt
+sample/aux/batchJobs.json
 
 sample/runSingle.py
 

@@ -100,22 +100,44 @@ class PlotterChords(Plotter):
         return addition
 
     def _plotBass(self, chordSymbol, xPos, yPos, page):
-        bass = None
 
         if chordSymbol.bass() is not None:
             if chordSymbol.root().name != chordSymbol.bass().name:
-                bass = '/' + self._getNumberWithAccidental(chordSymbol)
 
-        fontSize = self.Settings.fontSizeChords
+                fontSizeAddition = self.Settings.fontSizeAccidentalRelative * self.Settings.fontSizeChords
 
+                key = self.Settings.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
 
-        if bass:
-            self.axs[page].text(xPos + (1 + self.Settings.hDistanceChordAddition) * self.Settings.widthNumberRelative * fontSize,
-                            yPos + self.Settings.capsizeNumberRelative * fontSize * 0.3, bass,
-                            fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
-                            va='top', ha='left',
-                            # fontname='Arial',
-                            fontweight=1)
+                pitch = chordSymbol.bass()
+                number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
+
+                # plot slash
+                xPosRightOfChord = xPos + 0.8 * self.Settings.widthNumberRelative * self.Settings.fontSizeChords
+                yPosSlash = yPos - .4 * fontSizeAddition * self.Settings.capsizeNumberRelative
+
+                self.axs[page].text(xPosRightOfChord, yPosSlash, '/', fontsize=fontSizeAddition,
+                                    va='baseline', ha='left')
+
+                # plot number
+                xPosRightOfSlash = xPosRightOfChord + 0.8 * self.Settings.widthNumberRelative * fontSizeAddition
+                xPosBass = xPosRightOfSlash
+                if accidental:
+                    xPosBass += 0.006
+
+                yPosBass = yPosSlash - 0.25 * fontSizeAddition * self.Settings.capsizeNumberRelative
+
+                self.axs[page].text(xPosBass, yPosBass, number, fontsize=fontSizeAddition,
+                                    va='baseline', ha='left')
+
+                # plot accidental
+                self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page, addFontSize=0)
+
+                # self.axs[page].text(xPos + (1 + self.Settings.hDistanceChordAddition) * self.Settings.widthNumberRelative * fontSize,
+                #                     yPos + self.Settings.capsizeNumberRelative * fontSize * 0.3,
+                #                     bass,
+                #                     fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
+                #                     va='top', ha='left',
+                #                     )
 
 
     def _getNumberWithAccidental(self, chordSymbol):

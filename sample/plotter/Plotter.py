@@ -9,7 +9,7 @@ class Plotter:
         self.LocationFinder = LocationFinder
         self.axs = axs
 
-    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):
+    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, addFontSize=None):
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':
@@ -17,20 +17,22 @@ class Plotter:
             elif accidental.name == 'flat':
                 symbolAccidental = '♭'
 
-            relativeLocation = 0.2
+            relativeXLocation = 0.2
             if not front:
-                relativeLocation = 1 - relativeLocation
+                relativeXLocation = 1 - relativeXLocation
 
-            xPosAccidental = xPos + relativeLocation * self.Settings.widthNumberRelative * fontSize
+            xPosAccidental = xPos + relativeXLocation * self.Settings.widthNumberRelative * fontSize
+            yPosAccidental = yPos + 0.7 * self.Settings.capsizeNumberRelative * fontSize
+            fontSizeAccidental = self.Settings.fontSizeAccidentalRelative * fontSize
+            if addFontSize:
+                fontSizeAccidental += addFontSize
 
             if symbolAccidental:
-                self.axs[page].text(xPosAccidental,
-                                    yPos + 0.7 * self.Settings.capsizeNumberRelative * fontSize, symbolAccidental,
-                                    fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
-                                    va='baseline', ha='right', fontname=self.Settings.font, #fontweight=1
-                                    )
+                self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
+                                    fontsize=fontSizeAccidental,
+                                    va='baseline', ha='right', fontname=self.Settings.font)
 
-
+    # used to print key of the song
     def _getKeyLetter(self, key):
         letter = key.tonic.name[0]
         accidental = key.tonic.accidental

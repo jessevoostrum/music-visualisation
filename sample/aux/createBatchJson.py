@@ -14,7 +14,7 @@ for line in lines:
 
     line = line.rstrip('\n')
 
-    outputName = line.rstrip('.mscz') + '.musicxml'
+    outputName = os.path.splitext(line)[0] + '.musicxml'
 
     job = {"in": line,
            "out": outputName}

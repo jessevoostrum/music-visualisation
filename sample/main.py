@@ -53,11 +53,13 @@ class Visualiser:
         if staffs:
             if len(staffs) > 1:
                 streamObj.remove(staffs[1])
+                print("removed staff")
 
         parts = streamObj[music21.stream.Part]
         if parts:
             if len (parts) > 1:
-                streamObj.remove(parts[1])
+                streamObj.remove(parts[1:])
+                print("removed part(s)")
 
         return streamObj
 
