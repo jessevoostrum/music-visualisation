@@ -14,17 +14,18 @@ from sample.Settings import Settings
 class Visualiser:
     """class for making visualisations from a music21 stream"""
 
-    def __init__(self, pathToSong, pathToRoot, settings=None):
+    def __init__(self, pathToSong, settings=None):
 
         streamObj = music21.converter.parse(pathToSong)
 
         self.streamObj = self._preprocessStreamObj(streamObj)
 
         if not settings:
-            f = open(pathToRoot + '/sample/settings.json')
+            pathSettings = os.path.join(os.path.dirname(__file__), 'settings.json')
+            f = open(pathSettings)
             settings = json.load(f)
 
-        self.Settings = Settings(streamObj, settings, pathToRoot)
+        self.Settings = Settings(streamObj, settings)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
@@ -52,6 +53,12 @@ class Visualiser:
         if staffs:
             if len(staffs) > 1:
                 streamObj.remove(staffs[1])
+
+        parts = streamObj[music21.stream.Part]
+        if parts:
+            if len (parts) > 1:
+                streamObj.remove(parts[1])
+
         return streamObj
 
 
