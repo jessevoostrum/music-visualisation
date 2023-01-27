@@ -6,10 +6,11 @@ import numpy as np
 
 from sample.plotter.Plotter import Plotter
 
+fontDirectory = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/"
 
-fp1 = fm.FontProperties(fname="/Users/jvo/Downloads/freefont-20120503/FreeSerif.ttf")
-fp1 = fm.FontProperties(fname="/Users/jvo/Downloads/symbola/Symbola.ttf")
-fp2 = fm.FontProperties(fname="/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/OH no Type Company Order #e6cd109/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
+fp1 = fm.FontProperties(fname=fontDirectory + "freefont-20120503/FreeSerif.ttf")
+fp1 = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
+fp2 = fm.FontProperties(fname=fontDirectory + "Vulf mono/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
 
 
 class PlotterBarlines(Plotter):

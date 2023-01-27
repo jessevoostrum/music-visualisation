@@ -25,12 +25,15 @@ class PlotterChords(Plotter):
             xPos = xPos + self.Settings.xShiftChords
             yPos = self.yMin + yPosLineBase
 
-            self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+            if chord.chordKind != 'none':    # not N.C.
+                self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-            self._plotAddition(chord, xPos, yPos, page)
+                self._plotAddition(chord, xPos, yPos, page)
 
-            self._plotBass(chord, xPos, yPos, page)
+                self._plotBass(chord, xPos, yPos, page)
 
+            else:
+                self._plotNoChord(xPos, yPos, page)
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
@@ -101,7 +104,7 @@ class PlotterChords(Plotter):
 
         if chordSymbol.bass() is not None:
             if chordSymbol.root().name != chordSymbol.bass().name:
-                bass = '/' + self._getNumberWithAccidental(chordSymbol.bass())
+                bass = '/' + self._getNumberWithAccidental(chordSymbol)
 
         fontSize = self.Settings.fontSizeChords
 
@@ -115,8 +118,12 @@ class PlotterChords(Plotter):
                             fontweight=1)
 
 
-    def _getNumberWithAccidental(self, pitch):
-        number, alteration = self.key.getScaleDegreeAndAccidentalFromPitch(pitch)
+    def _getNumberWithAccidental(self, chordSymbol):
+
+        key = self.Settings.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
+
+        pitch = chordSymbol.bass()
+        number, alteration = key.getScaleDegreeAndAccidentalFromPitch(pitch)
         number = str(number)
 
         if alteration:
@@ -126,4 +133,9 @@ class PlotterChords(Plotter):
                 number = f"{{}}^b {number}"
 
         return number
+
+    def _plotNoChord(self, xPos, yPos, page):
+
+        self.axs[page].text(xPos, yPos, 'N.C.',
+                            va='baseline', size=self.Settings.fontSizeChords)
 

@@ -1,4 +1,5 @@
 import json
+import os
 
 from types import SimpleNamespace
 import music21
@@ -13,7 +14,7 @@ from sample.plotter.Plotter import Plotter
 
 class Settings:
 
-    def __init__(self, streamObj, settings, pathToRoot):
+    def __init__(self, streamObj, settings):
         self.streamObj = streamObj
         self.settings = settings
 
@@ -66,7 +67,8 @@ class Settings:
         self.thickBarlines = settings['thickBarlines']
         self.printArranger = settings['printArranger']
 
-        f = open(pathToRoot + '/sample/fontDimensions.json')
+        pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontDimensions.json')
+        f = open(pathFontDimensions)
         fontDimensions = json.load(f)
         if self.font in fontDimensions:
             fD = fontDimensions[self.font]

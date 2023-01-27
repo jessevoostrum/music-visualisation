@@ -56,20 +56,23 @@ class PlotterNotes(Plotter):
         offsetLength = el.duration.quarterLength
         xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
 
+        key = self.Settings.getKey(offset)
+
         slope = None
         if self._isGlissando(el):
-            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase)
+            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase, key)
         elif not self._isGraceNote(el):
-            self._plotRectangle(page, el, xPos, xLength,  yPos)
+            self._plotRectangle(page, el, xPos, xLength,  yPos, key)
 
-        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope)
+
+        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key)
 
         self._plotArticulation(el, elNext)
 
         if self.Settings.lyrics:
             self._plotLyric(page, el, xPos, yPosLineBase)
 
-    def _plotRectangle(self, page, el, xPos, xLength,  yPos):
+    def _plotRectangle(self, page, el, xPos, xLength,  yPos, key):
 
         if not el.tie:
             shape = 'rounded'
@@ -90,7 +93,7 @@ class PlotterNotes(Plotter):
         if self._isVibrato(el):
             shape = 'squiggly'
 
-        alpha, facecolor, hatch = self._adjustVisualParameters(el)
+        alpha, facecolor, hatch = self._adjustVisualParameters(el, key)
 
         leftBottom = [xPos, yPos]
         leftTop = [xPos, yPos + self.barSpace]
@@ -101,10 +104,10 @@ class PlotterNotes(Plotter):
 
         self.axs[page].add_patch(patch)
 
-    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase):
+    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase, key):
 
         sp = el.getSpannerSites()[0]
-        alpha, facecolor, hatch = self._adjustVisualParameters(el)
+        alpha, facecolor, hatch = self._adjustVisualParameters(el, key)
 
         if self._isStartGlissando(el):
             noteTarget = sp.getLast()
@@ -143,10 +146,8 @@ class PlotterNotes(Plotter):
         slope = (rightBottom[1] - leftBottom[1]) / xLength
         return slope
 
-    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope):
+    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key):
         if not (el.tie and not (el.tie.type == 'start')):
-            offsetEl = el.getOffsetInHierarchy(self.streamObj)
-            key = self.Settings.getKey(offsetEl)
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
             if not self._isGraceNote(el):
@@ -216,7 +217,7 @@ class PlotterNotes(Plotter):
             if lyric[-1] == "-":
                 self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
 
-    def _adjustVisualParameters(self, el):
+    def _adjustVisualParameters(self, el, key):
 
         facecolor = self.Settings.facecolor
         alpha = self.Settings.alpha
@@ -225,8 +226,7 @@ class PlotterNotes(Plotter):
 
         if self.Settings.coloursCircleOfFifths:
 
-            key = self.Settings.getKey(el.getOffsetInHierarchy(self.streamObj))
-            pitchKey = self.key.getTonic().ps
+            pitchKey = key.getTonic().ps
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
             circleOfFifthIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch)
