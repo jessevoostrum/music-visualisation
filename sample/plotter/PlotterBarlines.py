@@ -1,3 +1,4 @@
+import os
 import inspect
 import music21
 from matplotlib.patches import Ellipse, Rectangle
@@ -6,11 +7,8 @@ import numpy as np
 
 from sample.plotter.Plotter import Plotter
 
-fontDirectory = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/"
-
-fp1 = fm.FontProperties(fname=fontDirectory + "freefont-20120503/FreeSerif.ttf")
-fp1 = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
-fp2 = fm.FontProperties(fname=fontDirectory + "Vulf mono/Vulf Mono/Desktop/VulfMono-LightItalic.otf")
+fontDirectory = os.path.join(os.path.dirname(__file__), '../fonts/')
+fontPropertiesSymbola = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
 
 
 class PlotterBarlines(Plotter):
@@ -201,23 +199,26 @@ class PlotterBarlines(Plotter):
                     ha = 'right'
                     xPos -= self.Settings.xShiftChords
 
-                fp = fp1
-                va = 'bottom'
+
                 if el.name == 'segno':
                     text = "𝄋"
-                    fontsize =  self.Settings.fontSizeSegno
+                    fontSize = self.Settings.fontSizeSegno
+                    fontProperties = fontPropertiesSymbola
+                    va = 'bottom'
                 elif el.name == 'coda':
                     text = '𝄌'
-                    fontsize = self.Settings.fontSizeCoda
+                    fontSize = self.Settings.fontSizeCoda
+                    fontProperties = fontPropertiesSymbola
+                    va = 'bottom'
                 else:
                     text = el.getText()
-                    fp = fp2
-                    fontsize = self.Settings.fontSizeNotes
+                    fontProperties = None  # this makes sure to use default font properties
+                    fontSize = self.Settings.fontSizeNotes
                     va = 'baseline'
 
                 self.axs[page].text(xPos, yPos, text,
-                                    fontsize=fontsize,
-                                    fontproperties=fp,
+                                    fontsize=fontSize,
+                                    fontproperties=fontProperties,
                                     va=va, ha=ha)
 
     def _plotKey(self, measure):

@@ -27,7 +27,7 @@ class Plotter:
                 self.axs[page].text(xPosAccidental,
                                     yPos + 0.7 * self.Settings.capsizeNumberRelative * fontSize, symbolAccidental,
                                     fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
-                                    va='baseline', ha='right', fontname='Vulf Mono', #fontweight=1
+                                    va='baseline', ha='right', fontname=self.Settings.font, #fontweight=1
                                     )
 
 
