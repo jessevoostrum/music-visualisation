@@ -181,7 +181,7 @@ class PlotterBarlines(Plotter):
 
         for el in measure.recurse():
 
-            if type(el).__module__ == 'music21.repeat' and music21.repeat.RepeatExpression in inspect.getmro(type(el)):
+            if self._isRepeatExpression(el):
 
                 offset = measure.offset
 
@@ -221,6 +221,7 @@ class PlotterBarlines(Plotter):
                                     fontproperties=fontProperties,
                                     va=va, ha=ha)
 
+
     def _plotKey(self, measure):
         if measure[music21.key.Key, music21.key.KeySignature] and measure.number > 1:
             offset = measure.getOffsetInHierarchy(self.streamObj)
@@ -228,6 +229,9 @@ class PlotterBarlines(Plotter):
             yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
 
             xPos += self.Settings.xShiftNumberNote
+            if self._hasRepeatExpressionAtStart(measure):
+                xPos += self.Settings.widthNumberNote * 2
+
             key = self.Settings.getKey(offset)
             self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
                                 va='baseline', ha='left')
@@ -272,3 +276,14 @@ class PlotterBarlines(Plotter):
                 includedMeasuresDict[includedMeasure] = sp
 
         return includedMeasuresDict
+
+    def _hasRepeatExpressionAtStart(self, measure):
+        for el in measure.recurse():
+            if self._isRepeatExpression(el):
+                if el.name == 'segno' or el.name == 'coda':
+                    return True
+
+        return False
+
+    def _isRepeatExpression(self, el):
+        return type(el).__module__ == 'music21.repeat' and music21.repeat.RepeatExpression in inspect.getmro(type(el))
