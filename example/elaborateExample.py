@@ -2,6 +2,7 @@ import json
 
 from sample.main import Visualiser
 
+
 f = open('../sample/settings.json')
 settings = json.load(f)
 
