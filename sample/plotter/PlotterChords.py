@@ -1,6 +1,13 @@
+import json
+import os
+
 import music21
 import sample.aux.chordTypes as chordTypes
 from sample.plotter.Plotter import Plotter
+
+pathChordTypes = os.path.join(os.path.dirname(__file__), '../aux/chordTypes.json')
+f = open(pathChordTypes)
+chordTypes = json.load(f)
 
 
 class PlotterChords(Plotter):
@@ -28,7 +35,7 @@ class PlotterChords(Plotter):
             if chord.chordKind != 'none':    # not N.C.
                 self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-                self._plotAddition(chord, xPos, yPos, page)
+                self._plotAdditions(chord, xPos, yPos, page)
 
                 self._plotBass(chord, xPos, yPos, page)
 
@@ -46,58 +53,152 @@ class PlotterChords(Plotter):
         self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
 
-    def _plotAddition(self, chordSymbol, xPos, yPos, page):
+    def _plotAdditions(self, chordSymbol, xPos, yPos, page):
 
-        addition = self._findAddition(chordSymbol)
+        additions = self._findAdditions(chordSymbol)
 
         fontSize = self.Settings.fontSizeChords
         widthNumber = self.Settings.widthNumberRelative * fontSize
 
-        if addition:
-            self.axs[page].text(xPos + widthNumber + self.Settings.hDistanceChordAddition,
-                            yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7, addition,
-                            fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
-                            va='baseline', ha='left',
-                            # fontname='Arial',
-                            fontweight=1)
+        xPos = xPos + widthNumber + self.Settings.hDistanceChordAddition
+        yPos = yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7
+
+        self.fontSizeAddition = 10
+        self.width = 0.01
+        self.accidentalSpace = 0.01
+
+        for i, addition in enumerate(additions):
+
+            width = 0
+            if addition == "minor":
+                width = self._plotAdditionMinor(xPos, yPos, page)
+            if addition == "major":
+                width = self._plotAdditionMajor(xPos, yPos, page)
+            if addition == 'half-diminished' :
+                width = self._plotAdditionHalfDiminished(xPos, yPos, page)
+            if addition == 'diminished':
+                width = self._plotAdditionDiminished(xPos, yPos, page)
 
 
-    def _findAddition(self, chordSymbol):
-        addition = ""
-        
-        kind = chordSymbol.chordKind
-
-        if kind in music21.harmony.CHORD_ALIASES:
-            kind = music21.harmony.CHORD_ALIASES[kind]
-
-        if kind in music21.harmony.CHORD_TYPES:
-            addition += chordTypes.getAbbreviationListGivenChordType(kind)[0]
-
-        for csMod in chordSymbol.chordStepModifications:
-            if csMod.interval is not None:
-                numAlter = csMod.interval.semitones
-                if numAlter > 0:
-                    s = '\\#\!'
+            if addition == "seventh":
+                width = self._plotAdditionSeventh(xPos, yPos, page)
+            if addition == "ninth":
+                width = self._plotAdditionNinth(xPos, yPos, page)
+            if addition == "11th":
+                width = self._plotAddition11th(xPos, yPos, page)
+            if addition == "13th":
+                width = self._plotAddition13th(xPos, yPos, page)
+            if addition == 'augmented':
+                if i == 0:
+                    xPos += 0.003
                 else:
-                    s = 'b'
-                prefix = s * abs(numAlter)
-                if abs(numAlter) > 0:
-                    prefix = '\,{{}}^' + prefix
+                    xPos += self.accidentalSpace
+                width = self._plotAdditionAugmented(xPos, yPos, page)
+            if addition == 'flat-five':
+                width = self._plotAdditionFlatFive(xPos, yPos, page)
 
-                # print("numAlter", numAlter, "\n", "prefix", prefix)
+            xPos += width
 
-                # addition += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
-                addition += prefix + str(csMod.degree)
-            else:
-                # addition += ' ' + csMod.modType + ' ' + str(csMod.degree)
-                addition += str(csMod.degree)
 
-        if not addition == "":
-            addition  = "$" + addition + "$"
-        else:
-            addition = None
+    def _plotAdditionMinor(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "-", fontsize = self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
 
-        return addition
+    def _plotAdditionMajor(self, xPos, yPos, page):
+        self.axs[page].text(xPos + 0.001, yPos - 0.0005,
+                            "$\mathbb{\Delta}$", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width - 0.001
+
+    def _plotAdditionHalfDiminished(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "o", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
+
+    def _plotAdditionDiminished(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "$\\varnothing$", fontsize=8,
+                            va='baseline', ha='left', math_fontfamily='dejavusans')
+        return self.width
+
+    def _plotAdditionSeventh(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "7", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
+
+    def _plotAdditionNinth(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "9", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
+
+    def _plotAddition11th(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "11", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return 2 * self.width
+
+    def _plotAddition13th(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "13", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return 2 * self.width
+
+
+    def _plotAdditionAugmented(self, xPos, yPos, page):
+        accidental = music21.pitch.Accidental('sharp')
+        self._plotAccidental(accidental, self.fontSizeAddition, xPos, yPos, page)
+
+        self.axs[page].text(xPos, yPos,
+                            "5", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
+
+    def _plotAdditionFlatFive(self, xPos, yPos, page):
+        accidental = music21.pitch.Accidental('flat')
+        self._plotAccidental(accidental, self.fontSizeAddition, xPos, yPos, page)
+
+        self.axs[page].text(xPos, yPos,
+                            "5", fontsize=self.fontSizeAddition,
+                            va='baseline', ha='left')
+        return self.width
+
+
+    def _findAdditions(self, chordSymbol):
+
+        chordType = chordSymbol.chordKind
+
+        # use the alias of the chord type that is used by music21
+        if chordType in music21.harmony.CHORD_ALIASES:
+            chordType = music21.harmony.CHORD_ALIASES[chordType]
+
+        if chordType in chordTypes:
+            additions = chordTypes[chordType]
+
+        # for csMod in chordSymbol.chordStepModifications:
+        #     if csMod.interval is not None:
+        #         numAlter = csMod.interval.semitones
+        #         if numAlter > 0:
+        #             s = '\\#\!'
+        #         else:
+        #             s = 'b'
+        #         prefix = s * abs(numAlter)
+        #         if abs(numAlter) > 0:
+        #             prefix = '\,{{}}^' + prefix
+        #
+        #         # print("numAlter", numAlter, "\n", "prefix", prefix)
+        #
+        #         # addition += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
+        #         addition += prefix + str(csMod.degree)
+        #     else:
+        #         # addition += ' ' + csMod.modType + ' ' + str(csMod.degree)
+        #         addition += str(csMod.degree)
+
+        return additions
 
     def _plotBass(self, chordSymbol, xPos, yPos, page):
 
@@ -132,29 +233,6 @@ class PlotterChords(Plotter):
                 # plot accidental
                 self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page, addFontSize=0)
 
-                # self.axs[page].text(xPos + (1 + self.Settings.hDistanceChordAddition) * self.Settings.widthNumberRelative * fontSize,
-                #                     yPos + self.Settings.capsizeNumberRelative * fontSize * 0.3,
-                #                     bass,
-                #                     fontsize=self.Settings.fontSizeAccidentalRelative * fontSize,
-                #                     va='top', ha='left',
-                #                     )
-
-
-    def _getNumberWithAccidental(self, chordSymbol):
-
-        key = self.Settings.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
-
-        pitch = chordSymbol.bass()
-        number, alteration = key.getScaleDegreeAndAccidentalFromPitch(pitch)
-        number = str(number)
-
-        if alteration:
-            if alteration.name == 'sharp':
-                number = f"{{}}^\\# {number}"
-            elif alteration.name == 'flat':
-                number = f"{{}}^b {number}"
-
-        return number
 
     def _plotNoChord(self, xPos, yPos, page):
 

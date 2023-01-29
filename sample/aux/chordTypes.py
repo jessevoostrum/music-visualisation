@@ -107,4 +107,4 @@ if __name__ == '__main__':
         # chord = 'a'
         ax.text(xv[i], yv[i], chord, fontsize=30)
 
-    fig.savefig('output/chords2.pdf')
+    fig.savefig('../../output/chords2.pdf')

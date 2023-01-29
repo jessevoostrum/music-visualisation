@@ -20,6 +20,7 @@ class CanvasCreator:
         rcParams['font.family'] = self.Settings.font
         rcParams['font.style'] = self.Settings.fontStyle
         rcParams['font.weight'] = self.Settings.fontWeight
+        rcParams['mathtext.fontset'] = 'cm'
 
         self.yMin = self.Settings.yMin
         self.yMax = self.Settings.yMax
