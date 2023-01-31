@@ -35,7 +35,7 @@ class PlotterChords(Plotter):
             if chord.chordKind != 'none':    # not N.C.
                 self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-                self._plotAdditions(chord, xPos, yPos, page)
+                self._plotTypesAndModifications(chord, xPos, yPos, page)
 
                 self._plotBass(chord, xPos, yPos, page)
 
@@ -53,9 +53,7 @@ class PlotterChords(Plotter):
         self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
 
-    def _plotAdditions(self, chordSymbol, xPos, yPos, page):
-
-        additions = self._findAdditions(chordSymbol)
+    def _plotTypesAndModifications(self, chordSymbol, xPos, yPos, page):
 
         fontSize = self.Settings.fontSizeChords
         widthNumber = self.Settings.widthNumberRelative * fontSize
@@ -63,112 +61,209 @@ class PlotterChords(Plotter):
         xPos = xPos + widthNumber + self.Settings.hDistanceChordAddition
         yPos = yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7
 
-        self.fontSizeAddition = 10
+        self.fontSizeType = 10
+        self.fontSizeTypeSmall = 8
         self.width = 0.01
         self.accidentalSpace = 0.01
 
-        for i, addition in enumerate(additions):
+        xPos = self._plotTypes(chordSymbol, xPos, yPos, page)
+
+        self._plotModifications(chordSymbol, xPos, yPos, page)
+
+    def _plotTypes(self, chordSymbol, xPos, yPos, page):
+        chordTypes = self._findTypes(chordSymbol)
+
+        for i, chordType in enumerate(chordTypes):
 
             width = 0
-            if addition == "minor":
-                width = self._plotAdditionMinor(xPos, yPos, page)
-            if addition == "major":
-                width = self._plotAdditionMajor(xPos, yPos, page)
-            if addition == 'half-diminished' :
-                width = self._plotAdditionHalfDiminished(xPos, yPos, page)
-            if addition == 'diminished':
-                width = self._plotAdditionDiminished(xPos, yPos, page)
+            if chordType == "minor":
+                width = self._plotTypeMinor(xPos, yPos, page)
+            if chordType == "major" and len(chordTypes) != 1:
+                width = self._plotTypeMajor(xPos, yPos, page)
+            if chordType == 'half-diminished':
+                width = self._plotTypeHalfDiminished(xPos, yPos, page)
+            if chordType == 'diminished':
+                width = self._plotTypeDiminished(xPos, yPos, page)
 
+            if chordType == "seventh":
+                width = self._plotTypeSeventh(xPos, yPos, page)
+            if chordType == "ninth":
+                width = self._plotTypeNinth(xPos, yPos, page)
+            if chordType == "11th":
+                width = self._plotType11th(xPos, yPos, page)
+            if chordType == "13th":
+                width = self._plotType13th(xPos, yPos, page)
 
-            if addition == "seventh":
-                width = self._plotAdditionSeventh(xPos, yPos, page)
-            if addition == "ninth":
-                width = self._plotAdditionNinth(xPos, yPos, page)
-            if addition == "11th":
-                width = self._plotAddition11th(xPos, yPos, page)
-            if addition == "13th":
-                width = self._plotAddition13th(xPos, yPos, page)
-            if addition == 'augmented':
+            if chordType == 'augmented':
                 if i == 0:
-                    xPos += 0.003
-                else:
-                    xPos += self.accidentalSpace
-                width = self._plotAdditionAugmented(xPos, yPos, page)
-            if addition == 'flat-five':
-                width = self._plotAdditionFlatFive(xPos, yPos, page)
-
+                    xPos -= 0.007
+                width = self._plotTypeAugmented(xPos, yPos, page)
+            if chordType == 'flat-five':
+                width = self._plotTypeFlatFive(xPos, yPos, page)
+            if chordType == 'suspended-second':
+                width = self._plotTypeSuspendedSecond(xPos, yPos, page)
+            if chordType == 'suspended-fourth':
+                width = self._plotTypeSuspendedFourth(xPos, yPos, page)
             xPos += width
+        return xPos
 
+    def _plotModifications(self, chordSymbol, xPos, yPos, page):
 
-    def _plotAdditionMinor(self, xPos, yPos, page):
+        for csMod in chordSymbol.chordStepModifications:
+            if csMod.interval is not None:
+                width = 0
+                if csMod.modType == 'add':
+                    width = self._plotModificationAdd(xPos, yPos, page)
+                if csMod.modType == 'subtract':
+                    width = self._plotModificationSubtract(xPos, yPos, page)
+                if csMod.modType == 'alter':
+                    width = self._plotModificationAlter(xPos, yPos, page)
+
+                xPos += width
+
+                number = csMod.degree
+
+                accidental = None
+                if csMod.interval.semitones == -1:
+                    accidental = music21.pitch.Accidental('flat')
+                if csMod.interval.semitones == 1:
+                    accidental = music21.pitch.Accidental('sharp')
+
+                if accidental:
+                    xPos -= 0.0025
+
+                width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
+
+                xPos += width
+
+    def _plotTypeAndModificationNumberAndAccidental(self, number, accidental, xPos, yPos, page):
+
+        width = 0
+        if accidental:
+            xPos += self.accidentalSpace
+            width += self.accidentalSpace
+
+        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
+
         self.axs[page].text(xPos, yPos,
-                            "-", fontsize = self.fontSizeAddition,
+                            f"{number}", fontsize=self.fontSizeType,
+                            va='baseline', ha='left')
+        width += len(str(number)) * self.width
+
+        return width
+
+
+    def _plotModificationAdd(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _plotModificationSubtract(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "sub", fontsize=self.fontSizeTypeSmall,
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _plotModificationAlter(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "alt", fontsize=self.fontSizeTypeSmall,
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _plotTypeMinor(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "-", fontsize = self.fontSizeType,
                             va='baseline', ha='left')
         return self.width
 
-    def _plotAdditionMajor(self, xPos, yPos, page):
+    def _plotTypeMajor(self, xPos, yPos, page):
         self.axs[page].text(xPos + 0.001, yPos - 0.0005,
-                            "$\mathbb{\Delta}$", fontsize=self.fontSizeAddition,
+                            "$\mathbb{\Delta}$", fontsize=self.fontSizeType,
                             va='baseline', ha='left')
         return self.width - 0.001
 
-    def _plotAdditionHalfDiminished(self, xPos, yPos, page):
+    def _plotTypeHalfDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
-                            "o", fontsize=self.fontSizeAddition,
+                            "$\\varnothing$", fontsize=8, math_fontfamily='dejavusans',
                             va='baseline', ha='left')
         return self.width
 
-    def _plotAdditionDiminished(self, xPos, yPos, page):
+    def _plotTypeDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
-                            "$\\varnothing$", fontsize=8,
-                            va='baseline', ha='left', math_fontfamily='dejavusans')
-        return self.width
-
-    def _plotAdditionSeventh(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "7", fontsize=self.fontSizeAddition,
+                            "o", fontsize=9, fontstyle='normal',
                             va='baseline', ha='left')
         return self.width
 
-    def _plotAdditionNinth(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "9", fontsize=self.fontSizeAddition,
-                            va='baseline', ha='left')
-        return self.width
+    def _plotTypeSeventh(self, xPos, yPos, page):
+        width = self._plotTypeAndModificationNumberAndAccidental(7, None, xPos, yPos, page)
+        return width
 
-    def _plotAddition11th(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "11", fontsize=self.fontSizeAddition,
-                            va='baseline', ha='left')
-        return 2 * self.width
+    def _plotTypeNinth(self, xPos, yPos, page):
+        width = self._plotTypeAndModificationNumberAndAccidental(9, None, xPos, yPos, page)
+        return width
 
-    def _plotAddition13th(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "13", fontsize=self.fontSizeAddition,
-                            va='baseline', ha='left')
-        return 2 * self.width
+    def _plotType11th(self, xPos, yPos, page):
+        width = self._plotTypeAndModificationNumberAndAccidental(11, None, xPos, yPos, page)
+        return width
 
+    def _plotType13th(self, xPos, yPos, page):
+        width = self._plotTypeAndModificationNumberAndAccidental(13, None, xPos, yPos, page)
+        return width
 
-    def _plotAdditionAugmented(self, xPos, yPos, page):
+    def _plotTypeAugmented(self, xPos, yPos, page):
+        xPos += self.accidentalSpace
+
         accidental = music21.pitch.Accidental('sharp')
-        self._plotAccidental(accidental, self.fontSizeAddition, xPos, yPos, page)
+        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
 
         self.axs[page].text(xPos, yPos,
-                            "5", fontsize=self.fontSizeAddition,
+                            "5", fontsize=self.fontSizeType,
                             va='baseline', ha='left')
-        return self.width
+        return self.width + self.accidentalSpace
 
-    def _plotAdditionFlatFive(self, xPos, yPos, page):
+    def _plotTypeFlatFive(self, xPos, yPos, page):
         accidental = music21.pitch.Accidental('flat')
-        self._plotAccidental(accidental, self.fontSizeAddition, xPos, yPos, page)
+        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
 
         self.axs[page].text(xPos, yPos,
-                            "5", fontsize=self.fontSizeAddition,
+                            "5", fontsize=self.fontSizeType,
                             va='baseline', ha='left')
         return self.width
 
+    def _plotTypeSuspendedSecond(self, xPos, yPos, page):
 
-    def _findAdditions(self, chordSymbol):
+
+        self.axs[page].text(xPos, yPos,
+                            "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+
+        widthSus = 3 * self.width
+
+        xPos2 = xPos + widthSus
+
+        self.axs[page].text(xPos2, yPos,
+                            "2", fontsize=self.fontSizeType, # fontstyle='normal',
+                            va='baseline', ha='left')
+
+        return self.width + widthSus
+
+    def _plotTypeSuspendedFourth(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+
+        widthSus = 3 * self.width
+
+        xPos4 = xPos + widthSus
+
+        self.axs[page].text(xPos4, yPos,
+                            "4", fontsize=self.fontSizeType,
+                            va='baseline', ha='left')
+
+        return self.width + widthSus
+
+    def _findTypes(self, chordSymbol):
 
         chordType = chordSymbol.chordKind
 
@@ -176,29 +271,58 @@ class PlotterChords(Plotter):
         if chordType in music21.harmony.CHORD_ALIASES:
             chordType = music21.harmony.CHORD_ALIASES[chordType]
 
-        if chordType in chordTypes:
-            additions = chordTypes[chordType]
+        types = self._getTypeList(chordType)
 
-        # for csMod in chordSymbol.chordStepModifications:
-        #     if csMod.interval is not None:
-        #         numAlter = csMod.interval.semitones
-        #         if numAlter > 0:
-        #             s = '\\#\!'
-        #         else:
-        #             s = 'b'
-        #         prefix = s * abs(numAlter)
-        #         if abs(numAlter) > 0:
-        #             prefix = '\,{{}}^' + prefix
-        #
-        #         # print("numAlter", numAlter, "\n", "prefix", prefix)
-        #
-        #         # addition += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
-        #         addition += prefix + str(csMod.degree)
-        #     else:
-        #         # addition += ' ' + csMod.modType + ' ' + str(csMod.degree)
-        #         addition += str(csMod.degree)
+        return types
 
-        return additions
+    def _getTypeList(self, chordType):
+        types = []
+        if 'minor' in chordType:
+            types.append("minor")
+        if 'major' in chordType:
+            types.append("major")
+        if 'half-diminished' in chordType:
+            types.append("half-diminished")
+        if 'diminished' in chordType and not 'half-diminished' in chordType:
+            types.append("diminished")
+
+        if 'seventh' in chordType:
+            types.append("seventh")
+        if 'sixth' in chordType:
+            types.append("sixth")
+        if 'ninth' in chordType:
+            types.append("ninth")
+        if '11th' in chordType:
+            types.append("11th")
+        if '13th' in chordType:
+            types.append("13th")
+
+        if 'augmented' in chordType:
+            types.append("augmented")
+        if 'flat-five' in chordType:
+            types.append("flat-five")
+
+        if 'suspended-second' in chordType:
+            types.append("suspended-second")
+        if 'suspended-fourth' in chordType:
+            types.append("suspended-fourth")
+
+        if 'Neapolitan' in chordType:
+            types.append("Neapolitan")
+        if 'Italian' in chordType:
+            types.append("Italian")
+        if 'French' in chordType:
+            types.append("French")
+        if 'German' in chordType:
+            types.append("German")
+        if 'pedal' in chordType:
+            types.append("pedal")
+        if 'power' in chordType:
+            types.append("power")
+        if 'Tristan' in chordType:
+            types.append("Tristan")
+
+        return types
 
     def _plotBass(self, chordSymbol, xPos, yPos, page):
 
