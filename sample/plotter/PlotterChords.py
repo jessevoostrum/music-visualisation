@@ -1,13 +1,6 @@
-import json
-import os
-
 import music21
-import sample.aux.chordTypes as chordTypes
-from sample.plotter.Plotter import Plotter
 
-pathChordTypes = os.path.join(os.path.dirname(__file__), '../aux/chordTypes.json')
-f = open(pathChordTypes)
-chordTypes = json.load(f)
+from sample.plotter.Plotter import Plotter
 
 
 class PlotterChords(Plotter):
@@ -52,7 +45,6 @@ class PlotterChords(Plotter):
 
         self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
-
     def _plotTypesAndModifications(self, chordSymbol, xPos, yPos, page):
 
         fontSize = self.Settings.fontSizeChords
@@ -71,7 +63,7 @@ class PlotterChords(Plotter):
         self._plotModifications(chordSymbol, xPos, yPos, page)
 
     def _plotTypes(self, chordSymbol, xPos, yPos, page):
-        chordTypes = self._findTypes(chordSymbol)
+        chordTypes = self._getTypeList(chordSymbol)
 
         for i, chordType in enumerate(chordTypes):
 
@@ -151,25 +143,6 @@ class PlotterChords(Plotter):
         width += len(str(number)) * self.width
 
         return width
-
-
-    def _plotModificationAdd(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
-        return self.width * 3
-
-    def _plotModificationSubtract(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "sub", fontsize=self.fontSizeTypeSmall,
-                            va='baseline', ha='left')
-        return self.width * 3
-
-    def _plotModificationAlter(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "alt", fontsize=self.fontSizeTypeSmall,
-                            va='baseline', ha='left')
-        return self.width * 3
 
     def _plotTypeMinor(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
@@ -263,7 +236,25 @@ class PlotterChords(Plotter):
 
         return self.width + widthSus
 
-    def _findTypes(self, chordSymbol):
+    def _plotModificationAdd(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _plotModificationSubtract(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "sub", fontsize=self.fontSizeTypeSmall,
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _plotModificationAlter(self, xPos, yPos, page):
+        self.axs[page].text(xPos, yPos,
+                            "alt", fontsize=self.fontSizeTypeSmall,
+                            va='baseline', ha='left')
+        return self.width * 3
+
+    def _getTypeList(self, chordSymbol):
 
         chordType = chordSymbol.chordKind
 
@@ -271,11 +262,6 @@ class PlotterChords(Plotter):
         if chordType in music21.harmony.CHORD_ALIASES:
             chordType = music21.harmony.CHORD_ALIASES[chordType]
 
-        types = self._getTypeList(chordType)
-
-        return types
-
-    def _getTypeList(self, chordType):
         types = []
         if 'minor' in chordType:
             types.append("minor")
