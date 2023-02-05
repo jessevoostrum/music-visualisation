@@ -53,10 +53,10 @@ class PlotterChords(Plotter):
         xPos = xPos + widthNumber + self.Settings.hDistanceChordAddition
         yPos = yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7
 
-        self.fontSizeType = 10
-        self.fontSizeTypeSmall = 8
-        self.width = 0.01
-        self.accidentalSpace = 0.01
+        self.fontSizeType = self.Settings.fontSettings.fontSizeType
+        self.fontSizeTypeSmall = self.Settings.fontSettings.fontSizeTypeSmall
+        self.width = self.Settings.fontSettings.widthCharacter
+        self.accidentalSpace = self.Settings.fontSettings.accidentalSpace
 
         xPos = self._plotTypes(chordSymbol, xPos, yPos, page)
 
@@ -88,7 +88,7 @@ class PlotterChords(Plotter):
 
             if chordType == 'augmented':
                 if i == 0:
-                    xPos -= 0.007
+                    xPos -= 0.7 * self.Settings.fontSettings.accidentalSpace
                 width = self._plotTypeAugmented(xPos, yPos, page)
             if chordType == 'flat-five':
                 width = self._plotTypeFlatFive(xPos, yPos, page)
@@ -122,9 +122,10 @@ class PlotterChords(Plotter):
                     accidental = music21.pitch.Accidental('sharp')
 
                 if accidental:
-                    xPos -= 0.0025
+                    xPos -= 0.003
 
                 width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
+                width += 0.002
 
                 xPos += width
 
@@ -148,25 +149,25 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos,
                             "-", fontsize = self.fontSizeType,
                             va='baseline', ha='left')
-        return self.width
+        return self.Settings.fontSettings.widthMinus
 
     def _plotTypeMajor(self, xPos, yPos, page):
-        self.axs[page].text(xPos + 0.001, yPos - 0.0005,
+        self.axs[page].text(xPos + 0.001, yPos - 0.00035,  # - 0.0005
                             "$\mathbb{\Delta}$", fontsize=self.fontSizeType,
                             va='baseline', ha='left')
-        return self.width - 0.001
+        return self.Settings.fontSettings.widthDelta - 0.001
 
     def _plotTypeHalfDiminished(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
+        self.axs[page].text(xPos, yPos - 0.00034,
                             "$\\varnothing$", fontsize=8, math_fontfamily='dejavusans',
                             va='baseline', ha='left')
         return self.width
 
     def _plotTypeDiminished(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "o", fontsize=9, fontstyle='normal',
+        self.axs[page].text(xPos, yPos - 0.0014,
+                            "$\\circ$", fontsize=15, fontstyle='normal', math_fontfamily='cm',
                             va='baseline', ha='left')
-        return self.width
+        return self.width + 0.0003
 
     def _plotTypeSeventh(self, xPos, yPos, page):
         width = self._plotTypeAndModificationNumberAndAccidental(7, None, xPos, yPos, page)
@@ -211,7 +212,7 @@ class PlotterChords(Plotter):
                             "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
 
-        widthSus = 3 * self.width
+        widthSus = self.Settings.fontSettings.spaceAddSus
 
         xPos2 = xPos + widthSus
 
@@ -226,7 +227,7 @@ class PlotterChords(Plotter):
                             "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
 
-        widthSus = 3 * self.width
+        widthSus = self.Settings.fontSettings.spaceAddSus
 
         xPos4 = xPos + widthSus
 
@@ -240,7 +241,7 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos,
                             "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
-        return self.width * 3
+        return self.Settings.fontSettings.spaceAddSus
 
     def _plotModificationSubtract(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
