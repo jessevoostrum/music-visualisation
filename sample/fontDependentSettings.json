@@ -1,0 +1,16 @@
+{
+  "Vulf Mono": {
+    "fontSizeType": 10,
+    "fontSizeTypeSmall": 8,
+    "widthCharacter": 0.01,
+    "widthMinus": 0.01,
+    "accidentalSpace": 0.01
+  },
+  "DejaVu Sans": {
+    "fontSizeType": 10,
+    "fontSizeTypeSmall": 8,
+    "widthCharacter": 0.01,
+    "widthMinus": 0.005,
+    "accidentalSpace": 0.01
+  }
+}
