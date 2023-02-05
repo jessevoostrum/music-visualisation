@@ -9,7 +9,7 @@ class Plotter:
         self.LocationFinder = LocationFinder
         self.axs = axs
 
-    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, addFontSize=None):
+    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':
@@ -23,9 +23,8 @@ class Plotter:
 
             xPosAccidental = xPos + relativeXLocation * self.Settings.widthNumberRelative * fontSize
             yPosAccidental = yPos + 0.7 * self.Settings.capsizeNumberRelative * fontSize
-            fontSizeAccidental = self.Settings.fontSizeAccidentalRelative * fontSize
-            if addFontSize:
-                fontSizeAccidental += addFontSize
+
+            fontSizeAccidental = self.Settings.fontSettings.accidentalSizeRelative * fontSize
 
             if symbolAccidental:
                 self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,

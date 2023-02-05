@@ -7,18 +7,29 @@ import music21
 from sample.plotter.Plotter import Plotter
 
 
-# class FontSettings:
-#
-#     def __init__(self, settings):
-#         self.settings = settings
+class FontSettings:
+
+    def __init__(self, font):
+
+        pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
+        f = open(pathFontDimensions)
+        fontSettings = json.load(f)
+        fontSettings = fontSettings[font]
+
+        self.fontSizeType = fontSettings['fontSizeType']
+        self.fontSizeTypeSmall = fontSettings['fontSizeTypeSmall']
+        self.widthCharacter = fontSettings['widthCharacter']
+        self.widthMinus = fontSettings['widthMinus']
+        self.accidentalSpace = fontSettings['accidentalSpace']
+        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
+        self.widthDelta = fontSettings["widthDelta"]
+        self.spaceAddSus = fontSettings["spaceAddSus"]
 
 class Settings:
 
     def __init__(self, streamObj, settings):
         self.streamObj = streamObj
         self.settings = settings
-
-        # self.font_settings = FontSettings(settings['fontSettings'])
 
         self.measuresPerLine = settings['measuresPerLine']
         self.subdivision = settings['subdivision']
@@ -56,6 +67,9 @@ class Settings:
         self.radiusCorners = settings['radiusCorners']
         self.mutationAspect = settings['mutationAspect']
         self.font = settings['font']
+
+        self.fontSettings = FontSettings(self.font)
+
         self.fontDirectory = settings['fontDirectory']
         self.fontStyle = settings["fontStyle"]
         self.fontWeight = settings["fontWeight"]

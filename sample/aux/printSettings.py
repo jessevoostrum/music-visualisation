@@ -1,8 +1,9 @@
 import json
 
-f = open('../settings.json')
+
+f = open('../fontSettings.json')
 settings = json.load(f)
 
 
-for key in settings.keys():
-    print(f"self.{key} = settings['{key}']")
+for key in settings['DejaVu Sans'].keys():
+    print(f"self.{key} = fontDependentSettings['{key}']")
