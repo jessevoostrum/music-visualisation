@@ -17,7 +17,7 @@ class Plotter:
             elif accidental.name == 'flat':
                 symbolAccidental = '♭'
 
-            relativeXLocation = 0.2
+            relativeXLocation = 0.3
             if not front:
                 relativeXLocation = 1 - relativeXLocation
 

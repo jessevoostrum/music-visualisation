@@ -5,7 +5,7 @@ from matplotlib.patches import Ellipse, Rectangle
 import matplotlib.font_manager as fm
 import numpy as np
 
-from sample.plotter.Plotter import Plotter
+from sample.plotter.PlotterBase import Plotter
 
 fontDirectory = os.path.join(os.path.dirname(__file__), '../fonts/')
 fontPropertiesSymbola = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
