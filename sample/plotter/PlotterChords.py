@@ -342,7 +342,7 @@ class PlotterChords(Plotter):
                                     va='baseline', ha='left')
 
                 # plot accidental
-                self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page, addFontSize=0)
+                self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page)
 
 
     def _plotNoChord(self, xPos, yPos, page):

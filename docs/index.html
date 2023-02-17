@@ -1,8 +1,11 @@
+---
+---
+
 <!DOCTYPE html>
 <html>
     <head>
         <title>The Integer Book</title>
-        <link rel="shortcut icon" type="image/png" href="assets/images/favicon4.png">
+        <link rel="shortcut icon" type="image/png" href="assets/images/favicon/favicon4.png">
     </head>
     
     
@@ -10,9 +13,19 @@
         <h1>The Integer Book</h1>
     
         <p>
-        Download the latest version of the integer book <a href="integer-book.pdf" download>
+        Download the latest version of the integer book <a href="integer-book.pdf" download target="_blank">
             here</a>.
         </p>
+
+        <h2>Individual sheets</h2>
+
+        <ul>
+            {% for image in site.static_files %}
+                {% if image.path contains 'sheets' %}
+                    <p><a href="{{ site.baseurl }}{{ image.path }}" download> {{image.name| remove: ".pdf"}} </a></p>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </body>
     
 </html>
