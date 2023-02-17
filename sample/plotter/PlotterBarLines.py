@@ -11,7 +11,7 @@ fontDirectory = os.path.join(os.path.dirname(__file__), '../fonts/')
 fontPropertiesSymbola = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
 
 
-class PlotterBarlines(Plotter):
+class PlotterBarLines(Plotter):
 
     def __init__(self, streamObj, Settings, LocationFinder, axs):
 
@@ -19,7 +19,7 @@ class PlotterBarlines(Plotter):
 
         self.spannedMeasures = self._getSpannedMeasures()
 
-    def plotBarlines(self):
+    def plotBarLines(self):
 
         measures = self.streamObj[music21.stream.Measure]
 
@@ -27,57 +27,35 @@ class PlotterBarlines(Plotter):
 
             self._plotMeasureBarlines(measure)
 
-            if self.Settings.subdivision >= 1:
-                self._plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth1)
+            self._plotSubdivisions(measure)
 
-            if self.Settings.subdivision >= 2:
-                self._plotSubdivisionBarlines(measure, 0.25, self.Settings.lineWidth2)
+            self._plotThickBarlines(measure)
 
             self._plotRepeatBrackets(measure)
             self._plotRepeatExpressions(measure)
 
-            if measure.number == 0 and len(measures) > 1:
-                firstMeasure = self.streamObj.recurse().getElementsByClass(music21.stream.Measure)[1]
-            else:
-                firstMeasure = measure
-
-            if self.Settings.subdivision == 0:
-                self._plotTimeSignature(measure, firstMeasure)
+            self._plotTimeSignature(measure)
 
             self._plotKey(measure)
 
     def _plotMeasureBarlines(self, measure):
+
         if not measure.number == 0:
-            self._plotVBar(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
+            self._plotVLine(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
             offsetEndMeasure = measure.offset + measure.quarterLength
-            self._plotVBar(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
+            self._plotVLine(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension,
+                            start=False)
 
-        if self.Settings.thickBarlines:
+    def _plotSubdivisions(self, measure):
+        if self.Settings.subdivision == 1:
+            self._plotSubdivisionBarLines(measure, 1, self.Settings.lineWidth2)
 
-            for barLine in measure[music21.bar.Barline]:
-                offset = measure.offset + barLine.offset
+        elif self.Settings.subdivision == 2:
+            self._plotSubdivisionBarLines(measure, 1, self.Settings.lineWidth1)
+            self._plotSubdivisionBarLines(measure, 0.25, self.Settings.lineWidth2)
 
-                if type(barLine) == music21.bar.Repeat:
-
-                    if barLine.direction == 'start':
-                        start = True
-                    else:
-                        start = False
-
-                    self._plotVBar(offset, self.Settings.lineWidth0 + 1, self.Settings.heightBarline0Extension, start,
-                                   rectangle=True)
-                    self._plotDots(offset, start)
-                    self._plotHBar(offset, start)
-
-                if type(barLine) == music21.bar.Barline and barLine.type == 'final':
-                    self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, rectangle=True)
-
-                if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
-                    self._plotVBar(offset, None, self.Settings.heightBarline0Extension, start=False, double=True)
-
-
-    def _plotSubdivisionBarlines(self, measure, step, lineWidth):
+    def _plotSubdivisionBarLines(self, measure, step, lineWidth):
 
         for t in np.arange(0, measure.quarterLength, step=step):
             if measure.number == 0:
@@ -85,27 +63,61 @@ class PlotterBarlines(Plotter):
             elif measure.number >= 1:
                 offset = measure.offset + t
 
-            self._plotVBar(offset, lineWidth, 0, True)
+            self._plotVLine(offset, lineWidth, 0, True)
 
-    def _plotVBar(self, offset, lineWidth, extension, start, rectangle=False, double=False):
+    def _plotVLine(self, offset, lineWidth, extension, start):
 
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
         yPosLow = yPosLineBase + self.Settings.yMin
         yPosHigh = yPosLineBase + self.Settings.yMax
 
-        if double:
-            xPos -= 0.003
+        self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
+                          linestyle='solid', linewidth=lineWidth, color='grey', zorder=.4)
 
-        if not rectangle:
-            self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
-                              linestyle='solid', linewidth=lineWidth, color='grey', zorder=.5)
+
+    def _plotThickBarlines(self, measure):
+
+        # these barLines are plotted on top of the "normal" barLines
+
+        if self.Settings.thickBarlines:
+
+            for barLine in measure[music21.bar.Barline]:
+                offset = measure.offset + barLine.offset
+
+                if type(barLine) == music21.bar.Repeat:
+                    self._plotRepeatBarLine(barLine, offset)
+
+                if type(barLine) == music21.bar.Barline and barLine.type == 'final':
+                    self._plotThickVLine(offset, self.Settings.heightBarline0Extension, start=False)
+
+                if type(barLine) == music21.bar.Barline and barLine.type == 'double' and measure.number != 0:
+                    self._plotVLine(offset - .1, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=False)
+
+    def _plotRepeatBarLine(self, barLine, offset):
+
+        if barLine.direction == 'start':
+            start = True
         else:
-            width = self.Settings.widthThickBarline
-            if not start:
-                xPos -= width
-            patch = Rectangle((xPos, yPosLow), width=width, height=self.Settings.yMax + extension - self.Settings.yMin, color='grey', fill=True, zorder=.5)
-            self.axs[page].add_patch(patch)
+            start = False
+
+        self._plotThickVLine(offset, self.Settings.heightBarline0Extension, start)
+        self._plotDots(offset, start)
+        self._plotHBar(offset, start)
+
+    def _plotThickVLine(self, offset, extension, start):
+
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
+
+        yPosLow = yPosLineBase + self.Settings.yMin
+
+        lineWidth = self.Settings.widthThickBarline
+
+        if not start:
+            xPos -= lineWidth
+        patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
+                          color='grey', fill=True, zorder=.4, linewidth=0)
+        self.axs[page].add_patch(patch)
 
 
     def _plotDots(self, offset, start):
@@ -123,14 +135,17 @@ class PlotterBarlines(Plotter):
         for i in [-1, 1]:
 
             distance = 0.007
-            xyRatio =  self.Settings.widthA4 / self.Settings.heightA4
-            patch = Ellipse((xPos, yPos + i*distance), width=self.Settings.widthThickBarline, height=self.Settings.widthThickBarline*xyRatio, color='grey')
+            xyRatio = self.Settings.widthA4 / self.Settings.heightA4
+            patch = Ellipse((xPos, yPos + i*distance), width=self.Settings.widthThickBarline,
+                            height=self.Settings.widthThickBarline*xyRatio, color='grey')
 
             self.axs[page].add_patch(patch)
 
+        # make background of dots white
         margin = 0.007
-        patch = Rectangle((xPos - 0.5 * self.Settings.widthThickBarline - 0.0001, yPos - distance - margin),
-                          width=self.Settings.widthThickBarline + 0.0002, height=2 * distance + 2 * margin, color='white', zorder=0.5)
+        extraWidth = 0.002
+        patch = Rectangle((xPos - 0.5 * self.Settings.widthThickBarline - extraWidth/2, yPos - distance - margin),
+                          width=self.Settings.widthThickBarline + extraWidth, height=2 * distance + 2 * margin, color='white', zorder=0.5)
 
         self.axs[page].add_patch(patch)
 
@@ -146,7 +161,7 @@ class PlotterBarlines(Plotter):
             xPos -= width
 
         for yPos in [yPosLow, yPosHigh - self.Settings.widthThickBarline]:
-            patch = Rectangle((xPos, yPos), height=self.Settings.widthThickBarline, width=width, color='grey')
+            patch = Rectangle((xPos, yPos), height=self.Settings.widthThickBarline, width=width, color='grey', linewidth=0)
             self.axs[page].add_patch(patch)
 
     def _plotRepeatBrackets(self, measure):
@@ -236,14 +251,22 @@ class PlotterBarlines(Plotter):
             self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
                                 va='baseline', ha='left')
 
-    def _plotTimeSignature(self, measure, firstMeasure):
+    def _plotTimeSignature(self, measure):
+
+        measures = self.streamObj[music21.stream.Measure]
+        if measure.number == 0 and len(measures) > 1:
+            firstMeasure = measures[1]
+        else:
+            firstMeasure = measure
 
         if self.Settings.timeSignatureWithBarlines:
 
-            if measure[music21.meter.TimeSignature]:
-                if measure.number == 0:
-                    measure = firstMeasure
-                self._plotSubdivisionBarlines(measure, 1, self.Settings.lineWidth2)
+            if self.Settings.subdivision == 0:
+
+                if measure[music21.meter.TimeSignature]:
+                    if measure.number == 0:
+                        measure = firstMeasure
+                    self._plotSubdivisionBarLines(measure, 1, self.Settings.lineWidth2)
 
         else:
             if measure[music21.meter.TimeSignature]:
