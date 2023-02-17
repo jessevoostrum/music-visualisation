@@ -34,8 +34,6 @@
   "lineWidth1": 1,
   "lineWidth2": 0.2,
   "xMarginNote": 0.001,
-  "radiusCorners": 0.006,
-  "mutationAspect": 0.3,
   "font": "DejaVu Sans",
   "fontDirectory": null,
   "fontStyle": "normal",
