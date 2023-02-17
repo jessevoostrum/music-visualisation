@@ -3,7 +3,7 @@ from matplotlib import rc
 
 from sample.plotter.PlotterNotes import PlotterNotes
 from sample.plotter.PlotterChords import PlotterChords
-from sample.plotter.PlotterBarlines import PlotterBarlines
+from sample.plotter.PlotterBarLines import PlotterBarLines
 from sample.plotter.PlotterMetadata import PlotterMetadata
 
 class Dog:
@@ -23,7 +23,7 @@ class PlotterMain:
 
         self.PlotterNotes = PlotterNotes(self.streamObj, self.settings, self.LocationFinder, self.axs)
         self.PlotterChords = PlotterChords(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        self.PlotterBarlines = PlotterBarlines(self.streamObj, self.settings, self.LocationFinder, self.axs)
+        self.PlotterBarlines = PlotterBarLines(self.streamObj, self.settings, self.LocationFinder, self.axs)
         self.PlotterMetadata = PlotterMetadata(self.streamObj, self.settings, self.LocationFinder, self.axs)
 
     def plot(self):
@@ -32,5 +32,5 @@ class PlotterMain:
         rc('text.latex', preamble=r'\usepackage{amssymb}')
         self.PlotterNotes.plotNotes()
         self.PlotterChords.plotChords()
-        self.PlotterBarlines.plotBarlines()
+        self.PlotterBarlines.plotBarLines()
 
