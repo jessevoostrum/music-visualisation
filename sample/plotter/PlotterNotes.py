@@ -8,7 +8,7 @@ import colorcet as cc
 import numpy as np
 
 from sample.plotter.patches import Parallelogram
-from sample.plotter.Plotter import Plotter
+from sample.plotter.PlotterBase import Plotter
 
 
 class PlotterNotes(Plotter):
