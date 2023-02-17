@@ -64,8 +64,6 @@ class Settings:
         self.lineWidth1 = settings['lineWidth1']
         self.lineWidth2 = settings['lineWidth2']
         self.xMarginNote = settings['xMarginNote']
-        self.radiusCorners = settings['radiusCorners']
-        self.mutationAspect = settings['mutationAspect']
         self.font = settings['font']
 
         self.fontSettings = FontSettings(self.font)
