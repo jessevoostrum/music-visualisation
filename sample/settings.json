@@ -6,7 +6,7 @@
   "fontSizeMetadata": 10,
   "fontSizeLyrics": 5,
   "fontSizeChordsPerFontSizeNotes": 1.2,
-  "barSpacePerFontSize":  0.001,
+  "barSpacePerCapsize":  1.33,
   "overlapFactor":  0.5,
   "chordToneRatio": 2.5,
   "widthA4": 8.27,
