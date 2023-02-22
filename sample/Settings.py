@@ -171,7 +171,7 @@ class Settings:
             else:
                 yMin = - self.chordToneRatio * self.barSpace
         else:
-            yMin = - self.barSpace * .2  # why?
+            yMin = 0 # - self.barSpace * .2  # why?
         return yMin, yMax
 
     def _countLinesLyrics(self):
