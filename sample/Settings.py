@@ -38,7 +38,7 @@ class Settings:
         self.fontSizeMetadata = settings['fontSizeMetadata']
         self.fontSizeLyrics = settings['fontSizeLyrics']
         self.fontSizeChordsPerFontSizeNotes = settings['fontSizeChordsPerFontSizeNotes']
-        self.barSpacePerFontSize = settings['barSpacePerFontSize']
+        self.barSpacePerCapsize = settings['barSpacePerCapsize']
         self.overlapFactor = settings['overlapFactor']
         self.chordToneRatio = settings['chordToneRatio']
         self.widthA4 = settings['widthA4']
@@ -96,7 +96,7 @@ class Settings:
         self.lyricHeightMax = fontDimensions["firstLineHeight"] * self.fontSizeLyrics + (self._countLinesLyrics() - 1) * fontDimensions["extraLineHeight"] * self.fontSizeLyrics
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
-        self.barSpace = self.barSpacePerFontSize * self.fontSizeNotes
+        self.barSpace = self.barSpacePerCapsize * self.capsizeNumberNote
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
 
