@@ -7,8 +7,8 @@ From the root folder of the repository, run the following line in the terminal:
 
 ``` $ python run.py <path to song> <output directory> ```
 
-<path to song> should be the absolute path to the musicxml file, that you wish to convert. (can be either .mxl or .musicxml) 
-<output directory> is the location where you would like the output pdf file to be stored. 
+```<path to song>``` should be the absolute path to the musicxml file, that you wish to convert. (can be either .mxl or .musicxml) 
+```<output directory>``` is the location where you would like the output pdf file to be stored. 
 
 ### requirements
 - music21
