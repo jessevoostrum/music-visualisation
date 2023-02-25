@@ -253,39 +253,41 @@ class PlotterBarLines(Plotter):
 
     def _plotTimeSignature(self, measure):
 
-        measures = self.streamObj[music21.stream.Measure]
-        if measure.number == 0 and len(measures) > 1:
-            firstMeasure = measures[1]
-        else:
-            firstMeasure = measure
+        if self.Settings.plotTimeSignature:
 
-        if self.Settings.timeSignatureWithBarlines:
+            measures = self.streamObj[music21.stream.Measure]
+            if measure.number == 0 and len(measures) > 1:
+                firstMeasure = measures[1]
+            else:
+                firstMeasure = measure
 
-            if self.Settings.subdivision == 0:
+            if self.Settings.timeSignatureWithBarlines:
 
+                if self.Settings.subdivision == 0:
+
+                    if measure[music21.meter.TimeSignature]:
+                        if measure.number == 0:
+                            measure = firstMeasure
+                        self._plotSubdivisionBarLines(measure, 1, self.Settings.lineWidth2)
+
+            else:
                 if measure[music21.meter.TimeSignature]:
+
+                    ts = measure[music21.meter.TimeSignature][0]
+                    ts = f"{ts.numerator}/{ts.denominator}"
+
                     if measure.number == 0:
                         measure = firstMeasure
-                    self._plotSubdivisionBarLines(measure, 1, self.Settings.lineWidth2)
 
-        else:
-            if measure[music21.meter.TimeSignature]:
+                    page, yPosLineBase, xPos = self.LocationFinder.getLocation(measure.offset, start=True)
 
-                ts = measure[music21.meter.TimeSignature][0]
-                ts = f"{ts.numerator}/{ts.denominator}"
+                    xPos += self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength / 2)
 
-                if measure.number == 0:
-                    measure = firstMeasure
+                    yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
 
-                page, yPosLineBase, xPos = self.LocationFinder.getLocation(measure.offset, start=True)
-
-                xPos += self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength / 2)
-
-                yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
-
-                self.axs[page].text(xPos, yPos, ts,
-                                    fontsize=10,
-                                    va='baseline', ha='center')
+                    self.axs[page].text(xPos, yPos, ts,
+                                        fontsize=10,
+                                        va='baseline', ha='center')
 
     def _getSpannedMeasures(self):
         includedMeasuresDict = {}
