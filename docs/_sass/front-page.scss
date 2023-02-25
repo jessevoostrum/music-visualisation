@@ -1,0 +1,46 @@
+
+.outer-block{
+    display: flex;
+    flex-direction: row;
+    margin: 1em;
+}
+
+.short-description{
+    flex-basis: 30%; 
+}
+
+.figures-and-further-links{
+    flex-direction: column;
+    flex-basis: 70%;
+}
+
+.figures{
+    display: flex;
+    flex-direction: column;
+    // align-items: baseline;
+}
+
+.figure{
+    flex-basis: 50%;
+    justify-content: center;
+}
+
+.figure > img{
+    display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+.further-links{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.further-link{
+    justify-content: center;
+    margin-left: .5em;
+    margin-right: .5em;
+    padding: .5em;
+}

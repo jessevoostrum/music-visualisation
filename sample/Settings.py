@@ -66,6 +66,9 @@ class Settings:
         self.xMarginNote = settings['xMarginNote']
         self.font = settings['font']
 
+        self.plotTimeSignature = settings["plotTimeSignature"]
+
+
         self.fontSettings = FontSettings(self.font)
 
         self.fontDirectory = settings['fontDirectory']

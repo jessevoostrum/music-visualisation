@@ -44,6 +44,7 @@
   "timeSignatureWithBarlines": true,
   "lyrics": false,
   "thickBarlines": true,
-  "printArranger": true
+  "printArranger": true,
+  "plotTimeSignature": true
 }
 
