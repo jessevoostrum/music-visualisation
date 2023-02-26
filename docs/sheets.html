@@ -22,6 +22,19 @@ layout: default
                       {% endif %}
                   {% endfor %}
               </ul>
+              <ul>
+                {% for coll in site.collections %}
+                    {% if coll.label == "sheets" %}
+                    {% for file in coll.files %}
+                    <div>
+                    Name: {{ file.name }}
+                    Path: {{ file.path }}
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </ul>
+
         </div>
     </body>
     

@@ -34,6 +34,10 @@ baseurl: "/music-visualisation" # the subpath of your site, e.g. /blog
 plugins:
   - jekyll-feed
 
+collections:
+  - sheets
+
+
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
