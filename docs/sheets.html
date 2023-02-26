@@ -25,6 +25,12 @@ layout: default
               halloo {{site.url}} {{site.collections}} {{site.title}}
               <ul>
                 {% for coll in site.collections %}
+                    <div>
+                    Name: {{ coll.label }}
+                    </div>
+                {% endfor %}
+
+                {% for coll in site.collections %}
                     {% if coll.label == "sheets" %}
                     {% for file in coll.files %}
                     <div>
