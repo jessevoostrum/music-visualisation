@@ -22,24 +22,12 @@ layout: default
                       {% endif %}
                   {% endfor %}
               </ul>
-              halloo {{site.url}} {{site.collections}} {{site.title}}
+
               <ul>
                 {% for coll in site.collections %}
-                    <div>
-                    Name: {{ coll.label }}
-                    </div>
-                {% endfor %}
-
-                {% for coll in site.collections %}
                     {% if coll.label == "sheets" %}
-                    <div>
-                        found sheets
-                    </div>
                     {% for file in coll.files %}
-                    <div>
-                    Name: {{ file.name }}
-                    Path: {{ file.path }}
-                    </div>
+                    <p><a href="{{ site.baseurl }}{{ file.path }}" download> {{image.name| remove: ".pdf"}} </a></p>
                     {% endfor %}
                     {% endif %}
                 {% endfor %}
