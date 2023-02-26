@@ -32,6 +32,9 @@ layout: default
 
                 {% for coll in site.collections %}
                     {% if coll.label == "sheets" %}
+                    <div>
+                        found sheets
+                    </div>
                     {% for file in coll.files %}
                     <div>
                     Name: {{ file.name }}
