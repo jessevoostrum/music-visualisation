@@ -1,5 +1,3 @@
-import music21
-
 class Plotter:
 
     def __init__(self, streamObj, Settings, LocationFinder, axs):
@@ -17,7 +15,7 @@ class Plotter:
             elif accidental.name == 'flat':
                 symbolAccidental = '♭'
 
-            relativeXLocation = 0.3
+            relativeXLocation = self.Settings.fontSettings.accidentalXPositionRelative
             if not front:
                 relativeXLocation = 1 - relativeXLocation
 
@@ -27,6 +25,7 @@ class Plotter:
             fontSizeAccidental = self.Settings.fontSettings.accidentalSizeRelative * fontSize
 
             if symbolAccidental:
+
                 self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
                                     fontsize=fontSizeAccidental,
                                     va='baseline', ha='right', fontname=self.Settings.font)
@@ -47,3 +46,4 @@ class Plotter:
         letter = f"$\\mathregular{{{letter}}}$"
 
         return letter
+

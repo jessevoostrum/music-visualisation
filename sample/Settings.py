@@ -14,7 +14,11 @@ class FontSettings:
         pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
         f = open(pathFontDimensions)
         fontSettings = json.load(f)
-        fontSettings = fontSettings[font]
+        if font in fontSettings.keys():
+            fontSettings = fontSettings[font]
+        else:
+            fontSettings = fontSettings['DejaVu Sans']
+            print("no fontsettings available")
 
         self.fontSizeType = fontSettings['fontSizeType']
         self.fontSizeTypeSmall = fontSettings['fontSizeTypeSmall']
@@ -23,7 +27,11 @@ class FontSettings:
         self.accidentalSpace = fontSettings['accidentalSpace']
         self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
         self.widthDelta = fontSettings["widthDelta"]
+        self.widthCircle = fontSettings["widthCircle"]
         self.spaceAddSus = fontSettings["spaceAddSus"]
+        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
+        self.hDistanceChordAddition = fontSettings['hDistanceChordAddition']
+
 
 class Settings:
 
@@ -72,10 +80,11 @@ class Settings:
         self.fontSettings = FontSettings(self.font)
 
         self.fontDirectory = settings['fontDirectory']
+        self.fontPath = settings["fontPath"]
+        self.fontPathRoman = settings["fontPathRoman"]
         self.fontStyle = settings["fontStyle"]
         self.fontWeight = settings["fontWeight"]
         self.fontSizeAccidentalRelative = settings['fontSizeAccidentalRelative']
-        self.hDistanceChordAddition = settings['hDistanceChordAddition']
         self.widthThickBarline = settings['widthThickBarline']
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
         self.lyrics = settings['lyrics']
@@ -89,6 +98,7 @@ class Settings:
             fD = fontDimensions[self.font]
         else:
             fD = fontDimensions["DejaVu Sans"]
+            print("no font dimensions available")
 
         self.capsizeNumberRelative = fD["capsize"]
         self.widthNumberRelative = fD["width"]
