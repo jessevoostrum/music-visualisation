@@ -50,7 +50,7 @@ class PlotterChords(Plotter):
         fontSize = self.Settings.fontSizeChords
         widthNumber = self.Settings.widthNumberRelative * fontSize
 
-        xPos = xPos + widthNumber + self.Settings.hDistanceChordAddition
+        xPos = xPos + widthNumber + self.Settings.fontSettings.hDistanceChordAddition
         yPos = yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7
 
         self.fontSizeType = self.Settings.fontSettings.fontSizeType
@@ -155,19 +155,19 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos + 0.001, yPos - 0.00035,  # - 0.0005
                             "$\mathbb{\Delta}$", fontsize=self.fontSizeType,
                             va='baseline', ha='left')
-        return self.Settings.fontSettings.widthDelta - 0.001
+        return self.Settings.fontSettings.widthDelta
 
     def _plotTypeHalfDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos - 0.00034,
                             "$\\varnothing$", fontsize=8, math_fontfamily='dejavusans',
                             va='baseline', ha='left')
-        return self.width
+        return self.Settings.fontSettings.widthCircle
 
     def _plotTypeDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos - 0.0014,
                             "$\\circ$", fontsize=15, fontstyle='normal', math_fontfamily='cm',
                             va='baseline', ha='left')
-        return self.width + 0.0003
+        return self.Settings.fontSettings.widthCircle + 0.0003
 
     def _plotTypeSeventh(self, xPos, yPos, page):
         width = self._plotTypeAndModificationNumberAndAccidental(7, None, xPos, yPos, page)

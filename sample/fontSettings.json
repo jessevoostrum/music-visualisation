@@ -7,7 +7,10 @@
     "accidentalSpace": 0.01,
     "accidentalSizeRelative": 0.7,
     "widthDelta": 0.01,
-    "spaceAddSus": 0.03
+    "widthCircle": 0.01,
+    "spaceAddSus": 0.03,
+    "accidentalXPositionRelative": 0.3,
+    "hDistanceChordAddition": -0.001
   },
   "DejaVu Sans": {
     "fontSizeType": 10,
@@ -17,7 +20,22 @@
     "accidentalSpace": 0.007,
     "accidentalSizeRelative": 1,
     "widthDelta": 0.013,
-    "spaceAddSus": 0.025
-
+    "widthCircle": 0.01,
+    "spaceAddSus": 0.025,
+    "accidentalXPositionRelative": 0.3,
+    "hDistanceChordAddition": -0.001
+  },
+  "Realbook": {
+    "fontSizeType": 10,
+    "fontSizeTypeSmall": 8,
+    "widthCharacter": 0.008,
+    "widthMinus": 0.005,
+    "accidentalSpace": 0.004,
+    "accidentalSizeRelative": 1,
+    "widthDelta": 0.013,
+    "widthCircle": 0.01,
+    "spaceAddSus": 0.02,
+    "accidentalXPositionRelative": 0.1,
+    "hDistanceChordAddition": -0.0006
   }
 }

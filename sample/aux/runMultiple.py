@@ -8,7 +8,7 @@ from sample.main import Visualiser
 dir_songs_bass = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/"
 dir_songs_standards = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/standards_musescore/"
 dir_songs_testsuite = "/Users/jvo/Documents/music-visualisation/testsuite/"
-dir_songs_DS = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/DickSchmitt/"
+dir_songs_DS = "/Users/jvo/Downloads/DickSchmittMxl/"
 
 dirSongs = dir_songs_DS
 
@@ -38,7 +38,7 @@ lines = [os.path.basename(line) for line in lines]
 lines.sort()
 
 
-for line in lines:
+for line in lines[:10]:
 
     print(line)
 
@@ -51,5 +51,6 @@ for line in lines:
         vis.generate("../../output/outputDickSchmitt/")
 
     except Exception as e:
+        print("ERROR", "\n")
         print(repr(e))
 
