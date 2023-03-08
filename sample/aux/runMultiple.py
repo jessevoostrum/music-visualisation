@@ -38,7 +38,7 @@ lines = [os.path.basename(line) for line in lines]
 lines.sort()
 
 
-for line in lines[:10]:
+for line in lines:
 
     print(line)
 
