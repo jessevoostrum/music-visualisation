@@ -1,40 +1,12 @@
 ---
-layout: default
+layout: sheets-layout
 ---
 
-<!DOCTYPE html>
 <html>
-    <head>
-        <title>The Integer Book</title>
-    </head>
-    <style></style>
     <body>
-
-        <div class="content">
-
-            <p> Download the latest version of the integer book <a href="integer-book.pdf" download target="_blank"> here.</a> </p>
-    
-            <h2>Popular Sheets</h2>
-              <ul>
-                  {% for image in site.static_files %}
-                      {% if image.path contains 'sheets' %}
-                          <p><a href="{{ site.baseurl }}{{ image.path }}" download> {{image.name| remove: ".pdf"}} </a></p>
-                      {% endif %}
-                  {% endfor %}
-              </ul>
-
-              <ul>
-                {% for coll in site.collections %}
-                    {% if coll.label == "sheets" %}
-                    {% for file in coll.files %}
-                    <p><a href="{{ site.baseurl }}{{ file.path }}" download> {{image.name| remove: ".pdf"}} </a></p>
-                    {% endfor %}
-                    {% endif %}
-                {% endfor %}
-            </ul>
-
-        </div>
+        
+        <h2>Popular Sheets</h2>
+        {% include sheets-selection.liquid songs=site.data.popular_sheets %}
+        
     </body>
-    
-    
 </html>

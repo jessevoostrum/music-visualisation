@@ -1,0 +1,15 @@
+<ul>
+  {% for image in site.static_files %}
+    {% if image.path contains 'sheets' %}
+      {% for sheet in include.songs %}
+        {% if image.path contains sheet %}
+          <p>
+            <a href="{{ site.baseurl }}{{ image.path }}" download>
+              {{ image.name | remove: ".pdf" }}
+            </a>
+          </p>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+</ul>
