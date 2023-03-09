@@ -2,7 +2,7 @@
   {% for image in site.static_files %}
     {% if image.path contains 'sheets' %}
       {% for sheet in include.songs %}
-        {% if image.path contains sheet %}
+        {% if image.name == sheet %}
           <p>
             <a href="{{ site.baseurl }}{{ image.path }}" download>
               {{ image.name | remove: ".pdf" }}

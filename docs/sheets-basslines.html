@@ -1,0 +1,22 @@
+---
+layout: sheets-layout
+---
+
+<html>
+    <body>
+        
+        <h2>Basslines</h2>
+        <ul>
+            {% for image in site.static_files %}
+              {% if image.path contains 'basslines' %}
+                    <p>
+                      <a href="{{ site.baseurl }}{{ image.path }}" download>
+                        {{ image.name | remove: ".pdf" }}
+                      </a>
+                    </p>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        
+    </body>
+</html>

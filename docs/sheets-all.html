@@ -1,0 +1,22 @@
+---
+layout: sheets-layout
+---
+
+<html>
+    <body>
+        
+        <h2>All Sheets</h2>
+        <ul>
+            {% for image in site.static_files %}
+              {% if image.path contains 'sheets' %}
+                    <p>
+                      <a href="{{ site.baseurl }}{{ image.path }}" download>
+                        {{ image.name | remove: ".pdf" }}
+                      </a>
+                    </p>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        
+    </body>
+</html>

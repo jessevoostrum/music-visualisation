@@ -1,11 +1,34 @@
----
----
-
-
 <html>
-    <body>
+
+<head>
+    <style>
+        .flexbox-wrapper {
+        display: flex;
+        height: 2000px;
+        overflow: auto;
+        }
+        .regular {
+        background-color: blue;
+        height: 6000px;
+        }
+        .sticky {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        align-self: flex-start;
+        background-color: red;
+        }
+    </style>
+</head>
+<body>
     
-       {% include test-snippet.liquid items=site.data.popular_sheets %}
-        
-    </body>
+    <div class="flexbox-wrapper">
+        <div class="regular">
+          This is the regular box
+        </div>
+        <div class="sticky">
+          This is the sticky box
+        </div>
+      </div>
+</body>
 </html>
