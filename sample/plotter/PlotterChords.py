@@ -245,13 +245,13 @@ class PlotterChords(Plotter):
 
     def _plotModificationSubtract(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
-                            "sub", fontsize=self.fontSizeTypeSmall,
+                            "sub", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
         return self.width * 3
 
     def _plotModificationAlter(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
-                            "alt", fontsize=self.fontSizeTypeSmall,
+                            "alt", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
         return self.width * 3
 
