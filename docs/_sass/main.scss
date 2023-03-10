@@ -41,9 +41,6 @@ a:hover {text-decoration: underline; }
 
 .title {
   display: flex;
-  color: #7a8288;
-  font-size: 21px;
-  font-weight: bold;
   align-items: left;
   flex-basis: 70%;
   @media (min-width: $small) {
@@ -62,9 +59,9 @@ a:hover {text-decoration: underline; }
 
 .navigation {
   display: flex;
-  font-size: 15px;
+  font-size: 18px;
   font-weight: bold;
-  color: #7a8288;
+  color: rgb(44, 41, 41);
   flex-direction: row;
   align-items: center;
   justify-content: right;
@@ -79,7 +76,6 @@ a:hover {text-decoration: underline; }
 
 .navigation-block {
   justify-content: center;
-  margin-left: 1em;
-  margin-right: 1em;
-  padding: .5em;
+  margin-left: 4em;
+  margin-right: 0em;
 }

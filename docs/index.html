@@ -1,44 +1,12 @@
 ---
-layout: default
+layout: sheets-layout
 ---
 
-<!DOCTYPE html>
 <html>
-    <head>
-        <title>The Integer Book</title>
-        </head>
-    <style></style>
     <body>
-
-        <div class="outer-block">
-            <div class="short-description">
-                The Integer Book is a collection of sheet music visualisations that uses numbers to refer to the relative position of notes and chords within the key of the song instead of letters referring to absolute heights.
-            </div>
-
-            <div class="figures-and-further-links">
-                <div class="figures">
-                    
-                    <div class="figure">
-                            <img src="assets/images/twinkle2bars-1.png" alt="Snow">
-                    </div>
-                        
-                    
-                    <div class="figure">
-                        <img src="assets/images/twinkle2bars.png" alt="Snow">
-                    </div>
-                </div>
-
-                <div class="further-links">
-                    <div class="further-link"><a href="{{site.baseurl}}/learn-the-method.html">learn the method</a></div>
-                    <div class="further-link"><a href="{{site.baseurl}}/sheets-popular.html">browse sheets</a></div>
-                </div>
-
-            </div>
-        </div>
-    
         
-    
+        <h2>Popular Sheets</h2>
+        {% include sheets-selection.liquid songs=site.data.popular_sheets %}
+        
     </body>
 </html>
-
-
