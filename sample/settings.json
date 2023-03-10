@@ -46,6 +46,7 @@
   "lyrics": false,
   "thickBarlines": true,
   "printArranger": true,
-  "plotTimeSignature": true
+  "plotTimeSignature": true,
+  "saveCropped": false
 }
 

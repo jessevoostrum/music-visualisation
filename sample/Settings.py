@@ -73,6 +73,7 @@ class Settings:
         self.lineWidth2 = settings['lineWidth2']
         self.xMarginNote = settings['xMarginNote']
         self.font = settings['font']
+        self.saveCropped = settings["saveCropped"]
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 

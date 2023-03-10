@@ -37,7 +37,7 @@ class Visualiser:
         self.PlotterMain.plot()
 
         title = self.PlotterMain.PlotterMetadata.getSongTitle()
-        pathName = directoryName + f"{title}.pdf"
+        pathName = directoryName + f"/{title}.pdf"
         yPosLowest = self.LocationFinder.getYPosLineBase(-1)
 
         self.CanvasCreator.saveFig(title, pathName, yPosLowest)
