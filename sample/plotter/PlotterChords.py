@@ -70,12 +70,15 @@ class PlotterChords(Plotter):
             width = 0
             if chordType == "minor":
                 width = self._plotTypeMinor(xPos, yPos, page)
-            if chordType == "major" and len(chordTypes) != 1:
+            if chordType == "major" and len(chordTypes) != 1 and chordTypes[i+1] != 'sixth':
                 width = self._plotTypeMajor(xPos, yPos, page)
             if chordType == 'half-diminished':
                 width = self._plotTypeHalfDiminished(xPos, yPos, page)
             if chordType == 'diminished':
                 width = self._plotTypeDiminished(xPos, yPos, page)
+
+            if chordType == "sixth":
+                width = self._plotTypeSixth(xPos, yPos, page)
 
             if chordType == "seventh":
                 width = self._plotTypeSeventh(xPos, yPos, page)
@@ -131,6 +134,9 @@ class PlotterChords(Plotter):
 
     def _plotTypeAndModificationNumberAndAccidental(self, number, accidental, xPos, yPos, page):
 
+        if self.Settings.fontVShift:
+            yPos += self.Settings.fontVShift * self.Settings.capsizeNumberRelative * self.fontSizeType
+
         width = 0
         if accidental:
             xPos += self.accidentalSpace
@@ -168,6 +174,10 @@ class PlotterChords(Plotter):
                             "$\\circ$", fontsize=15, fontstyle='normal', math_fontfamily='cm',
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthCircle + 0.0003
+
+    def _plotTypeSixth(self, xPos, yPos, page):
+        width = self._plotTypeAndModificationNumberAndAccidental(6, None, xPos, yPos, page)
+        return width
 
     def _plotTypeSeventh(self, xPos, yPos, page):
         width = self._plotTypeAndModificationNumberAndAccidental(7, None, xPos, yPos, page)

@@ -331,6 +331,9 @@ class PlotterNotes(Plotter):
 
         yShiftNumbers = (self.barSpace - self.Settings.capsizeNumberNote) / 2
 
+        if self.Settings.fontVShift:
+            yShiftNumbers += self.Settings.fontVShift * self.Settings.capsizeNumberNote
+
         return yShiftNumbers
 
 
