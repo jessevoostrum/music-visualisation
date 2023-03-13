@@ -47,6 +47,7 @@
   "thickBarlines": true,
   "printArranger": true,
   "plotTimeSignature": true,
-  "saveCropped": false
+  "saveCropped": false,
+  "xkcd": false
 }
 

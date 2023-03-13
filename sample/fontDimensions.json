@@ -1,5 +1,10 @@
 {
-  "_comment": "the distances are given in A4 distance per pt",
+  "_comment": "the distances are given in A4 distance per pt, and vShift in fraction from capheight",
+  "Humor Sans": {
+    "capsize":  0.000684,
+    "width": 0.001,
+    "vShift": 0.12
+  },
   "Realbook": {
     "capsize":  0.000941,
     "width": 0.00065

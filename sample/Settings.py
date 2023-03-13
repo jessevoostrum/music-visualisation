@@ -74,6 +74,7 @@ class Settings:
         self.xMarginNote = settings['xMarginNote']
         self.font = settings['font']
         self.saveCropped = settings["saveCropped"]
+        self.xkcd = settings["xkcd"]
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 
@@ -86,6 +87,7 @@ class Settings:
         self.fontStyle = settings["fontStyle"]
         self.fontWeight = settings["fontWeight"]
         self.fontSizeAccidentalRelative = settings['fontSizeAccidentalRelative']
+
         self.widthThickBarline = settings['widthThickBarline']
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
         self.lyrics = settings['lyrics']
@@ -103,6 +105,10 @@ class Settings:
 
         self.capsizeNumberRelative = fD["capsize"]
         self.widthNumberRelative = fD["width"]
+        if "vShift" in fD.keys():
+            self.fontVShift = fD["vShift"]
+        else:
+            self.fontVShift = None
         self.capsizeNumberNote = fD["capsize"] * self.fontSizeNotes
         self.widthNumberNote = fD["width"] * self.fontSizeNotes
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes

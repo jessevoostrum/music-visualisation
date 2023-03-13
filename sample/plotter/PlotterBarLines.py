@@ -4,6 +4,8 @@ import music21
 from matplotlib.patches import Ellipse, Rectangle
 import matplotlib.font_manager as fm
 import numpy as np
+from contextlib import nullcontext
+import matplotlib.pyplot as plt
 
 from sample.plotter.PlotterBase import Plotter
 
@@ -21,22 +23,29 @@ class PlotterBarLines(Plotter):
 
     def plotBarLines(self):
 
-        measures = self.streamObj[music21.stream.Measure]
+        if self.Settings.xkcd:
+            context = plt.xkcd(scale=0.4, length=200, randomness=0)
+        else:
+            context = nullcontext()
 
-        for measure in measures:
+        with context:
 
-            self._plotMeasureBarlines(measure)
+            measures = self.streamObj[music21.stream.Measure]
 
-            self._plotSubdivisions(measure)
+            for measure in measures:
 
-            self._plotThickBarlines(measure)
+                self._plotMeasureBarlines(measure)
 
-            self._plotRepeatBrackets(measure)
-            self._plotRepeatExpressions(measure)
+                self._plotSubdivisions(measure)
 
-            self._plotTimeSignature(measure)
+                self._plotThickBarlines(measure)
 
-            self._plotKey(measure)
+                self._plotRepeatBrackets(measure)
+                self._plotRepeatExpressions(measure)
+
+                self._plotTimeSignature(measure)
+
+                self._plotKey(measure)
 
     def _plotMeasureBarlines(self, measure):
 
