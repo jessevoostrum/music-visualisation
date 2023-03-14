@@ -1,10 +1,6 @@
-import json
 import music21
-from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
-from matplotlib import cm
 from itertools import tee, islice, chain
-import colorcet as cc
 import numpy as np
 
 from sample.plotter.patches import Parallelogram
@@ -230,14 +226,10 @@ class PlotterNotes(Plotter):
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
             circleOfFifthIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch)
-            colormapIndex = circleOfFifthIndex / 12
 
-            # facecolor = cm.get_cmap('cet_fire')(colormapIndex)
-            facecolor = cc.cm.colorwheel(colormapIndex)
+            facecolor = self._colorwheel(circleOfFifthIndex)
             alpha = self._alpha(circleOfFifthIndex)
-            # if circleOfFifthIndex == 0:
-            #     facecolor = (0,0,1,1)
-            #     alpha = 0.2
+
 
         elif self.Settings.coloursVoices:
             if el.containerHierarchy():
@@ -427,4 +419,21 @@ class PlotterNotes(Plotter):
         nexts = chain(islice(nexts, 1, None), [None])
         return zip(prevs, items, nexts)
 
+    def _colorwheel(self, circleOfFifthIndex):
+        """index must be between 0 and 11"""
+
+        rgbs = [(0.18062, 0.13244, 0.91856, 1.0),
+                 (0.44913, 0.17088, 0.97129, 1.0),
+                 (0.69537, 0.25408, 0.98496, 1.0),
+                 (0.93769, 0.33352, 0.94809, 1.0),
+                 (0.98704, 0.57494, 0.75486, 1.0),
+                 (0.98761, 0.78074, 0.51946, 1.0),
+                 (0.94377, 0.93236, 0.2092, 1.0),
+                 (0.7223, 0.87807, 0.079194, 1.0),
+                 (0.46484, 0.78619, 0.051424, 1.0),
+                 (0.19593, 0.67703, 0.15768, 1.0),
+                 (0.27173, 0.52798, 0.46247, 1.0),
+                 (0.183, 0.36488, 0.72404, 1.0)]
+
+        return rgbs[circleOfFifthIndex]
 
