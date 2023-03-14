@@ -103,24 +103,35 @@ class Settings:
             fD = fontDimensions["DejaVu Sans"]
             print("no font dimensions available")
 
+        fDLyrics = fontDimensions["DejaVu Sans"]
+
         self.capsizeNumberRelative = fD["capsize"]
         self.widthNumberRelative = fD["width"]
         if "vShift" in fD.keys():
             self.fontVShift = fD["vShift"]
         else:
             self.fontVShift = None
-        self.capsizeNumberNote = fD["capsize"] * self.fontSizeNotes
-        self.widthNumberNote = fD["width"] * self.fontSizeNotes
+
+        self.capsizeNote = fD["capsize"] * self.fontSizeNotes
+        self.fontWidthNote = fD["width"] * self.fontSizeNotes
+
+        self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
+        self.capsizeChord = fD["capsize"] * self.fontSizeChords
+        self.fontWidthChord = fD["width"] * self.fontSizeChords
+
+        self.capsizeLyric = fDLyrics["capsize"] * self.fontSizeLyrics
+        self.fontWidthLyric = fDLyrics["width"] * self.fontSizeLyrics
+
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
         self.lyricHeightMax = fontDimensions["firstLineHeight"] * self.fontSizeLyrics + (self._countLinesLyrics() - 1) * fontDimensions["extraLineHeight"] * self.fontSizeLyrics
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
-        self.barSpace = self.barSpacePerCapsize * self.capsizeNumberNote
+        self.barSpace = self.barSpacePerCapsize * self.capsizeNote
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
 
-        self.heightBarline0Extension = self.capsizeNumberNote
+        self.heightBarline0Extension = self.capsizeNote
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
@@ -184,7 +195,7 @@ class Settings:
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
         chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
         if chords:
-            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNumberNote * 1.4
+            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNote * 1.4
             yMarginTopChord = self.fontSizeChords * 1
             if self.lyrics:
                 yMin = - (chordHeight + self.lyricHeightMax)
