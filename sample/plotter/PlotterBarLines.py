@@ -213,7 +213,7 @@ class PlotterBarLines(Plotter):
 
                 xPos += self.LocationFinder._getXLengthFromOffsetLength(el.getOffsetInHierarchy(measure))
 
-                yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
+                yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNote
 
 
                 if el.getOffsetInHierarchy(measure) < measure.duration.quarterLength * 0.5:
@@ -250,11 +250,11 @@ class PlotterBarLines(Plotter):
         if measure[music21.key.Key, music21.key.KeySignature] and measure.number > 1:
             offset = measure.getOffsetInHierarchy(self.streamObj)
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
-            yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
+            yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNote
 
             xPos += self.Settings.xShiftNumberNote
             if self._hasRepeatExpressionAtStart(measure):
-                xPos += self.Settings.widthNumberNote * 2
+                xPos += self.Settings.fontWidthNote * 2
 
             key = self.Settings.getKey(offset)
             self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
@@ -292,7 +292,7 @@ class PlotterBarLines(Plotter):
 
                     xPos += self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength / 2)
 
-                    yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNumberNote
+                    yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNote
 
                     self.axs[page].text(xPos, yPos, ts,
                                         fontsize=10,

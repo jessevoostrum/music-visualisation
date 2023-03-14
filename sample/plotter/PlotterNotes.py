@@ -18,8 +18,18 @@ class PlotterNotes(Plotter):
 
         self.graceNoteCounter = 0
 
-        self.lastLyricEnd = 0
-        self.yPosLineBaseLast = 0
+        self.xPosLyricEnd = {"1": 0,
+                             "2": 0,
+                             "3": 0,
+                             "4": 0}
+        self.yPosLineBaseLast = {"1": 0,
+                                 "2": 0,
+                                 "3": 0,
+                                 "4": 0}
+        self.lastSyllabic = {"1": 0,
+                             "2": 0,
+                             "3": 0,
+                             "4": 0}
 
     def plotNotes(self):
 
@@ -161,13 +171,13 @@ class PlotterNotes(Plotter):
             else:
                 xShiftNumbersGlissando = 0.002
                 if self._isStartGlissando(el):
-                    yPos += slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
+                    yPos += slope * (xShiftNumbersGlissando + self.Settings.fontWidthNote / 2)
                     xPos += xShiftNumbersGlissando
 
                 elif self._isEndGlissando(el):
                     xPos += xLength
                     xPos -= xShiftNumbersGlissando
-                    yPos -= slope * (xShiftNumbersGlissando + self.Settings.widthNumberNote/2)
+                    yPos -= slope * (xShiftNumbersGlissando + self.Settings.fontWidthNote / 2)
                     horizontalAlignment = 'right'
 
             yPos += self._computeYShiftNumbers()
@@ -182,36 +192,49 @@ class PlotterNotes(Plotter):
         """lyrics are plotted with vertical_alignment='top' at yPosLineBass.
         By multiple lines, the lyric already contains a newline command within it"""
 
-        lyric = el.lyric
-        if el.lyric:
-            syllabic = el.lyrics[0].syllabic
-            if syllabic == 'begin' or syllabic == 'middle':
-                lyric += "-"
-        xPosCenter = xPos + self.Settings.xShiftNumberNote / 4
+        if el.lyrics:
+            for lyric in el.lyrics:
 
-        sameLineAsLastElement = self.yPosLineBaseLast == yPosLineBase
+                marginTop = 0.2
+                lineNumber = lyric.number
+                strLineNumber = str(lineNumber)
 
-        if xPosCenter < self.lastLyricEnd and sameLineAsLastElement:
-            xPosCenter = self.lastLyricEnd + self.Settings.widthNumberNote * 0.3
+                xPosLyric = xPos + self.Settings.xShiftNumberNote / 4
+                sameLineAsLastElement = self.yPosLineBaseLast[strLineNumber] == yPosLineBase
 
-        self.yPosLineBaseLast = yPosLineBase
+                if xPosLyric < self.xPosLyricEnd[strLineNumber] and sameLineAsLastElement:
+                    xPosLyric = self.xPosLyricEnd[strLineNumber] + self.Settings.fontWidthLyric * 0.3
 
-        yPos = yPosLineBase
+                yPos = yPosLineBase - lineNumber * (1 + marginTop) * self.Settings.capsizeLyric
 
-        self.renderer = self.axs[page].figure.canvas.get_renderer()
+                self.renderer = self.axs[page].figure.canvas.get_renderer()
+                plottedLyric = self.axs[page].text(xPosLyric, yPos, lyric.text,
+                                                   fontsize=self.Settings.fontSizeLyrics,
+                                                   va='baseline', ha='left', font='Dejavu Sans', fontstyle='normal')
 
-        plottedLyric = self.axs[page].text(xPosCenter, yPos, lyric,
-                            fontsize=self.Settings.fontSizeLyrics,
-                            va='top', ha='left')
-        lyricStart = xPosCenter
+                bb = plottedLyric.get_window_extent(renderer=self.renderer).transformed(
+                    self.axs[page].transData.inverted())
+                lyricWidth = bb.width
 
-        bb = plottedLyric.get_window_extent(renderer=self.renderer).transformed(self.axs[page].transData.inverted())
-        lyricWidth = bb.width
 
-        self.lastLyricEnd = lyricStart + lyricWidth
-        if lyric:
-            if lyric[-1] == "-":
-                self.lastLyricEnd -= 0.3 * self.Settings.widthNumberNote
+                if self.lastSyllabic[strLineNumber] == 'middle' or self.lastSyllabic[strLineNumber] == 'begin':
+                    """note that in musescore export there is often middle and end syllable, after middle there is a hyphen"""
+
+                    if sameLineAsLastElement:
+                        xPosHyphen = (self.xPosLyricEnd[strLineNumber] + xPosLyric) / 2
+                    else:
+                        xPosHyphen = self.xPosLyricEnd[strLineNumber] + self.Settings.fontWidthLyric * 0.3
+                        yPos = self.yPosLineBaseLast[strLineNumber] - lineNumber * (1 + marginTop) * self.Settings.capsizeLyric
+
+                    self.axs[page].text(xPosHyphen, yPos, "-",
+                                        fontsize=self.Settings.fontSizeLyrics,
+                                        va='baseline', ha='center', font='Dejavu Sans', fontstyle='normal')
+
+                self.xPosLyricEnd[strLineNumber] = xPosLyric + lyricWidth
+
+                self.yPosLineBaseLast[strLineNumber] = yPosLineBase
+
+                self.lastSyllabic[strLineNumber] = lyric.syllabic
 
     def _adjustVisualParameters(self, el, key):
 
@@ -289,8 +312,8 @@ class PlotterNotes(Plotter):
     def _computeXShiftNumbers(self, el,xLength):
 
         xShiftNumbers = self.Settings.xShiftNumberNote
-        if xLength < (2 * self.Settings.xShiftNumberNote + self.Settings.widthNumberNote) and (not el.tie):
-            xShiftNumbers = 0.5 * xLength - 0.5 * self.Settings.widthNumberNote
+        if xLength < (2 * self.Settings.xShiftNumberNote + self.Settings.fontWidthNote) and (not el.tie):
+            xShiftNumbers = 0.5 * xLength - 0.5 * self.Settings.fontWidthNote
 
         return xShiftNumbers
 
@@ -321,10 +344,10 @@ class PlotterNotes(Plotter):
 
     def _computeYShiftNumbers(self):
 
-        yShiftNumbers = (self.barSpace - self.Settings.capsizeNumberNote) / 2
+        yShiftNumbers = (self.barSpace - self.Settings.capsizeNote) / 2
 
         if self.Settings.fontVShift:
-            yShiftNumbers += self.Settings.fontVShift * self.Settings.capsizeNumberNote
+            yShiftNumbers += self.Settings.fontVShift * self.Settings.capsizeNote
 
         return yShiftNumbers
 
