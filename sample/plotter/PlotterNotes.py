@@ -96,6 +96,15 @@ class PlotterNotes(Plotter):
                 shape = 'rightRounded'
                 xLength -= self.Settings.xMarginNote
 
+
+        shortenWhenThickBarline = self.Settings.widthThickBarline - 0.5 * self.Settings.lineWidth0 - self.Settings.xMarginNote
+        if self._overlapStartWithThickBarline(el):
+            xPos += shortenWhenThickBarline
+            xLength -= shortenWhenThickBarline
+
+        if self._overlapEndWithThickBarline(el):
+            xLength -= shortenWhenThickBarline
+
         if self._isVibrato(el):
             shape = 'squiggly'
 
@@ -109,6 +118,27 @@ class PlotterNotes(Plotter):
         patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape=shape)
 
         self.axs[page].add_patch(patch)
+
+    def _overlapStartWithThickBarline(self, el):
+        measure = el.containerHierarchy()[0]
+        if el.offset == 0 and self._measureHasThickBarlineStart(measure):
+            return True
+
+    def _overlapEndWithThickBarline(self, el):
+        measure = el.containerHierarchy()[0]
+        if el.offset + el.quarterLength == measure.quarterLength and self._measureHasThickBarlineEnd(measure):
+            return True
+
+    def _measureHasThickBarlineStart(self, measure):
+        for barLine in measure[music21.bar.Barline]:
+            if type(barLine) == music21.bar.Repeat and barLine.offset == 0:
+                return True
+
+    def _measureHasThickBarlineEnd(self, measure):
+        for barLine in measure[music21.bar.Barline]:
+            if (type(barLine) == music21.bar.Repeat or barLine.type == 'final') and barLine.offset == measure.quarterLength:
+                return True
+
 
     def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase, key):
 

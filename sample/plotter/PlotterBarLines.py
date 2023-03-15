@@ -74,17 +74,6 @@ class PlotterBarLines(Plotter):
 
             self._plotVLine(offset, lineWidth, 0, True)
 
-    def _plotVLine(self, offset, lineWidth, extension, start):
-
-        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
-
-        yPosLow = yPosLineBase + self.Settings.yMin
-        yPosHigh = yPosLineBase + self.Settings.yMax
-
-        self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
-                          linestyle='solid', linewidth=lineWidth, color='grey', zorder=.4)
-
-
     def _plotThickBarlines(self, measure):
 
         # these barLines are plotted on top of the "normal" barLines
@@ -114,6 +103,25 @@ class PlotterBarLines(Plotter):
         self._plotDots(offset, start)
         self._plotHBar(offset, start)
 
+    def _plotVLine(self, offset, lineWidth, extension, start):
+
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
+
+        yPosLow = yPosLineBase + self.Settings.yMin
+        yPosHigh = yPosLineBase + self.Settings.yMax
+
+        # self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
+        #                   linestyle='solid', linewidth=lineWidth, color='grey', zorder=.4)
+
+        xPos -= 0.5 * lineWidth
+
+        patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
+                          color='grey', fill=True,
+                          zorder=.4,
+                          linewidth=0
+                          )
+        self.axs[page].add_patch(patch)
+
     def _plotThickVLine(self, offset, extension, start):
 
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
@@ -122,10 +130,17 @@ class PlotterBarLines(Plotter):
 
         lineWidth = self.Settings.widthThickBarline
 
+        if start:
+            xPos -= 0.5 * self.Settings.lineWidth0
+
         if not start:
-            xPos -= lineWidth
+            xPos += 0.5 * self.Settings.lineWidth0 - lineWidth
+
         patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
-                          color='grey', fill=True, zorder=.4, linewidth=0)
+                          color='grey', fill=True,
+                          zorder=.4,
+                          linewidth=0
+                          )
         self.axs[page].add_patch(patch)
 
 
@@ -136,9 +151,13 @@ class PlotterBarLines(Plotter):
         yPosHigh = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension
         yPos = (yPosHigh + yPosLow)/2
 
-        shift = - self.Settings.widthThickBarline * 0.5  # - 0.0065
+        xShiftThickBarline = 0.5 * self.Settings.lineWidth0
+        xShiftCenterDot = 0.5 * self.Settings.widthThickBarline - xShiftThickBarline
         if start:
-            shift = shift * -1
+            shift = xShiftCenterDot
+        else:
+            shift = -xShiftCenterDot
+
         xPos = xPos + shift
 
         for i in [-1, 1]:
@@ -146,7 +165,7 @@ class PlotterBarLines(Plotter):
             distance = 0.007
             xyRatio = self.Settings.widthA4 / self.Settings.heightA4
             patch = Ellipse((xPos, yPos + i*distance), width=self.Settings.widthThickBarline,
-                            height=self.Settings.widthThickBarline*xyRatio, color='grey')
+                            height=self.Settings.widthThickBarline*xyRatio, color='grey', linewidth=0)
 
             self.axs[page].add_patch(patch)
 
@@ -184,7 +203,7 @@ class PlotterBarLines(Plotter):
 
             xPosEnd = xPosStart + self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength)
 
-            lineWidth = self.Settings.lineWidth0
+            lineWidth = 1
             self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
                                   linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
 
