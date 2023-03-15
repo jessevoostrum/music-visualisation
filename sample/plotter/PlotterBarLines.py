@@ -50,7 +50,9 @@ class PlotterBarLines(Plotter):
     def _plotMeasureBarlines(self, measure):
 
         if not measure.number == 0:
-            self._plotVLine(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
+
+            if measure.offset in self.LocationFinder.offsetsStartLine:
+                self._plotVLine(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
             offsetEndMeasure = measure.offset + measure.quarterLength
             self._plotVLine(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension,
