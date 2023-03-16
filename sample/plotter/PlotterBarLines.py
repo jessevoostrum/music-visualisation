@@ -51,7 +51,7 @@ class PlotterBarLines(Plotter):
 
         if not measure.number == 0:
 
-            if measure.offset in self.LocationFinder.offsetsStartLine:
+            if measure.offset in self.LocationFinder.offsetsStartLine or measure.number == 1:
                 self._plotVLine(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
             offsetEndMeasure = measure.offset + measure.quarterLength
