@@ -65,7 +65,7 @@ class LocationFinder:
                 xsStartLine.append(0)
 
             # start new line when new section of song starts
-            elif measure.flat.getElementsByClass(music21.expressions.RehearsalMark).first() and not measure.number == 1:
+            elif measure.flatten().getElementsByClass(music21.expressions.RehearsalMark).first() and not measure.number == 1:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 

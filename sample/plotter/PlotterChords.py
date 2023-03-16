@@ -11,7 +11,7 @@ class PlotterChords(Plotter):
         self.yMin = self.Settings.yMin
 
     def plotChords(self):
-        chords = self.streamObj.flat.getElementsByClass('ChordSymbol')
+        chords = self.streamObj.flatten().getElementsByClass('ChordSymbol')
         for i, chord, in enumerate(chords):
             offset = chord.offset
 
