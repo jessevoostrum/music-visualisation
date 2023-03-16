@@ -193,7 +193,7 @@ class Settings:
     def _getRangeYs(self):
         numTones = self.noteHighest - self.noteLowest + 1
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
-        chords = len(self.streamObj.flat.getElementsByClass('Chord')) > 0
+        chords = len(self.streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
         if chords:
             chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNote * 1.4
             yMarginTopChord = self.fontSizeChords * 1
