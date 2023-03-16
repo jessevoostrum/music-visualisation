@@ -193,16 +193,14 @@ class Settings:
     def _getRangeYs(self):
         numTones = self.noteHighest - self.noteLowest + 1
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
+        yMin = 0
+
         chords = len(self.streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
         if chords:
-            chordHeight = self.fontSizeChordsPerFontSizeNotes * self.capsizeNote * 1.4
-            yMarginTopChord = self.fontSizeChords * 1
-            if self.lyrics:
-                yMin = - (chordHeight + self.lyricHeightMax)
-            else:
-                yMin = - self.chordToneRatio * self.barSpace
-        else:
-            yMin = 0 # - self.barSpace * .2  # why?
+            yMin -= self.capsizeChord * 1.5
+
+        if self.lyrics:
+            yMin -= self.lyricHeightMax
         return yMin, yMax
 
     def _countLinesLyrics(self):
