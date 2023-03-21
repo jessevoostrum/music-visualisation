@@ -78,6 +78,15 @@ class Settings:
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 
+        self.widthThickBarline = settings['widthThickBarline']
+        self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
+        self.lyrics = settings['lyrics']
+        self.thickBarlines = settings['thickBarlines']
+        self.printArranger = settings['printArranger']
+        self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
+
+
+        # Font stuff
 
         self.fontSettings = FontSettings(self.font)
 
@@ -88,11 +97,6 @@ class Settings:
         self.fontWeight = settings["fontWeight"]
         self.fontSizeAccidentalRelative = settings['fontSizeAccidentalRelative']
 
-        self.widthThickBarline = settings['widthThickBarline']
-        self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
-        self.lyrics = settings['lyrics']
-        self.thickBarlines = settings['thickBarlines']
-        self.printArranger = settings['printArranger']
 
         pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontDimensions.json')
         f = open(pathFontDimensions)

@@ -18,6 +18,8 @@ class PlotterNotes(Plotter):
 
         self.graceNoteCounter = 0
 
+        # for plotting lyrics
+
         self.xPosLyricEnd = {"1": 0,
                              "2": 0,
                              "3": 0,
@@ -38,24 +40,59 @@ class PlotterNotes(Plotter):
 
         for idx in range(len(notes)):
 
-            el = notes[idx]
+            note = notes[idx]
             if idx < len(notes) - 1:
-                elNext = notes[idx+1]
+                noteNext = notes[idx + 1]
             else:
-                elNext = None
+                noteNext = None
 
-            if type(el) == music21.note.Note:
-                self._plotNote(el, elNext)
+            measure = note.containerHierarchy()[0]
+            offset = note.getOffsetInHierarchy(self.streamObj)
+            self._plotNote(note, noteNext, measure, offset)
 
-        for el in chords:
-            if type(el) == music21.chord.Chord:
-                for note in el.notes:
-                    elNext = None
-                    self._plotNote(note, elNext, offset=el.getOffsetInHierarchy(self.streamObj))
+        for chord in chords:
+            if type(chord) == music21.chord.Chord:
+                measure = chord.containerHierarchy()[0]
+                for note in chord.notes:
+                    noteNext = None
+                    self._plotNote(note, noteNext, measure, offset=chord.getOffsetInHierarchy(self.streamObj))
 
-    def _plotNote(self, el, elNext, offset=None):
-        if offset is None:
-            offset = el.getOffsetInHierarchy(self.streamObj)
+    def plotChordNotes(self):
+
+        chords = self.streamObj[music21.harmony.ChordSymbol]
+
+        for idx in range(len(chords)):
+
+            chord = chords[idx]
+
+            if idx < len(chords) - 1:
+                chordNext = chords[idx+1]
+            else:
+                chordNext = None
+
+            offset = chord.getOffsetInHierarchy(self.streamObj)
+            measure = chord.containerHierarchy()[0]
+            if chordNext:
+                offsetNext = chordNext.getOffsetInHierarchy(self.streamObj)
+                measureNext = chordNext.containerHierarchy()[0]
+                measureEnd = self._getMeasureByNumber(measureNext.number-1)
+            else:
+                offsetNext = self.streamObj.quarterLength
+                measureEnd = self.streamObj[music21.stream.Measure][-1]
+
+            notes = chord.notes
+            for note in notes:
+                midiNumber = note.pitch.ps
+                nL = self.Settings.noteLowest
+                nH = self.Settings.noteHighest
+
+                midiNumberPlottedNote = nL + (midiNumber - nL) % 12
+                while midiNumberPlottedNote <= nH:
+                    plottedNote = music21.note.Note(midiNumberPlottedNote, quarterLength=offsetNext - offset)
+                    self._plotNote(plottedNote, None, measure, offset=offset, measureEnd=measureEnd, isChordNote=True)
+                    midiNumberPlottedNote += 12
+
+    def _plotNote(self, el, elNext, measure,  offset, measureEnd=None, isChordNote=False):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
         yPosWithinLine = self._yPosWithinLine(el)
         yPos = yPosLineBase + yPosWithinLine
@@ -66,49 +103,57 @@ class PlotterNotes(Plotter):
 
         slope = None
         if self._isGlissando(el):
-            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase, key)
+            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase, key, measure, offset)
         elif not self._isGraceNote(el):
-            self._plotRectangle(page, el, xPos, xLength,  yPos, key)
+            self._plotRectangle(page, el, xPos, xLength,  yPos, key, measure, offset, measureEnd,  isChordNote=isChordNote)
 
-
-        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key)
+        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key, isChordNote=isChordNote)
 
         self._plotArticulation(el, elNext)
 
         if self.Settings.lyrics:
             self._plotLyric(page, el, xPos, yPosLineBase)
 
-    def _plotRectangle(self, page, el, xPos, xLength,  yPos, key):
+    def _plotRectangle(self, page, el, xPos, xLength,  yPos, key, measure, offset, measureEnd=None, isChordNote=False):
+
+        if not measureEnd:
+            measureEnd = measure
 
         if not el.tie:
             shape = 'rounded'
-            xPos += self.Settings.xMarginNote
-            xLength -= 2 * self.Settings.xMarginNote
-
-        elif el.tie:
-            if el.tie.type == 'start':
-                shape = 'leftRounded'
+            if not self._overlapStartWithThickBarline(el, offset, measure):
                 xPos += self.Settings.xMarginNote
                 xLength -= self.Settings.xMarginNote
+            else:
+                xPos += self.Settings.xMarginNoteThickBarline  # for info see position of thick barline
+                xLength -= self.Settings.xMarginNoteThickBarline
+            if not self._overlapEndWithThickBarline(el, offset, measureEnd):
+                xLength -= self.Settings.xMarginNote
+            else:
+                xLength -= self.Settings.xMarginNoteThickBarline
+
+        else:
+            if el.tie.type == 'start':
+                shape = 'leftRounded'
+                if not self._overlapStartWithThickBarline(el, offset, measure):
+                    xPos += self.Settings.xMarginNote
+                    xLength -= self.Settings.xMarginNote
+                else:
+                    xPos += self.Settings.xMarginNoteThickBarline
+                    xLength -= self.Settings.xMarginNoteThickBarline
             elif el.tie.type == 'continue':
                 shape = 'straight'
-            else:       # if el.tie.type == 'stop'
+            else:
                 shape = 'rightRounded'
-                xLength -= self.Settings.xMarginNote
-
-
-        shortenWhenThickBarline = self.Settings.widthThickBarline - 0.5 * self.Settings.lineWidth0 - self.Settings.xMarginNote
-        if self._overlapStartWithThickBarline(el):
-            xPos += shortenWhenThickBarline
-            xLength -= shortenWhenThickBarline
-
-        if self._overlapEndWithThickBarline(el):
-            xLength -= shortenWhenThickBarline
+                if not self._overlapEndWithThickBarline(el, offset, measureEnd):
+                    xLength -= self.Settings.xMarginNote
+                else:
+                    xLength -= self.Settings.xMarginNoteThickBarline
 
         if self._isVibrato(el):
             shape = 'squiggly'
 
-        alpha, facecolor, hatch = self._adjustVisualParameters(el, key)
+        alpha, facecolor, hatch = self._adjustVisualParameters(el, key, isChordNote)
 
         leftBottom = [xPos, yPos]
         leftTop = [xPos, yPos + self.barSpace]
@@ -119,28 +164,7 @@ class PlotterNotes(Plotter):
 
         self.axs[page].add_patch(patch)
 
-    def _overlapStartWithThickBarline(self, el):
-        measure = el.containerHierarchy()[0]
-        if el.offset == 0 and self._measureHasThickBarlineStart(measure):
-            return True
-
-    def _overlapEndWithThickBarline(self, el):
-        measure = el.containerHierarchy()[0]
-        if el.offset + el.quarterLength == measure.quarterLength and self._measureHasThickBarlineEnd(measure):
-            return True
-
-    def _measureHasThickBarlineStart(self, measure):
-        for barLine in measure[music21.bar.Barline]:
-            if type(barLine) == music21.bar.Repeat and barLine.offset == 0:
-                return True
-
-    def _measureHasThickBarlineEnd(self, measure):
-        for barLine in measure[music21.bar.Barline]:
-            if (type(barLine) == music21.bar.Repeat or barLine.type == 'final') and barLine.offset == measure.quarterLength:
-                return True
-
-
-    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase, key):
+    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase, key, measure, offset):
 
         sp = el.getSpannerSites()[0]
         alpha, facecolor, hatch = self._adjustVisualParameters(el, key)
@@ -151,8 +175,12 @@ class PlotterNotes(Plotter):
             yTarget = self._yPosWithinLine(noteTarget) + yPosLineBase
             yMiddle = (yTarget + yPos) / 2
 
-            xPos += self.Settings.xMarginNote
-            xLength -= self.Settings.xMarginNote
+            if not self._overlapStartWithThickBarline(el, offset, measure):
+                xPos += self.Settings.xMarginNote
+                xLength -= self.Settings.xMarginNote
+            else:
+                xPos += self.Settings.xMarginNoteThickBarline
+                xLength -= self.Settings.xMarginNoteThickBarline
 
             leftBottom = [xPos, yPos]
             leftTop = [xPos, yPos + self.barSpace]
@@ -167,7 +195,10 @@ class PlotterNotes(Plotter):
 
             yMiddle = (yOrigin + yPos) / 2
 
-            xLength -= self.Settings.xMarginNote
+            if not self._overlapEndWithThickBarline(el, offset, measure):
+                xLength -= self.Settings.xMarginNote
+            else:
+                xLength -= self.Settings.xMarginNoteThickBarline
 
             leftBottom = [xPos, yMiddle]
             leftTop = [xPos, yMiddle + self.barSpace]
@@ -182,7 +213,7 @@ class PlotterNotes(Plotter):
         slope = (rightBottom[1] - leftBottom[1]) / xLength
         return slope
 
-    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key):
+    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key, isChordNote=False):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
 
@@ -212,9 +243,18 @@ class PlotterNotes(Plotter):
 
             yPos += self._computeYShiftNumbers()
 
+            textColor = 'black'
+            alpha = 1
+            zorder = 1
+            if isChordNote:
+                textColor = 'grey'
+                alpha = 0.5
+                zorder = .5
+
+
             self.axs[page].text(xPos, yPos, number,
                                 fontsize=fontSize,
-                                va='baseline', ha=horizontalAlignment)
+                                va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
             self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
@@ -266,7 +306,7 @@ class PlotterNotes(Plotter):
 
                 self.lastSyllabic[strLineNumber] = lyric.syllabic
 
-    def _adjustVisualParameters(self, el, key):
+    def _adjustVisualParameters(self, el, key, isChordNote=False):
 
         facecolor = self.Settings.facecolor
         alpha = self.Settings.alpha
@@ -296,6 +336,11 @@ class PlotterNotes(Plotter):
             facecolor = 'grey'
             alpha = 0.15
             hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
+
+        if isChordNote:
+            facecolor = 'red'
+            alpha=0.05
+
         return alpha, facecolor, hatch
 
     def _yPosWithinLine(self, el):
@@ -466,11 +511,35 @@ class PlotterNotes(Plotter):
                 return True
         return False
 
+    def _overlapStartWithThickBarline(self, el, offset, measure):
+        if offset == measure.offset and self._measureHasThickBarlineStart(measure):
+            return True
+
+    def _overlapEndWithThickBarline(self, el, offset, measure):
+        if offset + el.quarterLength == measure.offset + measure.quarterLength and self._measureHasThickBarlineEnd(measure):
+            return True
+
+    def _measureHasThickBarlineStart(self, measure):
+        for barLine in measure[music21.bar.Barline]:
+            if type(barLine) == music21.bar.Repeat and barLine.offset == 0:
+                return True
+
+    def _measureHasThickBarlineEnd(self, measure):
+        for barLine in measure[music21.bar.Barline]:
+            if (type(barLine) == music21.bar.Repeat or barLine.type == 'final') and barLine.offset == measure.quarterLength:
+                return True
+
     def _previous_and_next(self, some_iterable):
         prevs, items, nexts = tee(some_iterable, 3)
         prevs = chain([None], prevs)
         nexts = chain(islice(nexts, 1, None), [None])
         return zip(prevs, items, nexts)
+
+    def _getMeasureByNumber(self, number):
+        measures = self.streamObj[music21.stream.Measure]
+        for measure in measures:
+            if measure.number == number:
+                return measure
 
     def _colorwheel(self, circleOfFifthIndex):
         """index must be between 0 and 11"""
