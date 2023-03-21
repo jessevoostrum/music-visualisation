@@ -1,0 +1,37 @@
+{"SBJ": {
+  "1": {
+    "natural": "wah",
+    "sharp": "sah",
+    "flat": "fah"
+  },
+  "2": {
+    "natural": "too",
+    "sharp": "soo",
+    "flat": "foo"
+  },
+  "3": {
+    "natural": "ree",
+    "sharp": "see",
+    "flat": "fee"
+  },
+  "4": {
+    "natural": "foe",
+    "sharp": "so",
+    "flat": "foef"
+  },
+  "5": {
+    "natural": "vie",
+    "sharp": "sigh",
+    "flat": "fie"
+  },
+  "6": {
+    "natural": "mi",
+    "sharp": "si",
+    "flat": "fi"
+  },
+  "7": {
+    "natural": "ne",
+    "sharp": "se",
+    "flat": "fe"
+  }
+}}

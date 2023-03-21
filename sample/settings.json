@@ -51,6 +51,7 @@
   "xkcd": false,
   "heightChordAddition": 0.7,
   "plotMelody": true,
-  "plotChordTones": false
+  "plotChordTones": false,
+  "alternativeSymbols": false
 }
 

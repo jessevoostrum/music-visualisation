@@ -1,3 +1,5 @@
+import os
+import json
 import music21
 from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from itertools import tee, islice, chain
@@ -32,6 +34,10 @@ class PlotterNotes(Plotter):
                              "2": 0,
                              "3": 0,
                              "4": 0}
+        if self.Settings.alternativeSymbols:
+            pathAlternativeSymbols = os.path.join(os.path.dirname(__file__), '../alternativeSymbols.json')
+            f = open(pathAlternativeSymbols)
+            self.alternativeSymbolsDict = json.load(f)[self.Settings.alternativeSymbols]
 
     def plotNotes(self):
 
@@ -251,12 +257,18 @@ class PlotterNotes(Plotter):
                 alpha = 0.5
                 zorder = .5
 
+            if not self.Settings.alternativeSymbols:
+                self.axs[page].text(xPos, yPos, number,
+                                    fontsize=fontSize,
+                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
-            self.axs[page].text(xPos, yPos, number,
-                                fontsize=fontSize,
-                                va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
+                self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
-            self._plotAccidental(accidental, fontSize, xPos, yPos, page)
+            else:
+                symbol = self._getSymbol(number, accidental)
+                self.axs[page].text(xPos, yPos, symbol,
+                                    fontsize=fontSize,
+                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
     def _plotLyric(self, page, el, xPos, yPosLineBase):
         """lyrics are plotted with vertical_alignment='top' at yPosLineBass.
@@ -416,7 +428,6 @@ class PlotterNotes(Plotter):
 
         return xShiftNumbers
 
-
     def _computeYShiftNumbers(self):
 
         yShiftNumbers = (self.barSpace - self.Settings.capsizeNote) / 2
@@ -425,7 +436,6 @@ class PlotterNotes(Plotter):
             yShiftNumbers += self.Settings.fontVShift * self.Settings.capsizeNote
 
         return yShiftNumbers
-
 
     def _plotArticulation(self, el, elNext):
         if elNext:
@@ -540,6 +550,15 @@ class PlotterNotes(Plotter):
         for measure in measures:
             if measure.number == number:
                 return measure
+
+    def _getSymbol(self, number, accidental):
+
+        if accidental:
+            accidentalName = accidental.name
+        else:
+            accidentalName = "natural"
+        symbol = self.alternativeSymbolsDict[str(number)][accidentalName]
+        return symbol
 
     def _colorwheel(self, circleOfFifthIndex):
         """index must be between 0 and 11"""

@@ -79,6 +79,8 @@ class Settings:
         self.plotMelody = settings["plotMelody"]
         self.plotChordTones = settings["plotChordTones"]
 
+        self.alternativeSymbols = settings["alternativeSymbols"]
+
         self.plotTimeSignature = settings["plotTimeSignature"]
 
         self.widthThickBarline = settings['widthThickBarline']

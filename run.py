@@ -16,6 +16,7 @@ parser.add_argument("-c", "--colourNotes", action="store_true")
 parser.add_argument("-l", "--lyrics", action="store_true")
 parser.add_argument("-cn", "--chordNotes", action="store_true")
 parser.add_argument("-cp", "--chordProgression", action="store_true")
+parser.add_argument("-as", "--alternativeSymbols")
 
 args = parser.parse_args()
 
@@ -60,6 +61,9 @@ if args.chordProgression:
     settings["plotChordNotes"] = True
     settings["plotMelody"] = False
     settings["measuresPerLine"] = 8
+
+if args.alternativeSymbols:
+    settings["alternativeSymbols"] = "SBJ"
 
 
 vis = Visualiser(pathSong, settings)
