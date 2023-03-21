@@ -76,6 +76,8 @@ class Settings:
         self.saveCropped = settings["saveCropped"]
         self.xkcd = settings["xkcd"]
         self.heightChordAddition = settings["heightChordAddition"]
+        self.plotMelody = settings["plotMelody"]
+        self.plotChordTones = settings["plotChordTones"]
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 

@@ -49,6 +49,8 @@
   "plotTimeSignature": true,
   "saveCropped": false,
   "xkcd": false,
-  "heightChordAddition": 0.7
+  "heightChordAddition": 0.7,
+  "plotMelody": true,
+  "plotChordTones": false
 }
 

@@ -12,26 +12,28 @@ class Dog:
 
 class PlotterMain:
 
-    def __init__(self, streamObj, settings, LocationFinder, axs):
+    def __init__(self, streamObj, Settings, LocationFinder, axs):
 
         self.streamObj = streamObj
-        self.settings = settings
+        self.Settings = Settings
 
         self.LocationFinder = LocationFinder
 
         self.axs = axs
 
-        self.PlotterNotes = PlotterNotes(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        self.PlotterChords = PlotterChords(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        self.PlotterBarlines = PlotterBarLines(self.streamObj, self.settings, self.LocationFinder, self.axs)
-        self.PlotterMetadata = PlotterMetadata(self.streamObj, self.settings, self.LocationFinder, self.axs)
+        self.PlotterNotes = PlotterNotes(self.streamObj, self.Settings, self.LocationFinder, self.axs)
+        self.PlotterChords = PlotterChords(self.streamObj, self.Settings, self.LocationFinder, self.axs)
+        self.PlotterBarlines = PlotterBarLines(self.streamObj, self.Settings, self.LocationFinder, self.axs)
+        self.PlotterMetadata = PlotterMetadata(self.streamObj, self.Settings, self.LocationFinder, self.axs)
 
     def plot(self):
 
         self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
-        self.PlotterNotes.plotNotes()
-        self.PlotterNotes.plotChordNotes()
+        if self.Settings.plotMelody:
+            self.PlotterNotes.plotNotes()
+        if self.Settings.plotChordTones:
+            self.PlotterNotes.plotChordNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarLines()
 
