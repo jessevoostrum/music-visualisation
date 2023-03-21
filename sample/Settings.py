@@ -75,6 +75,7 @@ class Settings:
         self.font = settings['font']
         self.saveCropped = settings["saveCropped"]
         self.xkcd = settings["xkcd"]
+        self.heightChordAddition = settings["heightChordAddition"]
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 
@@ -125,6 +126,8 @@ class Settings:
 
         self.capsizeLyric = fDLyrics["capsize"] * self.fontSizeLyrics
         self.fontWidthLyric = fDLyrics["width"] * self.fontSizeLyrics
+
+        self.capsizeType = fD["capsize"] * self.fontSettings.fontSizeType
 
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
@@ -201,7 +204,7 @@ class Settings:
 
         chords = len(self.streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
         if chords:
-            yMin -= self.capsizeChord * 1.5
+            yMin -= max(self.heightChordAddition * self.capsizeChord + self.capsizeType, self.capsizeType)
 
         if self.lyrics:
             yMin -= self.lyricHeightMax

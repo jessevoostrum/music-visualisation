@@ -48,6 +48,7 @@
   "printArranger": true,
   "plotTimeSignature": true,
   "saveCropped": false,
-  "xkcd": false
+  "xkcd": false,
+  "heightChordAddition": 0.7
 }
 
