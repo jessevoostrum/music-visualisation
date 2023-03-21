@@ -51,7 +51,7 @@ class PlotterChords(Plotter):
         widthNumber = self.Settings.widthNumberRelative * fontSize
 
         xPos = xPos + widthNumber + self.Settings.fontSettings.hDistanceChordAddition
-        yPos = yPos + self.Settings.capsizeNumberRelative * fontSize * 0.7
+        yPos = yPos + self.Settings.capsizeChord * self.Settings.heightChordAddition
 
         self.fontSizeType = self.Settings.fontSettings.fontSizeType
         self.fontSizeTypeSmall = self.Settings.fontSettings.fontSizeTypeSmall
