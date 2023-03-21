@@ -31,6 +31,7 @@ class PlotterMain:
         self.PlotterMetadata.plotMetadata()
         rc('text.latex', preamble=r'\usepackage{amssymb}')
         self.PlotterNotes.plotNotes()
+        self.PlotterNotes.plotChordNotes()
         self.PlotterChords.plotChords()
         self.PlotterBarlines.plotBarLines()
 
