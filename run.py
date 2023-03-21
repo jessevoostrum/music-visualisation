@@ -9,15 +9,15 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-s", "--pathSong", )
 parser.add_argument("-o", "--dirOutput", )
+parser.add_argument("-d", "--settingsDict", )
 parser.add_argument("-b", "--bass", action="store_true")
 parser.add_argument("-r", "--realbookFont", action="store_true")
 parser.add_argument("-c", "--colourNotes", action="store_true")
 parser.add_argument("-l", "--lyrics", action="store_true")
+parser.add_argument("-cn", "--chordNotes", action="store_true")
+parser.add_argument("-cp", "--chordProgression", action="store_true")
 
 args = parser.parse_args()
-
-f = open('sample/settings.json')
-settings = json.load(f)
 
 if args.pathSong:
     pathSong = args.pathSong
@@ -28,6 +28,14 @@ if args.dirOutput:
     dirOutput = args.dirOutput
 else:
     dirOutput = os.getcwd()
+
+if args.settingsDict:
+    pathSettings = args.settingsDict
+else:
+    pathSettings = 'sample/settings.json'
+
+f = open(pathSettings)
+settings = json.load(f)
 
 if args.bass:
     settings["measuresPerLine"] = 2
@@ -44,6 +52,15 @@ if args.colourNotes:
 
 if args.lyrics:
     settings['lyrics'] = True
+
+if args.chordNotes:
+    settings["plotChordNotes"] = True
+
+if args.chordProgression:
+    settings["plotChordNotes"] = True
+    settings["plotMelody"] = False
+    settings["measuresPerLine"] = 8
+
 
 vis = Visualiser(pathSong, settings)
 vis.generate(dirOutput)

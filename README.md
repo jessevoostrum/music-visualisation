@@ -21,7 +21,9 @@ Further options include:
 - -l for printing lyrics
 - -c for colouring notes according to circle of fifths
 - -r for realbook font (note that you first have to install the font (located in fonts folder))
-
+- -cn for printing chord notes
+- -cp for printing chord progressions (no melody, 8 measures per line)
+- -d <path-to-settings-dictionary> can be used to pass a custom settings dictionary. (most flexible) See 'sample/settings.json' for the default settings.
 
 ### requirements
 - music21
