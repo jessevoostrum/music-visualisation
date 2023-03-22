@@ -4,6 +4,7 @@ from matplotlib import rcParams
 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
+from matplotlib.figure import Figure
 
 
 class CanvasCreator:
@@ -52,7 +53,8 @@ class CanvasCreator:
     def _createCanvas(self, numPages):
 
         for _ in range(numPages):
-            fig, ax = plt.subplots(figsize=(self.Settings.widthA4, self.Settings.heightA4))
+            fig = Figure(figsize=(self.Settings.widthA4, self.Settings.heightA4))
+            ax = fig.subplots()
             ax = self._formatAx(ax)
             self.figs.append(fig)
             self.axs.append(ax)
