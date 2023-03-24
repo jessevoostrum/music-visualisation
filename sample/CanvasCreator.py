@@ -5,6 +5,8 @@ from matplotlib import rcParams
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
 from matplotlib.figure import Figure
+import matplotlib
+matplotlib.use('Agg')
 
 
 class CanvasCreator:
