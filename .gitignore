@@ -7,7 +7,7 @@ sheetMusic/
 *output/
 testsuite/
 *.txt
-sample/aux/batchJobs.json
+sample/auxilary_scripts/batchJobs.json
 
 sample/runSingle.py
 
