@@ -8,7 +8,7 @@ dir_songs_standards = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/b
 dir_songs_bass = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/"
 
 
-d = open('sample/auxilary_scripts/modeSongs.json')
+d = open('sample/auxiliary_scripts/modeSongs.json')
 modeSongs = json.load(d)
 
 # dir_notes = '/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/projects/music_software/IFR_animation/notes/'
