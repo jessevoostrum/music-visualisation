@@ -3,8 +3,8 @@ from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from itertools import tee, islice, chain
 import numpy as np
 
-from sample.plotter.patches import Parallelogram
-from sample.plotter.PlotterBase import Plotter
+from integerbook.plotter.patches import Parallelogram
+from integerbook.plotter.PlotterBase import Plotter
 
 
 class PlotterNotes(Plotter):

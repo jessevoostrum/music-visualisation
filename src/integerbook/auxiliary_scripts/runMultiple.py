@@ -2,7 +2,7 @@ import json
 import glob
 import os
 
-from sample.main import Visualiser
+from integerbook.main import Visualiser
 
 
 dir_songs_bass = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/bladmuziek/bass_lines_SBL/"

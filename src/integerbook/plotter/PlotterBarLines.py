@@ -7,7 +7,7 @@ import numpy as np
 from contextlib import nullcontext
 import matplotlib.pyplot as plt
 
-from sample.plotter.PlotterBase import Plotter
+from integerbook.plotter.PlotterBase import Plotter
 
 fontDirectory = os.path.join(os.path.dirname(__file__), '../fonts/')
 fontPropertiesSymbola = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")

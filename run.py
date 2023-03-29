@@ -2,7 +2,7 @@ import os
 import json
 import argparse
 
-from sample.main import Visualiser
+from integerbook.main import Visualiser
 
 
 parser = argparse.ArgumentParser()
@@ -32,7 +32,7 @@ else:
 if args.settingsDict:
     pathSettings = args.settingsDict
 else:
-    pathSettings = 'sample/settings.json'
+    pathSettings = 'integerbook/settings.json'
 
 f = open(pathSettings)
 settings = json.load(f)
@@ -44,7 +44,7 @@ if args.bass:
     settings['saveCropped'] = True
 
 if args.realbookFont:
-    settings['fontDirectory'] = "sample/fonts/Realbook"
+    settings['fontDirectory'] = "integerbook/fonts/Realbook"
     settings['font'] = 'Realbook'
 
 if args.colourNotes:

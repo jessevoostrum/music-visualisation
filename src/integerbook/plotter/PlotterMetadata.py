@@ -3,7 +3,7 @@ from matplotlib.patches import Polygon
 from matplotlib.patches import FancyBboxPatch, Rectangle
 import numpy as np
 
-from sample.plotter.PlotterBase import Plotter
+from integerbook.plotter.PlotterBase import Plotter
 
 
 

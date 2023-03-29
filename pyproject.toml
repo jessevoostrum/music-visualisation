@@ -1,0 +1,28 @@
+# pyproject.toml
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integerbook"
+version = "0.0.1"
+description = "sheet music converter"
+readme = "README.md"
+authors = [{ name = "Jesse van Oostrum", email = "integerbook@gmail.com" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["music"]
+dependencies = [
+    "music21>=8",
+]
+requires-python = ">=3.8"
+
+
+[project.urls]
+Homepage = "https://github.com/jessevoostrum/music-visualisation"
+

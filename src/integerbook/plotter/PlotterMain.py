@@ -1,10 +1,10 @@
 
 from matplotlib import rc
 
-from sample.plotter.PlotterNotes import PlotterNotes
-from sample.plotter.PlotterChords import PlotterChords
-from sample.plotter.PlotterBarLines import PlotterBarLines
-from sample.plotter.PlotterMetadata import PlotterMetadata
+from integerbook.plotter.PlotterNotes import PlotterNotes
+from integerbook.plotter.PlotterChords import PlotterChords
+from integerbook.plotter.PlotterBarLines import PlotterBarLines
+from integerbook.plotter.PlotterMetadata import PlotterMetadata
 
 class Dog:
     def __int__(self, age):

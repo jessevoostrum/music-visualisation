@@ -7,10 +7,10 @@ sheetMusic/
 *output/
 testsuite/
 *.txt
-sample/auxiliary_scripts/batchJobs.json
+integerbook/auxiliary_scripts/batchJobs.json
 
-sample/runSingle.py
-
+src/integerbook/runSingle.py
+src/integerbook.egg-info/
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

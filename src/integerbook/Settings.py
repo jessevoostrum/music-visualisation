@@ -4,7 +4,7 @@ import os
 from types import SimpleNamespace
 import music21
 
-from sample.plotter.PlotterBase import Plotter
+from integerbook.plotter.PlotterBase import Plotter
 
 
 class FontSettings:

@@ -4,12 +4,11 @@ import os
 
 import music21
 
-from sample.plotter.PlotterMain import PlotterMain
-from sample.LocationFinder import LocationFinder
-from sample.CanvasCreator import CanvasCreator
-from sample.Settings import Settings
+from integerbook.plotter.PlotterMain import PlotterMain
+from integerbook.LocationFinder import LocationFinder
+from integerbook.CanvasCreator import CanvasCreator
+from integerbook.Settings import Settings
 
-# print(os.getcwd())
 
 class Visualiser:
     """class for making visualisations from a music21 stream"""
