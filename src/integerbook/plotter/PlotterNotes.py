@@ -265,7 +265,7 @@ class PlotterNotes(Plotter):
         if el.lyrics:
             for lyric in el.lyrics:
 
-                marginTop = 0.2
+                marginTop = self.Settings.vMarginLyricsRelative
                 lineNumber = lyric.number
                 strLineNumber = str(lineNumber)
 
@@ -277,17 +277,19 @@ class PlotterNotes(Plotter):
 
                 yPos = yPosLineBase - lineNumber * (1 + marginTop) * self.Settings.capsizeLyric
 
-                # self.renderer = self.axs[page].figure.canvas.get_renderer()
+                if self.Settings.usePlt:
+                    self.renderer = self.axs[page].figure.canvas.get_renderer()
+
                 plottedLyric = self.axs[page].text(xPosLyric, yPos, lyric.text,
                                                    fontsize=self.Settings.fontSizeLyrics,
                                                    va='baseline', ha='left', font='Dejavu Sans', fontstyle='normal')
 
-                # bb = plottedLyric.get_window_extent(renderer=self.renderer).transformed(
-                #     self.axs[page].transData.inverted())
-                # lyricWidth = bb.width
-
-                lyricWidth = self.Settings.fontWidthLyric * len(lyric.text) * 0.7
-
+                if self.Settings.usePlt:
+                    bb = plottedLyric.get_window_extent(renderer=self.renderer).transformed(
+                        self.axs[page].transData.inverted())
+                    lyricWidth = bb.width
+                else:
+                    lyricWidth = self.Settings.fontWidthLyric * len(lyric.text) * 0.7
 
                 if self.lastSyllabic[strLineNumber] == 'middle' or self.lastSyllabic[strLineNumber] == 'begin':
                     """note that in musescore export there is often middle and end syllable, after middle there is a hyphen"""

@@ -87,6 +87,8 @@ class Settings:
         self.thickBarlines = settings['thickBarlines']
         self.printArranger = settings['printArranger']
         self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
+        self.usePlt = settings["usePlt"]
+        self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
 
 
         # Font stuff
@@ -133,7 +135,7 @@ class Settings:
 
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
-        self.lyricHeightMax = fontDimensions["firstLineHeight"] * self.fontSizeLyrics + (self._countLinesLyrics() - 1) * fontDimensions["extraLineHeight"] * self.fontSizeLyrics
+        self.lyricHeightMax = self._countLinesLyrics() * self.capsizeLyric * (1 + self.vMarginLyricsRelative) + self.capsizeLyric * self.vMarginLyricsRelative
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
         self.barSpace = self.barSpacePerCapsize * self.capsizeNote

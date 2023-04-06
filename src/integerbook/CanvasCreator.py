@@ -10,7 +10,7 @@ matplotlib.use('Agg')
 
 
 class CanvasCreator:
-    def __init__(self, Settings, numPages):
+    def __init__(self, Settings, numPages, yPosLowest):
 
         self.Settings = Settings
 
@@ -36,15 +36,17 @@ class CanvasCreator:
 
         self._createCanvas(numPages)
 
+        self.yPosLowest = yPosLowest
 
 
-    def saveFig(self, title, pathName, yPosLowest):
+
+    def saveFig(self, pathName):
 
         with PdfPages(pathName) as pdf:
             for fig in self.figs:
                 yLengthAboveTitle = 1 - self.Settings.yPosTitle
-                if len(self.figs) == 1 and yPosLowest >= 0.55 and self.Settings.saveCropped:
-                    heightStart = self.Settings.heightA4 * (yPosLowest - yLengthAboveTitle)
+                if len(self.figs) == 1 and self.yPosLowest >= 0.55 and self.Settings.saveCropped:
+                    heightStart = self.Settings.heightA4 * (self.yPosLowest - yLengthAboveTitle)
                     bbox = Bbox([[0, heightStart], [self.Settings.widthA4, self.Settings.heightA4]])
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:
@@ -55,8 +57,11 @@ class CanvasCreator:
     def _createCanvas(self, numPages):
 
         for _ in range(numPages):
-            fig = Figure(figsize=(self.Settings.widthA4, self.Settings.heightA4))
-            ax = fig.subplots()
+            if self.Settings.usePlt:
+                fig, ax = plt.subplots(figsize=(self.Settings.widthA4, self.Settings.heightA4))
+            else:
+                fig = Figure(figsize=(self.Settings.widthA4, self.Settings.heightA4))
+                ax = fig.subplots()
             ax = self._formatAx(ax)
             self.figs.append(fig)
             self.axs.append(ax)

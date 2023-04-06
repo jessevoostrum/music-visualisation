@@ -28,18 +28,23 @@ class Visualiser:
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
-        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
+        yPosLowest = self.LocationFinder.getYPosLineBase(-1)
+        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages(), yPosLowest)
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
-    def generate(self, directoryName=""):
         self.PlotterMain.plot()
 
-        title = self.PlotterMain.PlotterMetadata.getSongTitle()
-        pathName = directoryName + f"/{title}.pdf"
-        yPosLowest = self.LocationFinder.getYPosLineBase(-1)
+    def getSongTitle(self):
+        return self.PlotterMain.PlotterMetadata.getSongTitle()
 
-        self.CanvasCreator.saveFig(title, pathName, yPosLowest)
+    def saveFig(self, dirName=None, buffer=None):
+        if dirName:
+            title = self.getSongTitle()
+            pathName = dirName + '/' + title + '.pdf'
+            self.CanvasCreator.saveFig(pathName)
+        elif buffer:
+            self.CanvasCreator.saveFig(buffer)
 
     def _preprocessStreamObj(self, streamObj):
 
@@ -64,8 +69,7 @@ class Visualiser:
 
 
 if __name__ == '__main__':
-    pathToSong = "../example/All_Of_Me.mxl"
+    pathToSong = "../../example/All_Of_Me.mxl"
 
     vis = Visualiser(pathToSong)
-    vis.generate()
 
