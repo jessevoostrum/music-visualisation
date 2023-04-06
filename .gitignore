@@ -8,6 +8,7 @@ sheetMusic/
 testsuite/
 *.txt
 integerbook/auxiliary_scripts/batchJobs.json
+dist/
 
 src/integerbook/runSingle.py
 src/integerbook.egg-info/

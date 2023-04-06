@@ -1,0 +1,4 @@
+# MANIFEST.in
+
+include src/integerbook/fonts/**/*.ttf
+include src/integerbook/*.json
