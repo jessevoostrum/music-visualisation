@@ -2,32 +2,28 @@
 
 This library converts sheet music in musicxml format to visualisations that refer to notes and chords with their relative position within the key of the song. More about how this notational system works [here](https://integerbook.com/about). 
 
+### installation
+
+1. Download python
+2. install the [integerbook package](https://pypi.org/project/integerbook/0.0.2/) using pip: ``` $ pip install integerbook ```
+3. Download or copy the file ```run.py``` from the repository to a folder on your computer, e.g. ```~/Documents/music-visualisation```.
+
+
 ### running the code
-From the root folder of the repository, run the following line in the terminal:
+1. In the terminal, navigate to the folder where ```run.py``` is stored. 
+2. In the terminal, type: ``` $ python run.py -s <path-to-song>```  e.g.   
+``` $ python run.py -s "/Users/jvo/Documents/music-visualisation/example/Summertime.musicxml" ```
 
-``` $ python run.py ```
-
-This will convert the file "All_Of_Me.musicxml" located in the examples folder and place the result in the root folder of the repository. 
-
-The most important options are the following:
-- -s set song path (can be either .musicxml or .mxl file)
-- -o set output directory  (without "/" at the end)
-
-example: 
-``` $ python run.py -s "/Users/jvo/Documents/music-visualisation/example/Summertime.musicxml" -o "/Users/jvo/Downloads/output" ```
+This will convert the musicxml file you specified to a pdf and store it in the current folder. 
 
 Further options include:
+- -o set output directory  (without "/" at the end)
 - -b for bassline output
 - -l for printing lyrics
 - -c for colouring notes according to circle of fifths
-- -r for realbook font (note that you first have to install the font (located in fonts folder))
 - -cn for printing chord notes
 - -cp for printing chord progressions (no melody, 8 measures per line)
 - -d <path-to-settings-dictionary> can be used to pass a custom settings dictionary. (most flexible) See 'sample/settings.json' for the default settings.
-
-### requirements
-- music21
-- matplotlib
 
 
 ### example musicxml files

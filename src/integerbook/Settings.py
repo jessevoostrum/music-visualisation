@@ -1,41 +1,20 @@
 import json
 import os
 
-from types import SimpleNamespace
 import music21
-
-from integerbook.plotter.PlotterBase import Plotter
-
-
-class FontSettings:
-
-    def __init__(self, font):
-
-        pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
-        f = open(pathFontDimensions)
-        fontSettings = json.load(f)
-        if font in fontSettings.keys():
-            fontSettings = fontSettings[font]
-        else:
-            fontSettings = fontSettings['DejaVu Sans']
-            print("no fontsettings available")
-
-        self.fontSizeType = fontSettings['fontSizeType']
-        self.fontSizeTypeSmall = fontSettings['fontSizeTypeSmall']
-        self.widthCharacter = fontSettings['widthCharacter']
-        self.widthMinus = fontSettings['widthMinus']
-        self.accidentalSpace = fontSettings['accidentalSpace']
-        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
-        self.widthDelta = fontSettings["widthDelta"]
-        self.widthCircle = fontSettings["widthCircle"]
-        self.spaceAddSus = fontSettings["spaceAddSus"]
-        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
-        self.hDistanceChordAddition = fontSettings['hDistanceChordAddition']
 
 
 class Settings:
 
-    def __init__(self, streamObj, settings):
+    def __init__(self, streamObj, userSettings):
+
+        pathSettings = os.path.join(os.path.dirname(__file__), 'settings.json')
+        f = open(pathSettings)
+        settings = json.load(f)
+
+        if userSettings:
+            settings.update(userSettings)
+
         self.streamObj = streamObj
         self.settings = settings
 
@@ -228,3 +207,28 @@ class Settings:
     def _getLengthFirstMeasure(self):
         length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
         return length
+
+class FontSettings:
+
+    def __init__(self, font):
+
+        pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
+        f = open(pathFontDimensions)
+        fontSettings = json.load(f)
+        if font in fontSettings.keys():
+            fontSettings = fontSettings[font]
+        else:
+            fontSettings = fontSettings['DejaVu Sans']
+            print("no fontsettings available")
+
+        self.fontSizeType = fontSettings['fontSizeType']
+        self.fontSizeTypeSmall = fontSettings['fontSizeTypeSmall']
+        self.widthCharacter = fontSettings['widthCharacter']
+        self.widthMinus = fontSettings['widthMinus']
+        self.accidentalSpace = fontSettings['accidentalSpace']
+        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
+        self.widthDelta = fontSettings["widthDelta"]
+        self.widthCircle = fontSettings["widthCircle"]
+        self.spaceAddSus = fontSettings["spaceAddSus"]
+        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
+        self.hDistanceChordAddition = fontSettings['hDistanceChordAddition']

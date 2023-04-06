@@ -1,7 +1,4 @@
 """Jesse van Oostrum"""
-import json
-import os
-
 import music21
 
 from integerbook.plotter.PlotterMain import PlotterMain
@@ -13,18 +10,13 @@ from integerbook.Settings import Settings
 class Visualiser:
     """class for making visualisations from a music21 stream"""
 
-    def __init__(self, pathToSong, settings=None):
+    def __init__(self, pathToSong, userSettings=None):
 
         streamObj = music21.converter.parse(pathToSong)
 
         self.streamObj = self._preprocessStreamObj(streamObj)
 
-        if not settings:
-            pathSettings = os.path.join(os.path.dirname(__file__), 'settings.json')
-            f = open(pathSettings)
-            settings = json.load(f)
-
-        self.Settings = Settings(streamObj, settings)
+        self.Settings = Settings(streamObj, userSettings)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
@@ -39,12 +31,15 @@ class Visualiser:
         return self.PlotterMain.PlotterMetadata.getSongTitle()
 
     def saveFig(self, dirName=None, buffer=None):
-        if dirName:
-            title = self.getSongTitle()
-            pathName = dirName + '/' + title + '.pdf'
-            self.CanvasCreator.saveFig(pathName)
-        elif buffer:
+        if buffer:
             self.CanvasCreator.saveFig(buffer)
+        else:
+            title = self.getSongTitle()
+            if not dirName:
+                pathName = title + '.pdf'
+            else:
+                pathName = dirName + '/' + title + '.pdf'
+            self.CanvasCreator.saveFig(pathName)
 
     def _preprocessStreamObj(self, streamObj):
 
