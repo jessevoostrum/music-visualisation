@@ -50,7 +50,7 @@ if args.lyrics:
     settings['usePlt'] = True
     
 if args.chordNotes:
-    settings["plotChordNotes"] = True
+    settings["plotChordTones"] = True
 
 if args.chordProgression:
     settings["plotChordNotes"] = True
