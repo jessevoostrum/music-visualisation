@@ -68,11 +68,10 @@ class Settings:
         self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
         self.usePlt = settings["usePlt"]
         self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
-
+        self.alternativeSymbols = settings["alternativeSymbols"]
+        self.chordVerbosity = settings["chordVerbosity"]
 
         # Font stuff
-
-        self.fontSettings = FontSettings(self.font)
 
         self.fontDirectory = settings['fontDirectory']
         self.fontPath = settings["fontPath"]
@@ -110,7 +109,13 @@ class Settings:
         self.capsizeLyric = fDLyrics["capsize"] * self.fontSizeLyrics
         self.fontWidthLyric = fDLyrics["width"] * self.fontSizeLyrics
 
-        self.capsizeType = fD["capsize"] * self.fontSettings.fontSizeType
+        self.fontSizeType = settings['fontSizeTypeRelative'] * self.fontSizeChords
+        self.fontSizeTypeSmall = settings['fontSizeTypeSmallRelative'] * self.fontSizeType
+
+        self.fontSettings = FontSettings(self.font, self.fontSizeType)
+
+
+        self.capsizeType = fD["capsize"] * self.fontSizeType
 
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
@@ -121,6 +126,8 @@ class Settings:
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
 
+
+
         self.heightBarline0Extension = self.capsizeNote
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
@@ -128,8 +135,9 @@ class Settings:
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
 
-        key = self.getKey(0)
-        if key.mode == 'major':
+        self.firstKey = self.getKey(0)
+
+        if self.firstKey.mode == 'major':
             self.facecolor = settings['facecolor']
             self.facecolor2 = settings['facecolor2']
 
@@ -173,12 +181,17 @@ class Settings:
 
 
     def _getRangeNotes(self):
-        p = music21.analysis.discrete.Ambitus()
-        if p.getPitchSpan(self.streamObj):
-            pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
-            return pitchSpan[0], pitchSpan[1]
+        if self.plotMelody:
+            p = music21.analysis.discrete.Ambitus()
+            if p.getPitchSpan(self.streamObj):
+                pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
+                return pitchSpan[0], pitchSpan[1]
+            else:
+                return 1, 10
         else:
-            return 1, 10
+            nL = int(self.getKey(0).getTonic().ps)
+            nH = nL + 12
+            return nL, nH
 
     def _getRangeYs(self):
         numTones = self.noteHighest - self.noteLowest + 1
@@ -210,7 +223,7 @@ class Settings:
 
 class FontSettings:
 
-    def __init__(self, font):
+    def __init__(self, font, fontSizeType):
 
         pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
         f = open(pathFontDimensions)
@@ -221,14 +234,13 @@ class FontSettings:
             fontSettings = fontSettings['DejaVu Sans']
             print("no fontsettings available")
 
-        self.fontSizeType = fontSettings['fontSizeType']
-        self.fontSizeTypeSmall = fontSettings['fontSizeTypeSmall']
-        self.widthCharacter = fontSettings['widthCharacter']
-        self.widthMinus = fontSettings['widthMinus']
-        self.accidentalSpace = fontSettings['accidentalSpace']
-        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
-        self.widthDelta = fontSettings["widthDelta"]
-        self.widthCircle = fontSettings["widthCircle"]
-        self.spaceAddSus = fontSettings["spaceAddSus"]
-        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
-        self.hDistanceChordAddition = fontSettings['hDistanceChordAddition']
+
+        self.widthCharacter = fontSettings['widthCharacterRelative'] * fontSizeType
+        self.widthMinus = fontSettings['widthMinusRelative'] * fontSizeType
+        self.accidentalSpace = fontSettings['accidentalSpaceRelative'] * fontSizeType
+        self.accidentalSizeRelative = fontSettings["accidentalSizeRelativeRelative"] * fontSizeType
+        self.widthDelta = fontSettings["widthDeltaRelative"] * fontSizeType
+        self.widthCircle = fontSettings["widthCircleRelative"] * fontSizeType
+        self.spaceAddSus = fontSettings["spaceAddSusRelative"] * fontSizeType
+        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelativeRelative"] * fontSizeType
+        self.hDistanceChordAddition = fontSettings['hDistanceChordAdditionRelative'] * fontSizeType

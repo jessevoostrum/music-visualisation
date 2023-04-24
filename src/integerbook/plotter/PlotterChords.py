@@ -53,8 +53,8 @@ class PlotterChords(Plotter):
         xPos = xPos + widthNumber + self.Settings.fontSettings.hDistanceChordAddition
         yPos = yPos + self.Settings.capsizeChord * self.Settings.heightChordAddition
 
-        self.fontSizeType = self.Settings.fontSettings.fontSizeType
-        self.fontSizeTypeSmall = self.Settings.fontSettings.fontSizeTypeSmall
+        self.fontSizeType = self.Settings.fontSizeType
+        self.fontSizeTypeSmall = self.Settings.fontSizeTypeSmall
         self.width = self.Settings.fontSettings.widthCharacter
         self.accidentalSpace = self.Settings.fontSettings.accidentalSpace
 
@@ -70,67 +70,72 @@ class PlotterChords(Plotter):
             width = 0
             if chordType == "minor":
                 width = self._plotTypeMinor(xPos, yPos, page)
-            if chordType == "major" and len(chordTypes) != 1 and chordTypes[i+1] != 'sixth':
-                width = self._plotTypeMajor(xPos, yPos, page)
-            if chordType == 'half-diminished':
-                width = self._plotTypeHalfDiminished(xPos, yPos, page)
-            if chordType == 'diminished':
-                width = self._plotTypeDiminished(xPos, yPos, page)
 
-            if chordType == "sixth":
-                width = self._plotTypeSixth(xPos, yPos, page)
+            if self.Settings.chordVerbosity > 0:
 
-            if chordType == "seventh":
-                width = self._plotTypeSeventh(xPos, yPos, page)
-            if chordType == "ninth":
-                width = self._plotTypeNinth(xPos, yPos, page)
-            if chordType == "11th":
-                width = self._plotType11th(xPos, yPos, page)
-            if chordType == "13th":
-                width = self._plotType13th(xPos, yPos, page)
+                if chordType == "major" and len(chordTypes) != 1 and chordTypes[i+1] != 'sixth':
+                    width = self._plotTypeMajor(xPos, yPos, page)
+                if chordType == 'half-diminished':
+                    width = self._plotTypeHalfDiminished(xPos, yPos, page)
+                if chordType == 'diminished':
+                    width = self._plotTypeDiminished(xPos, yPos, page)
 
-            if chordType == 'augmented':
-                if i == 0:
-                    xPos -= 0.7 * self.Settings.fontSettings.accidentalSpace
-                width = self._plotTypeAugmented(xPos, yPos, page)
-            if chordType == 'flat-five':
-                width = self._plotTypeFlatFive(xPos, yPos, page)
-            if chordType == 'suspended-second':
-                width = self._plotTypeSuspendedSecond(xPos, yPos, page)
-            if chordType == 'suspended-fourth':
-                width = self._plotTypeSuspendedFourth(xPos, yPos, page)
+                if chordType == "sixth":
+                    width = self._plotTypeSixth(xPos, yPos, page)
+
+                if chordType == "seventh":
+                    width = self._plotTypeSeventh(xPos, yPos, page)
+                if chordType == "ninth":
+                    width = self._plotTypeNinth(xPos, yPos, page)
+                if chordType == "11th":
+                    width = self._plotType11th(xPos, yPos, page)
+                if chordType == "13th":
+                    width = self._plotType13th(xPos, yPos, page)
+
+                if chordType == 'augmented':
+                    if i == 0:
+                        xPos -= 0.7 * self.Settings.fontSettings.accidentalSpace
+                    width = self._plotTypeAugmented(xPos, yPos, page)
+                if chordType == 'flat-five':
+                    width = self._plotTypeFlatFive(xPos, yPos, page)
+                if chordType == 'suspended-second':
+                    width = self._plotTypeSuspendedSecond(xPos, yPos, page)
+                if chordType == 'suspended-fourth':
+                    width = self._plotTypeSuspendedFourth(xPos, yPos, page)
             xPos += width
         return xPos
 
     def _plotModifications(self, chordSymbol, xPos, yPos, page):
 
-        for csMod in chordSymbol.chordStepModifications:
-            if csMod.interval is not None:
-                width = 0
-                if csMod.modType == 'add':
-                    width = self._plotModificationAdd(xPos, yPos, page)
-                if csMod.modType == 'subtract':
-                    width = self._plotModificationSubtract(xPos, yPos, page)
-                if csMod.modType == 'alter':
-                    width = self._plotModificationAlter(xPos, yPos, page)
+        if self.Settings.chordVerbosity > 1:
 
-                xPos += width
+            for csMod in chordSymbol.chordStepModifications:
+                if csMod.interval is not None:
+                    width = 0
+                    if csMod.modType == 'add':
+                        width = self._plotModificationAdd(xPos, yPos, page)
+                    if csMod.modType == 'subtract':
+                        width = self._plotModificationSubtract(xPos, yPos, page)
+                    if csMod.modType == 'alter':
+                        width = self._plotModificationAlter(xPos, yPos, page)
 
-                number = csMod.degree
+                    xPos += width
 
-                accidental = None
-                if csMod.interval.semitones == -1:
-                    accidental = music21.pitch.Accidental('flat')
-                if csMod.interval.semitones == 1:
-                    accidental = music21.pitch.Accidental('sharp')
+                    number = csMod.degree
 
-                if accidental:
-                    xPos -= 0.003
+                    accidental = None
+                    if csMod.interval.semitones == -1:
+                        accidental = music21.pitch.Accidental('flat')
+                    if csMod.interval.semitones == 1:
+                        accidental = music21.pitch.Accidental('sharp')
 
-                width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
-                width += 0.002
+                    if accidental:
+                        xPos -= 0.003
 
-                xPos += width
+                    width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
+                    width += 0.002
+
+                    xPos += width
 
     def _plotTypeAndModificationNumberAndAccidental(self, number, accidental, xPos, yPos, page):
 
@@ -152,7 +157,7 @@ class PlotterChords(Plotter):
         return width
 
     def _plotTypeMinor(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
+        self.axs[page].text(xPos, yPos + 0.00005 * self.fontSizeType,
                             "-", fontsize = self.fontSizeType,
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthMinus
@@ -165,13 +170,13 @@ class PlotterChords(Plotter):
 
     def _plotTypeHalfDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos - 0.00034,
-                            "$\\varnothing$", fontsize=8, math_fontfamily='dejavusans',
+                            "$\\varnothing$", fontsize=self.fontSizeTypeSmall, math_fontfamily='dejavusans',
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthCircle
 
     def _plotTypeDiminished(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos - 0.0014,
-                            "$\\circ$", fontsize=15, fontstyle='normal', math_fontfamily='cm',
+                            "$\\circ$", fontsize=self.fontSizeType*1.5, fontstyle='normal', math_fontfamily='cm',
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthCircle + 0.0003
 
@@ -257,13 +262,13 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos,
                             "sub", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
-        return self.width * 3
+        return self.Settings.fontSettings.spaceAddSus
 
     def _plotModificationAlter(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
                             "alt", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
-        return self.width * 3
+        return self.Settings.fontSettings.spaceAddSus
 
     def _getTypeList(self, chordSymbol):
 

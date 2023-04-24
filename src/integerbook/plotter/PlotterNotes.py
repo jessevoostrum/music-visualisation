@@ -1,3 +1,5 @@
+import os
+import json
 import music21
 from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
 from itertools import tee, islice, chain
@@ -33,6 +35,11 @@ class PlotterNotes(Plotter):
                              "3": 0,
                              "4": 0}
 
+        if self.Settings.alternativeSymbols:
+            pathAlternativeSymbols = os.path.join(os.path.dirname(__file__), '../alternativeSymbols.json')
+            f = open(pathAlternativeSymbols)
+            self.alternativeSymbolsDict = json.load(f)[self.Settings.alternativeSymbols]
+
     def plotNotes(self):
 
         notes = self.streamObj[music21.note.Note]
@@ -61,6 +68,9 @@ class PlotterNotes(Plotter):
 
         chords = self.streamObj[music21.harmony.ChordSymbol]
 
+        nL = self.Settings.noteLowest
+        nH = self.Settings.noteHighest
+
         for idx in range(len(chords)):
 
             chord = chords[idx]
@@ -83,8 +93,6 @@ class PlotterNotes(Plotter):
             notes = chord.notes
             for note in notes:
                 midiNumber = note.pitch.ps
-                nL = self.Settings.noteLowest
-                nH = self.Settings.noteHighest
 
                 midiNumberPlottedNote = nL + (midiNumber - nL) % 12
                 while midiNumberPlottedNote <= nH:
@@ -251,12 +259,19 @@ class PlotterNotes(Plotter):
                 alpha = 0.5
                 zorder = .5
 
+            if not self.Settings.alternativeSymbols:
+                self.axs[page].text(xPos, yPos, number,
+                                    fontsize=fontSize,
+                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
-            self.axs[page].text(xPos, yPos, number,
-                                fontsize=fontSize,
-                                va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
-            self._plotAccidental(accidental, fontSize, xPos, yPos, page)
+                self._plotAccidental(accidental, fontSize, xPos, yPos, page)
+
+            else:
+                symbol = self._getSymbol(number, accidental)
+                self.axs[page].text(xPos, yPos, symbol,
+                                    fontsize=fontSize,
+                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
     def _plotLyric(self, page, el, xPos, yPosLineBase):
         """lyrics are plotted with vertical_alignment='top' at yPosLineBass.
@@ -544,6 +559,15 @@ class PlotterNotes(Plotter):
         for measure in measures:
             if measure.number == number:
                 return measure
+
+    def _getSymbol(self, number, accidental):
+
+        if accidental:
+            accidentalName = accidental.name
+        else:
+            accidentalName = "natural"
+        symbol = self.alternativeSymbolsDict[str(number)][accidentalName]
+        return symbol
 
     def _colorwheel(self, circleOfFifthIndex):
         """index must be between 0 and 11"""

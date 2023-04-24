@@ -3,11 +3,11 @@ import os
 import shutil
 import music21
 
-dirSongs2 = "/Users/jvo/Documents/hello-app/sheets(2)/"
+dirSongsOriginal = "/Users/jvo/Downloads/DickSchmittMxl/"
 dirSongs = "/Users/jvo/Documents/hello-app/sheets/"
 
 
-lines = glob.glob(dirSongs2 + '*' + '.musicxml')
+lines = glob.glob(dirSongsOriginal + '*' + '.musicxml')
 lines = [os.path.basename(line) for line in lines]
 lines.sort()
 
@@ -17,7 +17,7 @@ for line in lines:
     print(line)
 
     try:
-        pathSong = dirSongs2 + line
+        pathSong = dirSongsOriginal + line
 
         s = music21.converter.parse(pathSong)
 

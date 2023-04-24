@@ -18,18 +18,25 @@ settings = json.load(f)
 
 settings["measuresPerLine"] = 4
 settings["subdivision"] = 0
-settings["setInMajorKey"] = True
-settings["lyrics"] = False
-settings['coloursVoices'] = False
-settings['coloursCircleOfFifths'] = False
 settings['thickBarlines'] = True
 
-settings['fontDirectory'] = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/Vulf Mono/Vulf Mono/Desktop/"
-settings['font'] = 'Vulf Mono'
-settings['fontStyle'] = 'italic'
-settings['fontWeight'] = 'light'
+settings["setInMajorKey"] = True
+
+settings["lyrics"] = False
+settings["usePlt"] = False
+
+settings['coloursVoices'] = False
+settings['coloursCircleOfFifths'] = False
+
+# settings['fontDirectory'] = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/Vulf Mono/Vulf Mono/Desktop/"
+# settings['font'] = 'Vulf Mono'
+# settings['fontStyle'] = 'italic'
+# settings['fontWeight'] = 'light'
 settings['printArranger'] = False
 
+settings["alternativeSymbols"] = "SBJ"
+settings["fontSizeNotes"] = 7
+settings["xShiftNumberNote"] = 0.001
 
 lines1 = glob.glob(dirSongs + '*' + '.mxl')
 lines2 = glob.glob(dirSongs + '*' + '.musicxml')
@@ -42,13 +49,14 @@ for line in lines:
 
     print(line)
 
-    line = line.rstrip('\n')
-
     try:
         pathSong = dirSongs + line
 
         vis = Visualiser(pathSong, settings)
-        vis.generate("../../output/outputDickSchmitt/")
+
+        dirName = "../../../output/outputDickSchmittSteve"
+
+        vis.saveFig(dirName=dirName)
 
     except Exception as e:
         print("ERROR", "\n")

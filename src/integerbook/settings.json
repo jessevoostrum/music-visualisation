@@ -53,6 +53,10 @@
   "plotMelody": true,
   "plotChordTones": false,
   "usePlt": false,
-  "vMarginLyricsRelative": 0.25
+  "vMarginLyricsRelative": 0.25,
+  "alternativeSymbols": false,
+  "fontSizeTypeRelative": 0.8333,
+  "fontSizeTypeSmallRelative": 0.8,
+  "chordVerbosity": 1
 }
 

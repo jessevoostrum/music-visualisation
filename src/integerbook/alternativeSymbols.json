@@ -1,0 +1,76 @@
+{
+  "SBJ": {
+    "1": {
+      "natural": "wah",
+      "sharp": "sah",
+      "flat": "fah"
+    },
+    "2": {
+      "natural": "too",
+      "sharp": "soo",
+      "flat": "foo"
+    },
+    "3": {
+      "natural": "ree",
+      "sharp": "see",
+      "flat": "fee"
+    },
+    "4": {
+      "natural": "foe",
+      "sharp": "so",
+      "flat": "ree"
+    },
+    "5": {
+      "natural": "vie",
+      "sharp": "sie",
+      "flat": "fie"
+    },
+    "6": {
+      "natural": "mi",
+      "sharp": "si",
+      "flat": "fi"
+    },
+    "7": {
+      "natural": "ne",
+      "sharp": "wah",
+      "flat": "fe"
+    }
+  },
+  "solfege": {
+    "1": {
+      "natural": "do",
+      "sharp": "di",
+      "flat": "da"
+    },
+    "2": {
+      "natural": "re",
+      "sharp": "ri",
+      "flat": "ra"
+    },
+    "3": {
+      "natural": "mi",
+      "sharp": "fa",
+      "flat": "me"
+    },
+    "4": {
+      "natural": "fa",
+      "sharp": "fi",
+      "flat": "mi"
+    },
+    "5": {
+      "natural": "sol",
+      "sharp": "si",
+      "flat": "se"
+    },
+    "6": {
+      "natural": "la",
+      "sharp": "le",
+      "flat": "li"
+    },
+    "7": {
+      "natural": "ti",
+      "sharp": "do",
+      "flat": "te"
+    }
+  }
+}
