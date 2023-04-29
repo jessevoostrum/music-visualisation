@@ -238,9 +238,11 @@ class FontSettings:
         self.widthCharacter = fontSettings['widthCharacterRelative'] * fontSizeType
         self.widthMinus = fontSettings['widthMinusRelative'] * fontSizeType
         self.accidentalSpace = fontSettings['accidentalSpaceRelative'] * fontSizeType
-        self.accidentalSizeRelative = fontSettings["accidentalSizeRelativeRelative"] * fontSizeType
+        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
         self.widthDelta = fontSettings["widthDeltaRelative"] * fontSizeType
         self.widthCircle = fontSettings["widthCircleRelative"] * fontSizeType
         self.spaceAddSus = fontSettings["spaceAddSusRelative"] * fontSizeType
-        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelativeRelative"] * fontSizeType
+        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
         self.hDistanceChordAddition = fontSettings['hDistanceChordAdditionRelative'] * fontSizeType
+        self.positionSlashRelative = fontSettings["positionSlashRelative"]
+        self.widthAccidentalSlash = fontSettings["widthAccidentalSlashRelative"] * fontSizeType

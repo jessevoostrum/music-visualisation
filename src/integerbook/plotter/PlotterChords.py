@@ -339,7 +339,7 @@ class PlotterChords(Plotter):
                 number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
 
                 # plot slash
-                xPosRightOfChord = xPos + 0.8 * self.Settings.widthNumberRelative * self.Settings.fontSizeChords
+                xPosRightOfChord = xPos + self.Settings.fontSettings.positionSlashRelative * self.Settings.widthNumberRelative * self.Settings.fontSizeChords
                 yPosSlash = yPos - .4 * fontSizeAddition * self.Settings.capsizeNumberRelative
 
                 self.axs[page].text(xPosRightOfChord, yPosSlash, '/', fontsize=fontSizeAddition,
@@ -349,7 +349,7 @@ class PlotterChords(Plotter):
                 xPosRightOfSlash = xPosRightOfChord + 0.8 * self.Settings.widthNumberRelative * fontSizeAddition
                 xPosBass = xPosRightOfSlash
                 if accidental:
-                    xPosBass += 0.006
+                    xPosBass += self.Settings.fontSettings.widthAccidentalSlash
 
                 yPosBass = yPosSlash - 0.25 * fontSizeAddition * self.Settings.capsizeNumberRelative
 
