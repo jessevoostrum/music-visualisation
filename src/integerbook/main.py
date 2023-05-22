@@ -44,6 +44,7 @@ class Visualiser:
     def _preprocessStreamObj(self, streamObj):
 
         streamObj = self._removeBassStaff(streamObj)
+        streamObj = self._correctPickupMeasure(streamObj)
 
         return streamObj
 
@@ -62,9 +63,32 @@ class Visualiser:
 
         return streamObj
 
+    def _correctPickupMeasure(self, streamObj):
+        measures = streamObj[music21.stream.Measure]
+        if measures[0].number == 1:
+            if measures[0].quarterLength < measures[1].quarterLength:
+                streamObj = self._renumberMeasures(streamObj)
+        return streamObj
+
+    def _renumberMeasures(self, streamObj):
+        measures = streamObj[music21.stream.Measure]
+        for i in range(len(measures)):
+            measures[i].number = i
+        return streamObj
+
 
 if __name__ == '__main__':
-    pathToSong = "../../example/All_Of_Me.mxl"
+    import tracemalloc
+    pathToSong = "../../example/All_Of_Me.musicxml"
+
+    tracemalloc.start()
 
     vis = Visualiser(pathToSong)
+
+    vis.saveFig("/Users/jvo/Downloads/outputIBApp")
+
+    print(tracemalloc.get_traced_memory())
+
+    tracemalloc.stop()
+
 
