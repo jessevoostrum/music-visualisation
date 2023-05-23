@@ -70,6 +70,7 @@ class Settings:
         self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
+        self.forceMinor = settings["forceMinor"]
 
         # Font stuff
 
@@ -175,6 +176,9 @@ class Settings:
             key = key.asKey()
 
         if self.setInMajorKey and key.mode == 'minor':
+            key = key.relative
+
+        if key.mode == 'major' and self.forceMinor:
             key = key.relative
 
         return key

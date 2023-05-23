@@ -57,6 +57,7 @@
   "alternativeSymbols": false,
   "fontSizeTypeRelative": 0.8333,
   "fontSizeTypeSmallRelative": 0.8,
-  "chordVerbosity": 1
+  "chordVerbosity": 1,
+  "forceMinor": false
 }
 
