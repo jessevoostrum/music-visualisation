@@ -52,7 +52,6 @@
   "heightChordAddition": 0.7,
   "plotMelody": true,
   "plotChordTones": false,
-  "usePlt": false,
   "vMarginLyricsRelative": 0.25,
   "alternativeSymbols": false,
   "fontSizeTypeRelative": 0.8333,

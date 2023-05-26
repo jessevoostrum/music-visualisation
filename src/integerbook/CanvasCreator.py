@@ -1,13 +1,9 @@
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 from matplotlib import rcParams
 
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.transforms import Bbox
 from matplotlib.figure import Figure
-import matplotlib
-matplotlib.use('Agg')
-
 
 class CanvasCreator:
     def __init__(self, Settings, numPages, yPosLowest):
@@ -52,16 +48,12 @@ class CanvasCreator:
                 else:
                     pdf.savefig(fig)
 
-        plt.close("all")
-
     def _createCanvas(self, numPages):
 
         for _ in range(numPages):
-            if self.Settings.usePlt:
-                fig, ax = plt.subplots(figsize=(self.Settings.widthA4, self.Settings.heightA4))
-            else:
-                fig = Figure(figsize=(self.Settings.widthA4, self.Settings.heightA4))
-                ax = fig.subplots()
+
+            fig = Figure(figsize=(self.Settings.widthA4, self.Settings.heightA4))
+            ax = fig.subplots()
             ax = self._formatAx(ax)
             self.figs.append(fig)
             self.axs.append(ax)

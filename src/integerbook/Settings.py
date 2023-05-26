@@ -66,7 +66,6 @@ class Settings:
         self.thickBarlines = settings['thickBarlines']
         self.printArranger = settings['printArranger']
         self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
-        self.usePlt = settings["usePlt"]
         self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
