@@ -13,7 +13,7 @@ dir_songs_DS = "/Users/jvo/Downloads/DickSchmittMxl/"
 dirSongs = dir_songs_DS
 
 
-f = open('../settings.json')
+f = open('settings.json')
 settings = json.load(f)
 
 settings["measuresPerLine"] = 4
