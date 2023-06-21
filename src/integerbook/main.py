@@ -78,17 +78,21 @@ class Visualiser:
 
 
 if __name__ == '__main__':
-    import tracemalloc
-    pathToSong = "../../example/All_Of_Me.musicxml"
+    # import tracemalloc
+    # pathToSong = "../../example/All_Of_Me.musicxml"
+    #
+    # tracemalloc.start()
+    #
+    # vis = Visualiser(pathToSong)
+    #
+    # vis.saveFig("/Users/jvo/Downloads/outputIBApp")
+    #
+    # print(tracemalloc.get_traced_memory())
+    #
+    # tracemalloc.stop()
 
-    tracemalloc.start()
+    pathToSong = "../../example/All_Of_Me.musicxml"
 
     vis = Visualiser(pathToSong)
 
     vis.saveFig("/Users/jvo/Downloads/outputIBApp")
-
-    print(tracemalloc.get_traced_memory())
-
-    tracemalloc.stop()
-
-
