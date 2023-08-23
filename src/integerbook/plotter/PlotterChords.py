@@ -26,9 +26,9 @@ class PlotterChords(Plotter):
             yPos = self.yMin + yPosLineBase
 
             if chord.chordKind != 'none':    # not N.C.
-                self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+                widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-                self._plotTypesAndModifications(chord, xPos, yPos, page)
+                self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
 
                 self._plotBass(chord, xPos, yPos, page)
 
@@ -40,15 +40,25 @@ class PlotterChords(Plotter):
         key = self.Settings.getKey(offsetEl)
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
-        self.axs[page].text(xPos, yPos, number,
+        chordNumber = number
+        if self.Settings.romanNumerals:
+            chordNumber = self._getRomanNumeral(number, chordSymbol)
+
+        plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
                             va='baseline', size=self.Settings.fontSizeChords)
+
+        renderer = self.axs[page].figure._get_renderer()
+        bb = plottedNumber.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
+        widthNumber = bb.width
 
         self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
-    def _plotTypesAndModifications(self, chordSymbol, xPos, yPos, page):
+        return widthNumber
 
-        fontSize = self.Settings.fontSizeChords
-        widthNumber = self.Settings.widthNumberRelative * fontSize
+    def _plotTypesAndModifications(self, chordSymbol, xPos, yPos, page, widthNumber):
+
+        if not self.Settings.romanNumerals:
+            widthNumber = self.Settings.fontWidthChord
 
         xPos = xPos + widthNumber + self.Settings.fontSettings.hDistanceChordAddition
         yPos = yPos + self.Settings.capsizeChord * self.Settings.heightChordAddition
@@ -66,6 +76,10 @@ class PlotterChords(Plotter):
         chordTypes = self._getTypeList(chordSymbol)
 
         for i, chordType in enumerate(chordTypes):
+
+            if self.Settings.romanNumerals:
+                if chordType == "minor":
+                    continue
 
             width = 0
             if chordType == "minor":
@@ -365,3 +379,25 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos, 'N.C.',
                             va='baseline', size=self.Settings.fontSizeChords)
 
+    def _getRomanNumeral(self, number, chordSymbol):
+        if number == 1:
+            numeral = 'I'
+        if number == 2:
+            numeral = 'II'
+        if number == 3:
+            numeral = 'III'
+        if number == 4:
+            numeral = 'IV'
+        if number == 5:
+            numeral = 'V'
+        if number == 6:
+            numeral = 'VI'
+        if number == 7:
+            numeral = 'VII'
+
+        chordTypes = self._getTypeList(chordSymbol)
+        if len(chordTypes) > 0:
+            if chordTypes[0] == 'minor' or chordTypes[0] == 'half-diminished' or chordTypes[0] == 'diminished':
+                numeral = numeral.lower()
+
+        return numeral

@@ -43,7 +43,7 @@ class Visualiser:
 
     def _preprocessStreamObj(self, streamObj):
 
-        streamObj = self._removeBassStaff(streamObj)
+        # streamObj = self._removeBassStaff(streamObj)
         streamObj = self._correctPickupMeasure(streamObj)
 
         return streamObj
@@ -91,8 +91,8 @@ if __name__ == '__main__':
     #
     # tracemalloc.stop()
 
-    pathToSong = "../../example/All_Of_Me.musicxml"
+    pathToSong = "/Users/jvo/Documents/programming/sheet-music/sheets/popular-sheets/Lullaby_of_Birdland_453af5e8-18cb-4b4c-9f0a-4baf7a27db8d.musicxml"
 
     vis = Visualiser(pathToSong)
 
-    vis.saveFig("/Users/jvo/Downloads/outputIBApp")
+    vis.saveFig("/Users/jvo/Downloads/output")

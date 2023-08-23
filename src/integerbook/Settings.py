@@ -70,6 +70,7 @@ class Settings:
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
         self.forceMinor = settings["forceMinor"]
+        self.romanNumerals = settings["romanNumerals"]
 
         # Font stuff
 
