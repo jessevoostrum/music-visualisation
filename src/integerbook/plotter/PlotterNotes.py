@@ -10,6 +10,8 @@ import numpy as np
 from integerbook.plotter.patches import Parallelogram
 from integerbook.plotter.PlotterBase import Plotter
 
+from integerbook.plotter.PlotterChords import PlotterChords
+
 
 class PlotterNotes(Plotter):
 
@@ -41,6 +43,9 @@ class PlotterNotes(Plotter):
             pathAlternativeSymbols = os.path.join(os.path.dirname(__file__), '../alternativeSymbols.json')
             f = open(pathAlternativeSymbols)
             self.alternativeSymbolsDict = json.load(f)[self.Settings.alternativeSymbols]
+
+        if self.Settings.numbersRelativeToChord:
+            self.chordList = self._makeChordList()
 
     def plotNotes(self):
 
@@ -117,7 +122,7 @@ class PlotterNotes(Plotter):
         elif not self._isGraceNote(el):
             self._plotRectangle(page, el, xPos, xLength,  yPos, key, measure, offset, measureEnd,  isChordNote=isChordNote)
 
-        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key, isChordNote=isChordNote)
+        self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key, offset, isChordNote=isChordNote)
 
         self._plotArticulation(el, elNext)
 
@@ -223,9 +228,12 @@ class PlotterNotes(Plotter):
         slope = (rightBottom[1] - leftBottom[1]) / xLength
         return slope
 
-    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key, isChordNote=False):
+    def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key, offset, isChordNote=False):
         if not (el.tie and not (el.tie.type == 'start')):
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
+
+            if self.Settings.numbersRelativeToChord:
+                number, accidental = self._getNumberRelativeToChord(el, offset, accidental)
 
             if not self._isGraceNote(el):
                 xShiftNumbers = self._computeXShiftNumbers(el, xLength)
@@ -564,6 +572,145 @@ class PlotterNotes(Plotter):
             accidentalName = "natural"
         symbol = self.alternativeSymbolsDict[str(number)][accidentalName]
         return symbol
+
+    def _getNumberRelativeToChord(self, el, offset, accidentalOriginal):
+
+        chord = self._getCurrentChord(offset)
+        chordType = chord.chordKind
+
+        midiNumber = self._getRelativeMidiNumber(chord.root().ps, el.pitch.ps)
+        accidental = None
+
+        number = 0
+
+        additions = False
+
+        if midiNumber == 0:
+            number = 1
+
+        if midiNumber == 1:
+            if additions:
+                number = 9
+            else:
+                number = 2
+            accidental = music21.pitch.Accidental('flat')
+
+
+        if midiNumber == 2:
+            if additions and not chordType == 'suspended-second':
+                number = 9
+            else:
+                number = 2
+
+        if midiNumber == 3:
+            if 'minor' in chordType or chordType == 'half-diminished' or 'diminished' in chordType:
+                number = 3
+                accidental = None
+            else:
+                if additions:
+                    number = 9
+                else:
+                    number = 2
+                accidental = music21.pitch.Accidental('sharp')
+
+        if midiNumber == 4:
+            number = 3
+
+            if 'minor' in chordType or chordType == 'half-diminished' in chordType or 'diminished' in chordType:
+                if additions:
+                    number = 11
+                    accidental = music21.pitch.Accidental('flat')
+                else:
+                    number = 4
+                    accidental = music21.pitch.Accidental('flat')
+
+        if midiNumber == 5:
+            if additions and not 'suspended-fourth' in chordType:
+                number = 11
+            else:
+                number = 4
+
+        if midiNumber == 6:
+            if 'half-diminished' in chordType or 'diminished' in chordType:
+                number = 5
+            else:
+                if additions:
+                    number = 11
+                    accidental = music21.pitch.Accidental('sharp')
+                else:
+                    number = 4
+                    accidental = music21.pitch.Accidental('sharp')
+
+        if midiNumber == 7:
+            number = 5
+            if 'half-diminished' in chordType or 'diminished' in chordType :
+                accidental = music21.pitch.Accidental('sharp')
+            if 'augmented' in chordType:
+                accidental = music21.pitch.Accidental('flat')
+
+
+        if midiNumber == 8:
+            if 'augmented' in chordType:
+                number = 5
+            else:
+                number = 6
+                accidental = music21.pitch.Accidental('flat')
+
+        if midiNumber == 9:
+            number = 6
+            if chordType == 'diminished-seventh':
+                number = 7
+
+        majorSeventhChords = ['major', 'augmented', 'suspended-second', 'suspended-fourth', 'major-sixth']
+        minorSeventhChords = ['minor', 'diminished', 'minor-sixth']
+        chordsWithoutSeventh = majorSeventhChords + minorSeventhChords
+
+        if midiNumber == 10:
+            number = 7
+            if chordType in chordsWithoutSeventh:
+                if chordType in majorSeventhChords:
+                    accidental = music21.pitch.Accidental('flat')
+                else:
+                    accidental = None
+            else:
+                accidental = music21.pitch.Accidental('flat')
+                if ('minor' in chordType or 'dominant' in chordType or chordType == 'half-diminished') and not 'major' in chordType:
+                    accidental = None
+                if chordType == 'diminished-seventh':
+                    accidental = music21.pitch.Accidental('sharp')
+
+        if midiNumber == 11:
+            number = 7
+            if chordType in chordsWithoutSeventh:
+                if chordType in majorSeventhChords:
+                    accidental = None
+                else:
+                    accidental = music21.pitch.Accidental('sharp')
+
+            if ('minor' in chordType or 'seventh' in chordType or 'ninth' in chordType \
+                    or '11th' in chordType or '13th' in chordType or 'half-diminished' in chordType) \
+                    and not 'major' in chordType:
+                accidental = music21.pitch.Accidental('sharp')
+            if chordType == 'diminished-seventh':
+                accidental = music21.pitch.Accidental('double-sharp')
+
+        return number, accidental
+
+    def _getCurrentChord(self, offset):
+        i = 0
+        while i < len(self.chordList) and offset >= self.chordList[i][0]:
+            chord = self.chordList[i][1]
+            i += 1
+        return chord
+    def _getRelativeMidiNumber(self, root, pitch):
+        return int((pitch - root) % 12)
+    def _makeChordList(self):
+        chordList = []
+        chords = self.streamObj.flatten().getElementsByClass('ChordSymbol')
+        for chord in chords:
+            offset = chord.getOffsetInHierarchy(self.streamObj)
+            chordList.append((offset, chord))
+        return chordList
 
     def _colorwheel(self, circleOfFifthIndex):
         """index must be between 0 and 11"""

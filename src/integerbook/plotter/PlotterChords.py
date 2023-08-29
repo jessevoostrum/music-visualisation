@@ -284,7 +284,8 @@ class PlotterChords(Plotter):
                             va='baseline', ha='left')
         return self.Settings.fontSettings.spaceAddSus
 
-    def _getTypeList(self, chordSymbol):
+    @staticmethod
+    def _getTypeList(chordSymbol):
 
         chordType = chordSymbol.chordKind
 

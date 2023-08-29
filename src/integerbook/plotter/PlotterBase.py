@@ -14,6 +14,12 @@ class Plotter:
                 symbolAccidental = '♯'
             elif accidental.name == 'flat':
                 symbolAccidental = '♭'
+            elif accidental.name == 'natural':
+                symbolAccidental = '♮'
+            elif accidental.name == 'double-sharp':
+                symbolAccidental = '♯♯'
+            elif accidental.name == 'double-flat':
+                symbolAccidental = '♭♭'
 
             relativeXLocation = self.Settings.fontSettings.accidentalXPositionRelative
             if not front:

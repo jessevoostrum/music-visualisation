@@ -71,6 +71,7 @@ class Settings:
         self.chordVerbosity = settings["chordVerbosity"]
         self.forceMinor = settings["forceMinor"]
         self.romanNumerals = settings["romanNumerals"]
+        self.numbersRelativeToChord = settings["numbersRelativeToChord"]
 
         # Font stuff
 
@@ -162,7 +163,7 @@ class Settings:
                     break
 
         if not lastKey:
-            print('no key signature')
+            # print('no key signature')
             try:
                 lastKey = self.streamObj.analyze('key')
             except:

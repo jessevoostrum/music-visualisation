@@ -50,8 +50,11 @@ class PlotterMetadata(Plotter):
     def _plotKey(self):
 
         key = self.Settings.getKey(0)
+        number = "1"
+        if self.Settings.numbersRelativeToChord:
+            number = "I"
         self.ax.text(self.xPosLeft, self.Settings.yPosArranger,
-                          f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
+                          f"{number} = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeMetadata, horizontalalignment='left',
                           verticalalignment='baseline')
 
     def getSongTitle(self):
