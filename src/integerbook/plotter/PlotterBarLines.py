@@ -268,8 +268,11 @@ class PlotterBarLines(Plotter):
 
 
     def _plotKey(self, measure):
-        if measure[music21.key.Key, music21.key.KeySignature] and measure.number > 1:
-            offset = measure.getOffsetInHierarchy(self.streamObj)
+        for i, key in enumerate(measure[music21.key.Key, music21.key.KeySignature]):
+            if measure == self.streamObj[music21.stream.Measure][0] and i == 0:
+                continue
+            offset = key.getOffsetInHierarchy(self.streamObj)
+
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
             yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNote
 
@@ -278,7 +281,10 @@ class PlotterBarLines(Plotter):
                 xPos += self.Settings.fontWidthNote * 2
 
             key = self.Settings.getKey(offset)
-            self.axs[page].text(xPos, yPos, f"1 = {self._getKeyLetter(key)} ", fontsize=self.Settings.fontSizeNotes,
+            letter = self._getKeyLetter(key)
+            if key.mode == 'minor':
+                letter += "-"
+            self.axs[page].text(xPos, yPos, f"1 = {letter}", fontsize=self.Settings.fontSizeNotes,
                                 va='baseline', ha='left')
 
     def _plotTimeSignature(self, measure):

@@ -58,7 +58,7 @@
   "fontSizeTypeSmallRelative": 0.8,
   "chordVerbosity": 2,
   "forceMinor": false,
-  "romanNumerals": true,
-  "numbersRelativeToChord": true
+  "romanNumerals": false,
+  "numbersRelativeToChord": false
 }
 

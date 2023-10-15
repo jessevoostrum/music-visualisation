@@ -26,11 +26,20 @@ class PlotterChords(Plotter):
             yPos = self.yMin + yPosLineBase
 
             if chord.chordKind != 'none':    # not N.C.
-                widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+                if not self.Settings.romanNumerals:
+                    widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
-                self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+                    self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
 
-                self._plotBass(chord, xPos, yPos, page)
+                    self._plotBass(chord, xPos, yPos, page)
+
+                else:
+                    widthNumber = self._plotRomanNumeral(chord, xPos, yPos, page, i, chords)
+
+                    xPos = self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+
+                    self._plotSecondaryNumeral(chord, xPos, yPos, page)
+
 
             else:
                 self._plotNoChord(xPos, yPos, page)
@@ -42,7 +51,7 @@ class PlotterChords(Plotter):
 
         chordNumber = number
         if self.Settings.romanNumerals:
-            chordNumber = self._getRomanNumeral(number, chordSymbol)
+            chordNumber = self._getRomanNumeral(number, key, chordSymbol)
 
         plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
                             va='baseline', size=self.Settings.fontSizeChords)
@@ -70,7 +79,9 @@ class PlotterChords(Plotter):
 
         xPos = self._plotTypes(chordSymbol, xPos, yPos, page)
 
-        self._plotModifications(chordSymbol, xPos, yPos, page)
+        xPos = self._plotModifications(chordSymbol, xPos, yPos, page)
+
+        return xPos
 
     def _plotTypes(self, chordSymbol, xPos, yPos, page):
         chordTypes = self._getTypeList(chordSymbol)
@@ -150,6 +161,7 @@ class PlotterChords(Plotter):
                     width += 0.002
 
                     xPos += width
+            return xPos
 
     def _plotTypeAndModificationNumberAndAccidental(self, number, accidental, xPos, yPos, page):
 
@@ -380,25 +392,149 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos, 'N.C.',
                             va='baseline', size=self.Settings.fontSizeChords)
 
-    def _getRomanNumeral(self, number, chordSymbol):
-        if number == 1:
-            numeral = 'I'
-        if number == 2:
-            numeral = 'II'
-        if number == 3:
-            numeral = 'III'
-        if number == 4:
-            numeral = 'IV'
-        if number == 5:
-            numeral = 'V'
-        if number == 6:
-            numeral = 'VI'
-        if number == 7:
-            numeral = 'VII'
+    def _plotRomanNumeral(self, chordSymbol, xPos, yPos, page, i, chords):
 
-        chordTypes = self._getTypeList(chordSymbol)
-        if len(chordTypes) > 0:
-            if chordTypes[0] == 'minor' or chordTypes[0] == 'half-diminished' or chordTypes[0] == 'diminished':
-                numeral = numeral.lower()
+        offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
+        key = self.Settings.getKey(offsetEl)
+        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+
+        chordNumber = self._getRomanNumeral(number, key, chordSymbol)
+
+        if self._secondaryDominant(chordSymbol, key):
+            chordNumber = "V"
+
+        plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
+                                            va='baseline', size=self.Settings.fontSizeChords)
+
+        renderer = self.axs[page].figure._get_renderer()
+        bb = plottedNumber.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
+        widthNumber = bb.width
+
+        if not self._secondaryDominant(chordSymbol, key):
+            self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
+
+        return widthNumber
+
+    def _plotSecondaryNumeral(self, chordSymbol, xPos, yPos, page):
+        offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
+        key = self.Settings.getKey(offsetEl)
+        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+        target = self._secondaryDominant(chordSymbol, key)
+        if target:
+           self.axs[page].text(xPos, yPos, f"\{target}",
+                                                va='baseline', size=self.Settings.fontSizeChords)
+    def _secondaryDominant(self, chordSymbol, key):
+        if self._isDiatonic(chordSymbol, key):
+            return False
+        if self._isMajor(chordSymbol):
+            fifthOf = chordSymbol.root().transpose(-7)
+            number, accidental = key.getScaleDegreeAndAccidentalFromPitch(fifthOf)
+            if not accidental:
+                return self._getRomanNumeral(number, key)
+        return False
+
+
+    @staticmethod
+    def _isDiatonic(chordSymbol, key):
+        majorDiatonicChords = {
+            "1": [0, 4, 7, 11],
+            "2": [2, 5, 9, 12],
+            "3": [4, 7, 11, 14],
+            "4": [5, 9, 12, 16],
+            "5": [7, 11, 14, 17],
+            "6": [9, 12, 16, 19],
+            "7": [11, 14, 17, 21]
+        }
+        minorDiatonicChords = {
+            "1": [0, 3, 7, 10],
+            "2": [2, 5, 8, 12],
+            "3": [3, 7, 10, 14],
+            "4": [5, 8, 12, 15],
+            "5": [7, 11, 14, 17],
+            "6": [8, 12, 15, 19],
+            "7": [10, 14, 17, 20]
+        }
+        if key.mode == 'major':
+            diatonicChords = majorDiatonicChords
+        else:
+            diatonicChords = minorDiatonicChords
+
+        pitches = [int(note.pitch.ps) for note in chordSymbol.notes]
+        pitchKey = int(key.tonic.ps)
+
+        for chord in diatonicChords.values():
+            if PlotterChords._chordsEqual(chord, pitches, pitchKey):
+                return True
+        return False
+
+    @staticmethod
+    def _chordsEqual(relativeChord, absoluteChord, pitchKey):
+        for i in range(min(len(absoluteChord), 4)):
+            relativePitch = (absoluteChord[i] - pitchKey) % 12
+            print(relativeChord[i], relativePitch)
+            print(i)
+            print(relativeChord)
+            if relativeChord[i] % 12 != relativePitch:
+                print(i)
+                return False
+        return True
+    @staticmethod
+    def _isMajor(chordSymbol):
+        notes = chordSymbol.notes
+        root = chordSymbol.root()
+        for note in notes:
+            triadInterval = note.pitch.ps - root.ps
+            if triadInterval == 4 or triadInterval == 5:
+                return True
+        return False
+
+    def _isSecondaryDominant(self, romanNumeral):
+        if romanNumeral.secondaryRomanNumeral:
+            return True
+        else:
+            return False
+
+
+    def _getRomanNumeral(self, number, key, chordSymbol=None):
+        numeral = None
+        if key.mode == 'major':
+            if number == 1:
+                numeral = 'I'
+            if number == 2:
+                numeral = 'ii'
+            if number == 3:
+                numeral = 'iii'
+            if number == 4:
+                numeral = 'IV'
+            if number == 5:
+                numeral = 'V'
+            if number == 6:
+                numeral = 'vi'
+            if number == 7:
+                numeral = 'vii'
+        else:
+            if number == 1:
+                numeral = 'i'
+            if number == 2:
+                numeral = 'ii'
+            if number == 3:
+                numeral = 'III'
+            if number == 4:
+                numeral = 'iv'
+            if number == 5:
+                numeral = 'V'
+            if number == 6:
+                numeral = 'VI'
+            if number == 7:
+                numeral = 'VII'
+
+
+        if chordSymbol:
+            chordTypes = self._getTypeList(chordSymbol)
+            if len(chordTypes) > 0:
+                if chordTypes[0] == 'minor' or chordTypes[0] == 'half-diminished' or chordTypes[0] == 'diminished':
+                    numeral = numeral.lower()
+                else:
+                    numeral = numeral.upper()
 
         return numeral
