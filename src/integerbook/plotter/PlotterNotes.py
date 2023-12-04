@@ -15,7 +15,7 @@ from integerbook.plotter.PlotterChords import PlotterChords
 
 class PlotterNotes(Plotter):
 
-    def __init__(self, streamObj, Settings, LocationFinder, axs,):
+    def __init__(self, streamObj, Settings, LocationFinder, axs, ):
 
         super().__init__(streamObj, Settings, LocationFinder, axs)
 
@@ -26,18 +26,30 @@ class PlotterNotes(Plotter):
 
         # for plotting lyrics
 
-        self.xPosLyricEnd = {"1": 0,
-                             "2": 0,
-                             "3": 0,
-                             "4": 0}
-        self.yPosLineBaseLast = {"1": 0,
-                                 "2": 0,
-                                 "3": 0,
-                                 "4": 0}
-        self.lastSyllabic = {"1": 0,
-                             "2": 0,
-                             "3": 0,
-                             "4": 0}
+        self.xPosLyricEnd = {"1": {"1": 0,
+                                   "2": 0,
+                                   "3": 0,
+                                   "4": 0},
+                             "2": {"1": 0,
+                                   "2": 0,
+                                   "3": 0,
+                                   "4": 0}}
+        self.yPosLineBaseLast = {"1": {"1": 0,
+                                       "2": 0,
+                                       "3": 0,
+                                       "4": 0},
+                                 "2": {"1": 0,
+                                       "2": 0,
+                                       "3": 0,
+                                       "4": 0}}
+        self.lastSyllabic = {"1": {"1": 0,
+                                   "2": 0,
+                                   "3": 0,
+                                   "4": 0},
+                             "2": {"1": 0,
+                                   "2": 0,
+                                   "3": 0,
+                                   "4": 0}}
 
         if self.Settings.alternativeSymbols:
             pathAlternativeSymbols = os.path.join(os.path.dirname(__file__), '../alternativeSymbols.json')
@@ -83,7 +95,7 @@ class PlotterNotes(Plotter):
             chord = chords[idx]
 
             if idx < len(chords) - 1:
-                chordNext = chords[idx+1]
+                chordNext = chords[idx + 1]
             else:
                 chordNext = None
 
@@ -92,7 +104,7 @@ class PlotterNotes(Plotter):
             if chordNext:
                 offsetNext = chordNext.getOffsetInHierarchy(self.streamObj)
                 measureNext = chordNext.containerHierarchy()[0]
-                measureEnd = self._getMeasureByNumber(measureNext.number-1)
+                measureEnd = self._getMeasureByNumber(measureNext.number - 1)
             else:
                 offsetNext = self.streamObj.quarterLength
                 measureEnd = self.streamObj[music21.stream.Measure][-1]
@@ -107,7 +119,7 @@ class PlotterNotes(Plotter):
                     self._plotNote(plottedNote, None, measure, offset=offset, measureEnd=measureEnd, isChordNote=True)
                     midiNumberPlottedNote += 12
 
-    def _plotNote(self, el, elNext, measure,  offset, measureEnd=None, isChordNote=False):
+    def _plotNote(self, el, elNext, measure, offset, measureEnd=None, isChordNote=False):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
         yPosWithinLine = self._yPosWithinLine(el)
         yPos = yPosLineBase + yPosWithinLine
@@ -118,9 +130,10 @@ class PlotterNotes(Plotter):
 
         slope = None
         if self._isGlissando(el):
-            slope = self._plotParallelogram(page, el, xPos, xLength,  yPos, yPosLineBase, key, measure, offset)
+            slope = self._plotParallelogram(page, el, xPos, xLength, yPos, yPosLineBase, key, measure, offset)
         elif not self._isGraceNote(el):
-            self._plotRectangle(page, el, xPos, xLength,  yPos, key, measure, offset, measureEnd,  isChordNote=isChordNote)
+            self._plotRectangle(page, el, xPos, xLength, yPos, key, measure, offset, measureEnd,
+                                isChordNote=isChordNote)
 
         self._plotNumber(page, el, elNext, xPos, xLength, yPos, slope, key, offset, isChordNote=isChordNote)
 
@@ -129,7 +142,7 @@ class PlotterNotes(Plotter):
         if self.Settings.lyrics:
             self._plotLyric(page, el, xPos, yPosLineBase)
 
-    def _plotRectangle(self, page, el, xPos, xLength,  yPos, key, measure, offset, measureEnd=None, isChordNote=False):
+    def _plotRectangle(self, page, el, xPos, xLength, yPos, key, measure, offset, measureEnd=None, isChordNote=False):
 
         if not measureEnd:
             measureEnd = measure
@@ -179,7 +192,7 @@ class PlotterNotes(Plotter):
 
         self.axs[page].add_patch(patch)
 
-    def _plotParallelogram(self, page, el, xPos, xLength,  yPos, yPosLineBase, key, measure, offset):
+    def _plotParallelogram(self, page, el, xPos, xLength, yPos, yPosLineBase, key, measure, offset):
 
         sp = el.getSpannerSites()[0]
         alpha, facecolor, hatch = self._adjustVisualParameters(el, key)
@@ -274,7 +287,6 @@ class PlotterNotes(Plotter):
                                     fontsize=fontSize,
                                     va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
-
                 self._plotAccidental(accidental, fontSize, xPos, yPos, page)
 
             else:
@@ -284,23 +296,27 @@ class PlotterNotes(Plotter):
                                     va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
 
     def _plotLyric(self, page, el, xPos, yPosLineBase):
-        """lyrics are plotted with vertical_alignment='top' at yPosLineBass.
-        By multiple lines, the lyric already contains a newline command within it"""
 
         if el.lyrics:
             for lyric in el.lyrics:
+
+                voice = "1"
+                if self.isSecondVoice(el):
+                    voice = "2"
 
                 marginTop = self.Settings.vMarginLyricsRelative
                 lineNumber = lyric.number
                 strLineNumber = str(lineNumber)
 
                 xPosLyric = xPos + self.Settings.xShiftNumberNote / 4
-                sameLineAsLastElement = self.yPosLineBaseLast[strLineNumber] == yPosLineBase
+                sameLineAsLastElement = self.yPosLineBaseLast[voice][strLineNumber] == yPosLineBase
 
-                if xPosLyric < self.xPosLyricEnd[strLineNumber] and sameLineAsLastElement:
-                    xPosLyric = self.xPosLyricEnd[strLineNumber] + self.Settings.fontWidthLyric * 0.3
+                if xPosLyric < self.xPosLyricEnd[voice][strLineNumber] and sameLineAsLastElement:
+                    xPosLyric = self.xPosLyricEnd[voice][strLineNumber] + self.Settings.fontWidthLyric * 0.3
 
-                yPos = yPosLineBase - lineNumber * (1 + marginTop) * self.Settings.capsizeLyric
+                yPos = yPosLineBase - lineNumber * self.Settings.lineHeightLyrics
+                if voice == "2":
+                    yPos -= self.Settings.numLinesLyrics * self.Settings.lineHeightLyrics
 
                 plottedLyric = self.axs[page].text(xPosLyric, yPos, lyric.text,
                                                    fontsize=self.Settings.fontSizeLyrics,
@@ -310,31 +326,30 @@ class PlotterNotes(Plotter):
                 bb = plottedLyric.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
                 lyricWidth = bb.width
 
-                if self.lastSyllabic[strLineNumber] == 'middle' or self.lastSyllabic[strLineNumber] == 'begin':
+                # plot hyphen
+                if self.lastSyllabic[voice][strLineNumber] == 'middle' or self.lastSyllabic[voice][strLineNumber] == 'begin':
                     """note that in musescore export there is often middle and end syllable, after middle there is a hyphen"""
 
                     if sameLineAsLastElement:
-                        xPosHyphen = (self.xPosLyricEnd[strLineNumber] + xPosLyric) / 2
+                        xPosHyphen = (self.xPosLyricEnd[voice][strLineNumber] + xPosLyric) / 2
                     else:
-                        xPosHyphen = self.xPosLyricEnd[strLineNumber] + self.Settings.fontWidthLyric * 0.3
-                        yPos = self.yPosLineBaseLast[strLineNumber] - lineNumber * (1 + marginTop) * self.Settings.capsizeLyric
+                        xPosHyphen = self.xPosLyricEnd[voice][strLineNumber] + self.Settings.fontWidthLyric * 0.3
 
                     self.axs[page].text(xPosHyphen, yPos, "-",
                                         fontsize=self.Settings.fontSizeLyrics,
                                         va='baseline', ha='center', font='Dejavu Sans', fontstyle='normal')
 
-                self.xPosLyricEnd[strLineNumber] = xPosLyric + lyricWidth
+                self.xPosLyricEnd[voice][strLineNumber] = xPosLyric + lyricWidth
 
-                self.yPosLineBaseLast[strLineNumber] = yPosLineBase
+                self.yPosLineBaseLast[voice][strLineNumber] = yPosLineBase
 
-                self.lastSyllabic[strLineNumber] = lyric.syllabic
+                self.lastSyllabic[voice][strLineNumber] = lyric.syllabic
 
     def _adjustVisualParameters(self, el, key, isChordNote=False):
 
         facecolor = self.Settings.facecolor
         alpha = self.Settings.alpha
         hatch = None
-
 
         if self.Settings.coloursCircleOfFifths:
 
@@ -348,11 +363,8 @@ class PlotterNotes(Plotter):
 
 
         elif self.Settings.coloursVoices:
-            if el.containerHierarchy():
-                container = el.containerHierarchy()[0]
-                if type(container) == music21.stream.Voice:
-                    if container.id == '2':
-                        facecolor = self.Settings.facecolor2
+            if self.isSecondVoice(el):
+                facecolor = self.Settings.facecolor2
 
         # ghost note
         if el.notehead == 'x':
@@ -362,9 +374,18 @@ class PlotterNotes(Plotter):
 
         if isChordNote:
             facecolor = 'red'
-            alpha=0.05
+            alpha = 0.05
 
         return alpha, facecolor, hatch
+
+    @staticmethod
+    def isSecondVoice(el):
+        if el.containerHierarchy():
+            container = el.containerHierarchy()[0]
+            if type(container) == music21.stream.Voice:
+                if container.id == '2':
+                    return True
+        return False
 
     def _yPosWithinLine(self, el):
         yPosWithinLine = (el.pitch.ps - self.noteLowest) * self.barSpace * (1 - self.Settings.overlapFactor)
@@ -395,7 +416,7 @@ class PlotterNotes(Plotter):
         return not el.duration.linked
 
     def _relativePitchToCircleOfFifthsIndex(self, relativePitch):
-        pitchesCircleOfFifths = [(i*7) % 12 for i in range(12)]
+        pitchesCircleOfFifths = [(i * 7) % 12 for i in range(12)]
         return pitchesCircleOfFifths.index(relativePitch)
 
     def _alpha(self, circleOfFifthIndex):
@@ -407,7 +428,7 @@ class PlotterNotes(Plotter):
         alpha = alphas[circleOfFifthIndex]
         return alpha
 
-    def _computeXShiftNumbers(self, el,xLength):
+    def _computeXShiftNumbers(self, el, xLength):
 
         xShiftNumbers = self.Settings.xShiftNumberNote
         if xLength < (2 * self.Settings.xShiftNumberNote + self.Settings.fontWidthNote) and (not el.tie):
@@ -427,7 +448,7 @@ class PlotterNotes(Plotter):
                 xShiftNumbers = 0
                 self.graceNoteCounter += 1
             elif el.beams.getTypes()[0] == 'continue':
-                if elNext.beams.getTypes()[0] == 'continue': # max of 4 grace notes supported
+                if elNext.beams.getTypes()[0] == 'continue':  # max of 4 grace notes supported
                     xShiftNumbers = self.Settings.xShiftNumberNote / 4
                     self.graceNoteCounter += 1
                 elif elNext.beams.getTypes()[0] == 'stop':
@@ -439,7 +460,6 @@ class PlotterNotes(Plotter):
 
         return xShiftNumbers
 
-
     def _computeYShiftNumbers(self):
 
         yShiftNumbers = (self.barSpace - self.Settings.capsizeNote) / 2
@@ -448,7 +468,6 @@ class PlotterNotes(Plotter):
             yShiftNumbers += self.Settings.fontVShift * self.Settings.capsizeNote
 
         return yShiftNumbers
-
 
     def _plotArticulation(self, el, elNext):
         if elNext:
@@ -468,21 +487,19 @@ class PlotterNotes(Plotter):
 
                 yPosCenter = (yPosLow + yPosHigh) / 2
 
-
                 offsetLength = el.duration.quarterLength
                 xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
                 xPos = xPosStart + xLength
 
-
-                #self.axs[page].vlines(xPos, yPosLow, yPosHigh, alpha=.7)
+                # self.axs[page].vlines(xPos, yPosLow, yPosHigh, alpha=.7)
                 width = 2 * self.Settings.xMarginNote
-                patchLine = FancyBboxPatch((xPos - width/2, yPosLow),
-                                       width, yPosHigh - yPosLow,
-                                       boxstyle=f"round, pad=0, rounding_size=0.002",
-                                       mutation_aspect=0.15,
-                                       facecolor='blue', alpha=1,
-                                        linewidth=0
-                                       )
+                patchLine = FancyBboxPatch((xPos - width / 2, yPosLow),
+                                           width, yPosHigh - yPosLow,
+                                           boxstyle=f"round, pad=0, rounding_size=0.002",
+                                           mutation_aspect=0.15,
+                                           facecolor='blue', alpha=1,
+                                           linewidth=0
+                                           )
                 self.axs[page].add_patch(patchLine)
 
                 fontsize = 6
@@ -491,25 +508,26 @@ class PlotterNotes(Plotter):
 
                 width = width * 2
 
-                patchRectangle = Rectangle((xPos - width/2, yPosCenter - height/2), width, height, facecolor='white', zorder=2 )
+                patchRectangle = Rectangle((xPos - width / 2, yPosCenter - height / 2), width, height,
+                                           facecolor='white', zorder=2)
                 self.axs[page].add_patch(patchRectangle)
 
                 radius = self.barSpace
-                yxRatio =  self.Settings.heightA4 / self.Settings.widthA4
-                patch = Ellipse((xPos, yPosCenter), width=radius * yxRatio, height=radius, facecolor='white', zorder=2, alpha=.0)
+                yxRatio = self.Settings.heightA4 / self.Settings.widthA4
+                patch = Ellipse((xPos, yPosCenter), width=radius * yxRatio, height=radius, facecolor='white', zorder=2,
+                                alpha=.0)
 
                 self.axs[page].add_patch(patch)
 
                 fontsize = 7
                 fontHeight = fontsize * 0.0008554
-                yPosBaseline = yPosCenter -  fontHeight / 2
+                yPosBaseline = yPosCenter - fontHeight / 2
                 if articulation == 'hammer on':
                     letter = "H"
                 else:
                     letter = "P"
-                self.axs[page].text(xPos, yPosBaseline, letter, ha='center', va='baseline', font='Arial', fontsize=7, fontstyle='normal', zorder=2)
-
-
+                self.axs[page].text(xPos, yPosBaseline, letter, ha='center', va='baseline', font='Arial', fontsize=7,
+                                    fontstyle='normal', zorder=2)
 
     def _getArticulation(self, el, elNext):
         articulation = None
@@ -539,7 +557,8 @@ class PlotterNotes(Plotter):
             return True
 
     def _overlapEndWithThickBarline(self, el, offset, measure):
-        if offset + el.quarterLength == measure.offset + measure.quarterLength and self._measureHasThickBarlineEnd(measure):
+        if offset + el.quarterLength == measure.offset + measure.quarterLength and self._measureHasThickBarlineEnd(
+                measure):
             return True
 
     def _measureHasThickBarlineStart(self, measure):
@@ -549,7 +568,9 @@ class PlotterNotes(Plotter):
 
     def _measureHasThickBarlineEnd(self, measure):
         for barLine in measure[music21.bar.Barline]:
-            if (type(barLine) == music21.bar.Repeat or barLine.type == 'final') and barLine.offset == measure.quarterLength:
+            if (
+                    type(
+                        barLine) == music21.bar.Repeat or barLine.type == 'final') and barLine.offset == measure.quarterLength:
                 return True
 
     def _previous_and_next(self, some_iterable):
@@ -594,7 +615,6 @@ class PlotterNotes(Plotter):
             else:
                 number = 2
             accidental = music21.pitch.Accidental('flat')
-
 
         if midiNumber == 2:
             if additions and not chordType == 'suspended-second':
@@ -643,11 +663,10 @@ class PlotterNotes(Plotter):
 
         if midiNumber == 7:
             number = 5
-            if 'half-diminished' in chordType or 'diminished' in chordType :
+            if 'half-diminished' in chordType or 'diminished' in chordType:
                 accidental = music21.pitch.Accidental('sharp')
             if 'augmented' in chordType:
                 accidental = music21.pitch.Accidental('flat')
-
 
         if midiNumber == 8:
             if 'augmented' in chordType:
@@ -674,7 +693,8 @@ class PlotterNotes(Plotter):
                     accidental = None
             else:
                 accidental = music21.pitch.Accidental('flat')
-                if ('minor' in chordType or 'dominant' in chordType or chordType == 'half-diminished') and not 'major' in chordType:
+                if (
+                        'minor' in chordType or 'dominant' in chordType or chordType == 'half-diminished') and not 'major' in chordType:
                     accidental = None
                 if chordType == 'diminished-seventh':
                     accidental = music21.pitch.Accidental('sharp')
@@ -688,7 +708,7 @@ class PlotterNotes(Plotter):
                     accidental = music21.pitch.Accidental('sharp')
 
             if ('minor' in chordType or 'seventh' in chordType or 'ninth' in chordType \
-                    or '11th' in chordType or '13th' in chordType or 'half-diminished' in chordType) \
+                or '11th' in chordType or '13th' in chordType or 'half-diminished' in chordType) \
                     and not 'major' in chordType:
                 accidental = music21.pitch.Accidental('sharp')
             if chordType == 'diminished-seventh':
@@ -702,8 +722,10 @@ class PlotterNotes(Plotter):
             chord = self.chordList[i][1]
             i += 1
         return chord
+
     def _getRelativeMidiNumber(self, root, pitch):
         return int((pitch - root) % 12)
+
     def _makeChordList(self):
         chordList = []
         chords = self.streamObj.flatten().getElementsByClass('ChordSymbol')
@@ -716,17 +738,16 @@ class PlotterNotes(Plotter):
         """index must be between 0 and 11"""
 
         rgbs = [(0.18062, 0.13244, 0.91856, 1.0),
-                 (0.44913, 0.17088, 0.97129, 1.0),
-                 (0.69537, 0.25408, 0.98496, 1.0),
-                 (0.93769, 0.33352, 0.94809, 1.0),
-                 (0.98704, 0.57494, 0.75486, 1.0),
-                 (0.98761, 0.78074, 0.51946, 1.0),
-                 (0.94377, 0.93236, 0.2092, 1.0),
-                 (0.7223, 0.87807, 0.079194, 1.0),
-                 (0.46484, 0.78619, 0.051424, 1.0),
-                 (0.19593, 0.67703, 0.15768, 1.0),
-                 (0.27173, 0.52798, 0.46247, 1.0),
-                 (0.183, 0.36488, 0.72404, 1.0)]
+                (0.44913, 0.17088, 0.97129, 1.0),
+                (0.69537, 0.25408, 0.98496, 1.0),
+                (0.93769, 0.33352, 0.94809, 1.0),
+                (0.98704, 0.57494, 0.75486, 1.0),
+                (0.98761, 0.78074, 0.51946, 1.0),
+                (0.94377, 0.93236, 0.2092, 1.0),
+                (0.7223, 0.87807, 0.079194, 1.0),
+                (0.46484, 0.78619, 0.051424, 1.0),
+                (0.19593, 0.67703, 0.15768, 1.0),
+                (0.27173, 0.52798, 0.46247, 1.0),
+                (0.183, 0.36488, 0.72404, 1.0)]
 
         return rgbs[circleOfFifthIndex]
-

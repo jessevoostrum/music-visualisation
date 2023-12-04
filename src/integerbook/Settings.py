@@ -121,14 +121,14 @@ class Settings:
 
         self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
         self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
-        self.lyricHeightMax = self._countLinesLyrics() * self.capsizeLyric * (1 + self.vMarginLyricsRelative) + self.capsizeLyric * self.vMarginLyricsRelative
+        self.numLinesLyrics = self._countNumLinesLyrics()
+        self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
+        self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
         self.barSpace = self.barSpacePerCapsize * self.capsizeNote
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
-
-
 
         self.heightBarline0Extension = self.capsizeNote
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
@@ -211,7 +211,17 @@ class Settings:
             yMin -= self.lyricHeightMax
         return yMin, yMax
 
-    def _countLinesLyrics(self):
+    def _countNumVoices(self):
+        "maximum is 2"
+        for el in self.streamObj[music21.note.Note]:
+            if el.containerHierarchy():
+                container = el.containerHierarchy()[0]
+                if type(container) == music21.stream.Voice:
+                    if container.id == '2':
+                        return 2
+        return 1
+
+    def _countNumLinesLyrics(self):
         maxNumLines = 0
         for el in self.streamObj[music21.note.Note]:
             if el.lyric:
