@@ -48,14 +48,18 @@ class LocationFinder:
 
 
     def _getOffsetsAndXsStartLine(self, offsetLineMax):
+        """the x in this function has units offset (so not position on the page)"""
         offsetsStartLine = []
         xsStartLine = []
 
         measures = self._getMeasures()
         hasPickupMeasure = measures[0].number == 0
 
+        firstCoda = True
+
         for measure in self.streamObj.recurse().getElementsByClass(music21.stream.Measure):
 
+            # initializing first line
             if measure.number == 0:  # pickup measure
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(-measure.quarterLength)
@@ -64,11 +68,14 @@ class LocationFinder:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
+            # special conditions for starting new line
+
             # start new line when new section of song starts
             elif measure.flatten().getElementsByClass(music21.expressions.RehearsalMark).first() and not measure.number == 1:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
+            # start new line for volta > 1 (RepeatBracket)
             elif measure.getSpannerSites():
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
@@ -77,10 +84,19 @@ class LocationFinder:
                             offsetsStartLine.append(measure.offset)
                             xsStartLine.append(xPosSpanner)
 
+            # start new line for second volta
+            elif self._hasCoda(measure) and not firstCoda:
+                offsetsStartLine.append(measure.offset)
+                xsStartLine.append(xPosCoda)
+
+            # standard condition for starting new line:
             if measure.offset + measure.quarterLength - offsetsStartLine[-1] + xsStartLine[-1] > offsetLineMax:
                 offsetsStartLine.append(measure.offset)
                 xsStartLine.append(0)
 
+            # save location of repetition signs
+
+            # save position of first volta
             if measure.getSpannerSites():
                 spanner = measure.getSpannerSites()[0]
                 if type(spanner) == music21.spanner.RepeatBracket:
@@ -88,7 +104,12 @@ class LocationFinder:
                         if spanner.isFirst(measure):
                             xPosSpanner = measure.offset - offsetsStartLine[-1] + xsStartLine[-1]
 
-            # will not work if length of measure exceeds offsetLineMax, then will be counted in first and last (el)if statement
+            # save position of first coda
+            if self._hasCoda(measure) and firstCoda:
+                xPosCoda = measure.offset + self._offsetCoda(measure) - offsetsStartLine[-1] + xsStartLine[-1]
+                firstCoda = False
+
+            # ? will not work if length of measure exceeds offsetLineMax, then will be counted in first and last (el)if statement
 
         return offsetsStartLine, xsStartLine
 
@@ -155,4 +176,16 @@ class LocationFinder:
             (self._getPickupMeasureSpace() + offsetLine))
 
         return xPos
+
+    @staticmethod
+    def _hasCoda(measure):
+        for el in measure:
+            if type(el) == music21.repeat.Coda:
+                return True
+        return False
+    @staticmethod
+    def _offsetCoda(measure):
+        for el in measure:
+            if type(el) == music21.repeat.Coda:
+                return el.offset
 
