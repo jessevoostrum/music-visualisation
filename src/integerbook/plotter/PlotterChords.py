@@ -132,17 +132,22 @@ class PlotterChords(Plotter):
 
     def _plotModifications(self, chordSymbol, xPos, yPos, page):
 
-        if self.Settings.chordVerbosity > 1:
+        if self.Settings.chordVerbosity > 0:
 
             for csMod in chordSymbol.chordStepModifications:
                 if csMod.interval is not None:
                     width = 0
                     if csMod.modType == 'add':
-                        width = self._plotModificationAdd(xPos, yPos, page)
+                        if self.Settings.chordVerbosity == 1:
+                            break
+                        # width = self._plotModificationAdd(xPos, yPos, page)
                     if csMod.modType == 'subtract':
-                        width = self._plotModificationSubtract(xPos, yPos, page)
+                        if self.Settings.chordVerbosity == 1:
+                            break
+                        # width = self._plotModificationSubtract(xPos, yPos, page)
                     if csMod.modType == 'alter':
-                        width = self._plotModificationAlter(xPos, yPos, page)
+                        pass
+                        # width = self._plotModificationAlter(xPos, yPos, page)
 
                     xPos += width
 
