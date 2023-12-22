@@ -50,8 +50,6 @@ class PlotterChords(Plotter):
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         chordNumber = number
-        if self.Settings.romanNumerals:
-            chordNumber = self._getRomanNumeral(number, key, chordSymbol)
 
         plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
                             va='baseline', size=self.Settings.fontSizeChords)
@@ -400,12 +398,14 @@ class PlotterChords(Plotter):
     def _plotRomanNumeral(self, chordSymbol, xPos, yPos, page, i, chords):
 
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
+        if offsetEl == 80:
+            pass
         key = self.Settings.getKey(offsetEl)
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         chordNumber = self._getRomanNumeral(number, key, chordSymbol)
 
-        if self._secondaryDominant(chordSymbol, key):
+        if self._isSecondaryDominant(chordSymbol, key):
             chordNumber = "V"
 
         plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
@@ -415,7 +415,7 @@ class PlotterChords(Plotter):
         bb = plottedNumber.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
         widthNumber = bb.width
 
-        if not self._secondaryDominant(chordSymbol, key):
+        if not self._isSecondaryDominant(chordSymbol, key):
             self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
         return widthNumber
@@ -423,21 +423,29 @@ class PlotterChords(Plotter):
     def _plotSecondaryNumeral(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
         key = self.Settings.getKey(offsetEl)
-        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
-        target = self._secondaryDominant(chordSymbol, key)
-        if target:
-           self.axs[page].text(xPos, yPos, f"\{target}",
-                                                va='baseline', size=self.Settings.fontSizeChords)
-    def _secondaryDominant(self, chordSymbol, key):
+        if self._isSecondaryDominant(chordSymbol, key):
+            target = self._targetSecondaryDominant(chordSymbol, key)
+            if target:
+               self.axs[page].text(xPos, yPos, f"\{target}",
+                                                    va='baseline', size=self.Settings.fontSizeChords)
+    def _isSecondaryDominant(self, chordSymbol, key):
         if self._isDiatonic(chordSymbol, key):
             return False
         if self._isMajor(chordSymbol):
-            fifthOf = chordSymbol.root().transpose(-7)
+            if chordSymbol.isSeventh() and not chordSymbol.isDominantSeventh():
+                return False
+            if self._isSixth(chordSymbol):
+                return False
+            fifthOf = chordSymbol.root().transpose('p4')
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(fifthOf)
-            if not accidental:
-                return self._getRomanNumeral(number, key)
+            if not accidental and number != 1:
+                return True
         return False
 
+    def _targetSecondaryDominant(self, chordSymbol, key):
+        fifthOf = chordSymbol.root().transpose('p4')
+        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(fifthOf)
+        return self._getRomanNumeral(number, key)
 
     @staticmethod
     def _isDiatonic(chordSymbol, key):
@@ -476,11 +484,11 @@ class PlotterChords(Plotter):
     def _chordsEqual(relativeChord, absoluteChord, pitchKey):
         for i in range(min(len(absoluteChord), 4)):
             relativePitch = (absoluteChord[i] - pitchKey) % 12
-            print(relativeChord[i], relativePitch)
-            print(i)
-            print(relativeChord)
+            # print(relativeChord[i], relativePitch)
+            # print(i)
+            # print(relativeChord)
             if relativeChord[i] % 12 != relativePitch:
-                print(i)
+                # print(i)
                 return False
         return True
     @staticmethod
@@ -493,12 +501,15 @@ class PlotterChords(Plotter):
                 return True
         return False
 
-    def _isSecondaryDominant(self, romanNumeral):
-        if romanNumeral.secondaryRomanNumeral:
-            return True
-        else:
-            return False
-
+    @staticmethod
+    def _isSixth(chordSymbol):
+        notes = chordSymbol.notes
+        root = chordSymbol.root()
+        for note in notes:
+            triadInterval = note.pitch.ps - root.ps
+            if triadInterval == 9:
+                return True
+        return False
 
     def _getRomanNumeral(self, number, key, chordSymbol=None):
         numeral = None
