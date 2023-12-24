@@ -8,7 +8,6 @@
   "fontSizeChordsPerFontSizeNotes": 1.2,
   "barSpacePerCapsize":  1.33,
   "overlapFactor":  0.5,
-  "chordToneRatio": 2.5,
   "widthA4": 8.27,
   "heightA4": 11.69,
   "widthMarginLine": 0.025,
@@ -59,6 +58,8 @@
   "chordVerbosity": 2,
   "forceMinor": false,
   "romanNumerals": false,
-  "numbersRelativeToChord": false
+  "numbersRelativeToChord": false,
+  "ignoreSecondaryDominants": [],
+  "manualSecondaryChords": []
 }
 

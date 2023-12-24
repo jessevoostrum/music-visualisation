@@ -27,7 +27,6 @@ class Settings:
         self.fontSizeChordsPerFontSizeNotes = settings['fontSizeChordsPerFontSizeNotes']
         self.barSpacePerCapsize = settings['barSpacePerCapsize']
         self.overlapFactor = settings['overlapFactor']
-        self.chordToneRatio = settings['chordToneRatio']
         self.widthA4 = settings['widthA4']
         self.heightA4 = settings['heightA4']
         self.widthMarginLine = settings['widthMarginLine']
@@ -72,8 +71,10 @@ class Settings:
         self.forceMinor = settings["forceMinor"]
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
+        self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
+        self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
 
-        # Font stuff
+        ### Font stuff
 
         self.fontDirectory = settings['fontDirectory']
         self.fontPath = settings["fontPath"]
@@ -146,6 +147,7 @@ class Settings:
         else:
             self.facecolor = settings['facecolor2']
             self.facecolor2 = settings['facecolor']
+
 
 
     def getSettings(self):
@@ -235,6 +237,35 @@ class Settings:
     def _getLengthFirstMeasure(self):
         length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
         return length
+
+    def _convertMeasureChordIdcsToGlobalIdcs(self, measureChordIdcs):
+        globalChordIdcs = []
+        for measureChordIdx in measureChordIdcs:
+            globalChordIdx = self._measureChordIdxToGlobalChordIdx(measureChordIdx)
+            globalChordIdcs.append(globalChordIdx)
+        return globalChordIdcs
+
+    def _makeManualSecondaryChordDict(self, manualSecondaryChords):
+        manualSecondaryChordDict = {}
+        for manualSecondaryChord in manualSecondaryChords:
+            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualSecondaryChord[0])
+            manualSecondaryChordDict[str(globalChordlIdx)] = {
+                "root": manualSecondaryChord[1],
+                "target": manualSecondaryChord[2],
+                "accidentalRoot": manualSecondaryChord[3] if len(manualSecondaryChord) > 3 else None,
+                "accidentalTarget": manualSecondaryChord[4] if len(manualSecondaryChord) > 3 else None,
+            }
+        print(manualSecondaryChordDict)
+        return manualSecondaryChordDict
+
+    def _measureChordIdxToGlobalChordIdx(self, measureChordIdx):
+        globalChordIdx = 0
+        for measure in self.streamObj[music21.stream.Measure]:
+            if measure.number == measureChordIdx[0]:
+                return globalChordIdx + measureChordIdx[1]
+            globalChordIdx += len(measure[music21.harmony.ChordSymbol])
+
+
 
 class FontSettings:
 
