@@ -49,7 +49,8 @@ class Plotter:
         letter = f"$\\mathregular{{{letter}}}$"
 
         if key.mode == 'minor':
-            letter += '-'
+            enDash = u'\u2013'
+            letter += enDash
 
         return letter
 

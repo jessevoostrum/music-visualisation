@@ -113,8 +113,8 @@ class Settings:
         self.capsizeLyric = fDLyrics["capsize"] * self.fontSizeLyrics
         self.fontWidthLyric = fDLyrics["width"] * self.fontSizeLyrics
 
-        self.fontSizeType = settings['fontSizeTypeRelative'] * self.fontSizeChords
-        self.fontSizeTypeSmall = settings['fontSizeTypeSmallRelative'] * self.fontSizeType
+        self.fontSizeType = settings['fontSizeTypePerFontSizeChord'] * self.fontSizeChords
+        self.fontSizeTypeSmall = settings['fontSizeTypeSmallPerFontSizeType'] * self.fontSizeType
 
         self.fontSettings = FontSettings(self.font, self.fontSizeType)
 
@@ -290,7 +290,7 @@ class FontSettings:
         self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
         self.widthDelta = fontSettings["widthDeltaRelative"] * fontSizeType
         self.widthCircle = fontSettings["widthCircleRelative"] * fontSizeType
-        self.spaceAddSus = fontSettings["spaceAddSusRelative"] * fontSizeType
+        self.spaceAfterAddSus = fontSettings["spaceAfterAddSusRelative"] * fontSizeType
         self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
         self.hDistanceChordAddition = fontSettings['hDistanceChordAdditionRelative'] * fontSizeType
         self.positionSlashRelative = fontSettings["positionSlashRelative"]

@@ -29,6 +29,8 @@ class PlotterChords(Plotter):
                 if not self.Settings.romanNumerals:
                     widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
 
+                    print(chord)
+
                     self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
 
                     self._plotBass(chord, xPos, yPos, page)
@@ -80,6 +82,7 @@ class PlotterChords(Plotter):
         return xPos
 
     def _plotTypes(self, chordSymbol, xPos, yPos, page):
+        print('xPosStart', xPos)
         chordTypes = self._getTypeList(chordSymbol)
 
         for i, chordType in enumerate(chordTypes):
@@ -117,32 +120,39 @@ class PlotterChords(Plotter):
                     if i == 0:
                         xPos -= 0.7 * self.Settings.fontSettings.accidentalSpace
                     width = self._plotTypeAugmented(xPos, yPos, page)
-                if chordType == 'flat-five':
-                    width = self._plotTypeFlatFive(xPos, yPos, page)
                 if chordType == 'suspended-second':
                     width = self._plotTypeSuspendedSecond(xPos, yPos, page)
                 if chordType == 'suspended-fourth':
                     width = self._plotTypeSuspendedFourth(xPos, yPos, page)
             xPos += width
+            print(width)
+            print('xPosEnd', xPos)
         return xPos
 
     def _plotModifications(self, chordSymbol, xPos, yPos, page):
 
-        if self.Settings.chordVerbosity > 0:
+        noTypesPrinted = self._noTypesPrinted(chordSymbol)
 
-            for csMod in chordSymbol.chordStepModifications:
+        if self.Settings.chordVerbosity > 0:
+            firstAdd = True
+            for i, csMod in enumerate(chordSymbol.chordStepModifications):
                 if csMod.interval is not None:
                     width = 0
                     if csMod.modType == 'add':
                         if self.Settings.chordVerbosity == 1:
-                            break
-                        # width = self._plotModificationAdd(xPos, yPos, page)
+                            continue
+                        if not firstAdd:
+                            width = self._plotComma(xPos, yPos, page)
+                        if noTypesPrinted and firstAdd:
+                            width = self._plotModificationAdd(xPos, yPos, page)
+                            firstAdd = False
                     if csMod.modType == 'subtract':
                         if self.Settings.chordVerbosity == 1:
-                            break
-                        # width = self._plotModificationSubtract(xPos, yPos, page)
+                            continue
+                        width = self._plotModificationSubtract(xPos, yPos, page)
                     if csMod.modType == 'alter':
-                        pass
+                        if noTypesPrinted:
+                            xPos -= 0.7 * self.accidentalSpace
                         # width = self._plotModificationAlter(xPos, yPos, page)
 
                     xPos += width
@@ -155,18 +165,15 @@ class PlotterChords(Plotter):
                     if csMod.interval.semitones == 1:
                         accidental = music21.pitch.Accidental('sharp')
 
-                    if accidental:
-                        xPos -= 0.003
-
+                    print('xPosModification', xPos)
                     width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
-                    width += 0.002
 
                     xPos += width
             return xPos
 
     def _plotTypeAndModificationNumberAndAccidental(self, number, accidental, xPos, yPos, page):
 
-        if self.Settings.fontVShift:
+        if self.Settings.fontVShift:  # this is for fonts that are not placed exactly on the baseline (vertically)
             yPos += self.Settings.fontVShift * self.Settings.capsizeNumberRelative * self.fontSizeType
 
         width = 0
@@ -185,13 +192,14 @@ class PlotterChords(Plotter):
 
     def _plotTypeMinor(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos + 0.00005 * self.fontSizeType,
-                            "-", fontsize = self.fontSizeType,
+                            u'\u2013', fontsize=self.fontSizeType,
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthMinus
 
     def _plotTypeMajor(self, xPos, yPos, page):
-        self.axs[page].text(xPos + 0.001, yPos - 0.00035,  # - 0.0005
-                            "$\mathbb{\Delta}$", fontsize=self.fontSizeType,
+        self.axs[page].text(xPos + 0.0001 * self.fontSizeType,
+                            yPos - 0.0006,  # symbol has an absolute bias (not relative to font size)
+                            "$\mathbb{\Delta}$", fontsize=self.fontSizeType, math_fontfamily='cm',
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthDelta
 
@@ -202,8 +210,9 @@ class PlotterChords(Plotter):
         return self.Settings.fontSettings.widthCircle
 
     def _plotTypeDiminished(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos - 0.0014,
-                            "$\\circ$", fontsize=self.fontSizeType*1.5, fontstyle='normal', math_fontfamily='cm',
+        self.axs[page].text(xPos, yPos - 0.00017 * self.fontSizeType,
+                            "$\\circ$", fontsize=self.fontSizeType*1.5, #fontstyle='normal',
+                            math_fontfamily='cm',
                             va='baseline', ha='left')
         return self.Settings.fontSettings.widthCircle + 0.0003
 
@@ -229,7 +238,6 @@ class PlotterChords(Plotter):
 
     def _plotTypeAugmented(self, xPos, yPos, page):
         xPos += self.accidentalSpace
-
         accidental = music21.pitch.Accidental('sharp')
         self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
 
@@ -238,23 +246,9 @@ class PlotterChords(Plotter):
                             va='baseline', ha='left')
         return self.width + self.accidentalSpace
 
-    def _plotTypeFlatFive(self, xPos, yPos, page):
-        accidental = music21.pitch.Accidental('flat')
-        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
-
-        self.axs[page].text(xPos, yPos,
-                            "5", fontsize=self.fontSizeType,
-                            va='baseline', ha='left')
-        return self.width
-
     def _plotTypeSuspendedSecond(self, xPos, yPos, page):
 
-
-        self.axs[page].text(xPos, yPos,
-                            "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
-
-        widthSus = self.Settings.fontSettings.spaceAddSus
+        widthSus = self._plotSus(xPos, yPos, page)
 
         xPos2 = xPos + widthSus
 
@@ -265,11 +259,7 @@ class PlotterChords(Plotter):
         return self.width + widthSus
 
     def _plotTypeSuspendedFourth(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
-                            "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
-
-        widthSus = self.Settings.fontSettings.spaceAddSus
+        widthSus = self._plotSus(xPos, yPos, page)
 
         xPos4 = xPos + widthSus
 
@@ -279,11 +269,18 @@ class PlotterChords(Plotter):
 
         return self.width + widthSus
 
+    def _plotSus(self, xPos, yPos, page):
+        plottedObject = self.axs[page].text(xPos, yPos,
+                            "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+
+        return self._getPlottedWidth(page, plottedObject) + self.Settings.fontSettings.spaceAfterAddSus
+
     def _plotModificationAdd(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos,
+        plottedObject = self.axs[page].text(xPos, yPos,
                             "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
                             va='baseline', ha='left')
-        return self.Settings.fontSettings.spaceAddSus
+        return self._getPlottedWidth(page, plottedObject) + self.Settings.fontSettings.spaceAfterAddSus
 
     def _plotModificationSubtract(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
@@ -297,9 +294,15 @@ class PlotterChords(Plotter):
                             va='baseline', ha='left')
         return self.Settings.fontSettings.spaceAddSus
 
+    def _plotComma(self, xPos, yPos, page):
+        plottedObject = self.axs[page].text(xPos, yPos,
+                            ",", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
+                            va='baseline', ha='left')
+        return self._getPlottedWidth(page, plottedObject)
+
     @staticmethod
     def _getTypeList(chordSymbol):
-
+        # see: https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/kind-value/
         chordType = chordSymbol.chordKind
 
         # use the alias of the chord type that is used by music21
@@ -329,8 +332,6 @@ class PlotterChords(Plotter):
 
         if 'augmented' in chordType:
             types.append("augmented")
-        if 'flat-five' in chordType:
-            types.append("flat-five")
 
         if 'suspended-second' in chordType:
             types.append("suspended-second")
@@ -425,8 +426,7 @@ class PlotterChords(Plotter):
     def _getPlottedWidth(self, page, plottedObject):
         renderer = self.axs[page].figure._get_renderer()
         bb = plottedObject.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
-        widthNumber = bb.width
-        return widthNumber
+        return bb.width
 
     def _plotSecondaryTargetNumeral(self, chordSymbol, xPos, yPos, page, idxChord):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
@@ -582,6 +582,13 @@ class PlotterChords(Plotter):
             if relativeChord[i] % 12 != relativePitch:
                 return False
         return True
+
+    def _noTypesPrinted(self, chordSymbol):
+        chordTypes = self._getTypeList(chordSymbol)
+        if len(chordTypes) == 0 or chordTypes == ['major'] or chordTypes == ['minor']:
+            return True
+        else:
+            return False
 
     def _getRomanNumeral(self, number, key, chordSymbol=None):
         numeral = None

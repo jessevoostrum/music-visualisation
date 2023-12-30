@@ -20,8 +20,7 @@ class Visualiser:
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
-        yPosLowest = self.LocationFinder.getYPosLineBase(-1)
-        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages(), yPosLowest)
+        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
@@ -31,15 +30,16 @@ class Visualiser:
         return self.PlotterMain.PlotterMetadata.getSongTitle()
 
     def saveFig(self, dirName=None, buffer=None):
+        yPosLowest = self.LocationFinder.getYPosLineBase(-1) + self.Settings.yMin
         if buffer:
-            self.CanvasCreator.saveFig(buffer)
+            self.CanvasCreator.saveFig(buffer, yPosLowest)
         else:
             title = self.getSongTitle()
             if not dirName:
                 pathName = title + '.pdf'
             else:
                 pathName = dirName + '/' + title + '.pdf'
-            self.CanvasCreator.saveFig(pathName)
+            self.CanvasCreator.saveFig(pathName, yPosLowest)
 
     def _preprocessStreamObj(self, streamObj):
 

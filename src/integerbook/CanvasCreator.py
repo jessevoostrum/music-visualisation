@@ -6,7 +6,7 @@ from matplotlib.transforms import Bbox
 from matplotlib.figure import Figure
 
 class CanvasCreator:
-    def __init__(self, Settings, numPages, yPosLowest):
+    def __init__(self, Settings, numPages):
 
         self.Settings = Settings
 
@@ -32,17 +32,16 @@ class CanvasCreator:
 
         self._createCanvas(numPages)
 
-        self.yPosLowest = yPosLowest
 
 
 
-    def saveFig(self, pathName):
+    def saveFig(self, pathName, yPosLowest):
 
         with PdfPages(pathName) as pdf:
             for fig in self.figs:
-                yLengthAboveTitle = 1 - self.Settings.yPosTitle
-                if len(self.figs) == 1 and self.yPosLowest >= 0.55 and self.Settings.saveCropped:
-                    heightStart = self.Settings.heightA4 * (self.yPosLowest - yLengthAboveTitle)
+                yLengthAboveTitle = 1 - self.Settings.yPosTitle  # plotTitle has vertical alignment = top
+                if len(self.figs) == 1 and yPosLowest >= 0.55 and self.Settings.saveCropped:
+                    heightStart = self.Settings.heightA4 * (yPosLowest - yLengthAboveTitle)
                     bbox = Bbox([[0, heightStart], [self.Settings.widthA4, self.Settings.heightA4]])
                     pdf.savefig(fig, bbox_inches=bbox)
                 else:

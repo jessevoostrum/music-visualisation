@@ -79,9 +79,10 @@ class PlotterNotes(Plotter):
         for chord in chords:
             if type(chord) == music21.chord.Chord:
                 measure = chord.containerHierarchy()[0]
+                offset = chord.getOffsetInHierarchy(self.streamObj)
                 for note in chord.notes:
                     noteNext = None
-                    self._plotNote(note, noteNext, measure, offset=chord.getOffsetInHierarchy(self.streamObj))
+                    self._plotNote(note, noteNext, measure, offset)
 
     def plotChordNotes(self):
 

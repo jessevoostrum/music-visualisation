@@ -29,7 +29,7 @@ class PlotterMain:
     def plot(self):
 
         self.PlotterMetadata.plotMetadata()
-        rc('text.latex', preamble=r'\usepackage{amssymb}')
+        # rc('text.latex', preamble=r'\usepackage{amssymb}')
         if self.Settings.plotMelody:
             self.PlotterNotes.plotNotes()
         if self.Settings.plotChordTones:

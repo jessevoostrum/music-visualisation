@@ -6,6 +6,8 @@
   "fontSizeMetadata": 10,
   "fontSizeLyrics": 6,
   "fontSizeChordsPerFontSizeNotes": 1.2,
+  "fontSizeTypePerFontSizeChord": 0.8333,
+  "fontSizeTypeSmallPerFontSizeType": 0.8,
   "barSpacePerCapsize":  1.33,
   "overlapFactor":  0.5,
   "widthA4": 8.27,
@@ -53,12 +55,11 @@
   "plotChordTones": false,
   "vMarginLyricsRelative": 0.25,
   "alternativeSymbols": false,
-  "fontSizeTypeRelative": 0.8333,
-  "fontSizeTypeSmallRelative": 0.8,
   "chordVerbosity": 2,
   "forceMinor": false,
   "romanNumerals": false,
   "numbersRelativeToChord": false,
+  "manualRomanNumerals": [],
   "ignoreSecondaryDominants": [],
   "manualSecondaryChords": []
 }
