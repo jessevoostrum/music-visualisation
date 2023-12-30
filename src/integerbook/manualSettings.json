@@ -1,0 +1,21 @@
+{
+  "The_Christmas_Song_1538abdd-35a0-4a29-aa7c-f37a93b33673.musicxml":{
+    "manualSecondaryChords": [[[6, 1], "ii", "III"],
+                             [[6, 2], "V", "III"],
+                             [[7,1], "ii", "III", null, "flat"],
+                             [[7,2], "V", "III", null, "flat"],
+                             [[24, 1], "ii", "iii"]
+                             ]
+  },
+  "Let_It_Snow_235c3558-b290-41fc-9f4f-c89d9d956bdc.musicxml": {
+    "ignoreSecondaryDominants": [[15, 1], [15, 2], [15, 3]]
+  },
+  "Autumn_Leaves_18ae0812-5600-4fcc-8a30-170c9edcd876.musicxml": {
+    "manualRomanNumerals": [
+      [[1,0], "ii", null],
+      [[2,0], "V", null],
+      [[3,0], "I", null],
+      [[4,0], "IV", null]
+    ]
+  }
+}

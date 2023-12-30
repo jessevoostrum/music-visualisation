@@ -347,7 +347,13 @@ class PlotterNotes(Plotter):
 
     def _adjustVisualParameters(self, el, key, isChordNote=False):
 
-        facecolor = self.Settings.facecolor
+        if key.mode == 'major':
+            facecolor = self.Settings.facecolorMajor
+            facecolor2 = self.Settings.facecolorMinor
+        if key.mode == 'minor':
+            facecolor = self.Settings.facecolorMinor
+            facecolor2 = self.Settings.facecolorMajor
+
         alpha = self.Settings.alpha
         hatch = None
 
@@ -364,7 +370,7 @@ class PlotterNotes(Plotter):
 
         elif self.Settings.coloursVoices:
             if self.isSecondVoice(el):
-                facecolor = self.Settings.facecolor2
+                facecolor = facecolor2
 
         # ghost note
         if el.notehead == 'x':

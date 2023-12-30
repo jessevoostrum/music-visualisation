@@ -46,10 +46,10 @@ class Plotter:
             elif accidental.name == 'flat':
                 letter = letter + "{}^b"
 
+        letter = f"$\\mathregular{{{letter}}}$"
+
         if key.mode == 'minor':
             letter += '-'
-
-        letter = f"$\\mathregular{{{letter}}}$"
 
         return letter
 

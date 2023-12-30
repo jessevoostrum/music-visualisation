@@ -282,8 +282,6 @@ class PlotterBarLines(Plotter):
 
             key = self.Settings.getKey(offset)
             letter = self._getKeyLetter(key)
-            if key.mode == 'minor':
-                letter += "-"
             self.axs[page].text(xPos, yPos, f"1 = {letter}", fontsize=self.Settings.fontSizeNotes,
                                 va='baseline', ha='left')
 

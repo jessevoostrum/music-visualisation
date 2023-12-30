@@ -401,14 +401,15 @@ class PlotterChords(Plotter):
     def _plotRomanNumeral(self, chordSymbol, xPos, yPos, page, idxChord, chords):
 
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
-        if offsetEl == 80:
-            pass
         key = self.Settings.getKey(offsetEl)
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
 
         chordNumber = self._getRomanNumeral(number, key, chordSymbol)
+        if str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
+            chordNumber = self.Settings.manualRomanNumeralDict[str(idxChord)]['numeral']
+            accidental = self.Settings.manualRomanNumeralDict[str(idxChord)]['accidental']
 
-        if self._isSecondaryChord(chordSymbol, key, idxChord):
+        elif self._isSecondaryChord(chordSymbol, key, idxChord):
             chordNumber = self._rootSecondaryChord(idxChord)
             accidental = self._accidentalRootSecondaryChord(idxChord)
 
@@ -444,7 +445,7 @@ class PlotterChords(Plotter):
             self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
     def _isSecondaryChord(self, chordSymbol, key, idxChord):
-        if idxChord in self.Settings.ignoreSecondaryDominants:
+        if idxChord in self.Settings.ignoreSecondaryDominants or str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
             return False
         if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
             return True
@@ -486,11 +487,18 @@ class PlotterChords(Plotter):
                 self._rootEqualsBass(chordSymbol):
             number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
             if not accidental:
-                if number == 1:
-                    if self._hasDominantSeventh(chordSymbol):
+                if key.mode == 'major':
+                    if number == 1:
+                        if self._hasDominantSeventh(chordSymbol):
+                            return True
+                    if number in [6, 7, 2, 3]:   # see Mulholland page 40. this corresponds to V/ii, V/iii, etc.
                         return True
-                if number in [6, 7, 2, 3]:   # see Mulholland page 40. this corresponds to V/ii, V/iii, etc.
-                    return True
+                if key.mode == 'minor':
+                    if number == 3:
+                        if self._hasDominantSeventh(chordSymbol):
+                            return True
+                    if number in [2, 1, 7]:  # less common secondary dominants (see Mulholland p101) are not implemented
+                        return True
         return False
 
     def _targetSecondaryDominant(self, chordSymbol, key):
@@ -571,11 +579,7 @@ class PlotterChords(Plotter):
     def _chordsEqual(relativeChord, absoluteChord, pitchKey):
         for i in range(min(len(absoluteChord), 4)):
             relativePitch = (absoluteChord[i] - pitchKey) % 12
-            # print(relativeChord[i], relativePitch)
-            # print(i)
-            # print(relativeChord)
             if relativeChord[i] % 12 != relativePitch:
-                # print(i)
                 return False
         return True
 

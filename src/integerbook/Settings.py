@@ -71,6 +71,7 @@ class Settings:
         self.forceMinor = settings["forceMinor"]
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
+        self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(settings["manualRomanNumerals"])
         self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
         self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
 
@@ -138,15 +139,9 @@ class Settings:
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
 
-        self.firstKey = self.getKey(0)
+        self.facecolorMajor = settings['facecolor']
+        self.facecolorMinor = settings['facecolor2']
 
-        if self.firstKey.mode == 'major':
-            self.facecolor = settings['facecolor']
-            self.facecolor2 = settings['facecolor2']
-
-        else:
-            self.facecolor = settings['facecolor2']
-            self.facecolor2 = settings['facecolor']
 
 
 
@@ -165,7 +160,6 @@ class Settings:
                     break
 
         if not lastKey:
-            # print('no key signature')
             try:
                 lastKey = self.streamObj.analyze('key')
             except:
@@ -255,8 +249,17 @@ class Settings:
                 "accidentalRoot": manualSecondaryChord[3] if len(manualSecondaryChord) > 3 else None,
                 "accidentalTarget": manualSecondaryChord[4] if len(manualSecondaryChord) > 3 else None,
             }
-        print(manualSecondaryChordDict)
         return manualSecondaryChordDict
+
+    def _makeManualRomanNumeralDict(self, manualRomanNumerals):
+        manualRomanNumeralDict = {}
+        for manualRomanNumeral in manualRomanNumerals:
+            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualRomanNumeral[0])
+            manualRomanNumeralDict[str(globalChordlIdx)] = {
+                "numeral": manualRomanNumeral[1],
+                "accidental": manualRomanNumeral[2] if len(manualRomanNumeral) > 2 else None,
+            }
+        return manualRomanNumeralDict
 
     def _measureChordIdxToGlobalChordIdx(self, measureChordIdx):
         globalChordIdx = 0
