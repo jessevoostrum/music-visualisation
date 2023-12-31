@@ -1,6 +1,10 @@
+import math
+
 import music21
 
 from integerbook.plotter.PlotterBase import Plotter
+from matplotlib.patches import Ellipse, Polygon
+
 
 
 class PlotterChords(Plotter):
@@ -100,13 +104,12 @@ class PlotterChords(Plotter):
                 if chordType == "major" and len(chordTypes) != 1 and chordTypes[i+1] != 'sixth':
                     width = self._plotTypeMajor(xPos, yPos, page)
                 if chordType == 'half-diminished':
-                    width = self._plotTypeHalfDiminished(xPos, yPos, page)
+                    width = self._plotTypeDiminishedOrHalfDiminished(xPos, yPos, page, halfDiminished=True)
                 if chordType == 'diminished':
-                    width = self._plotTypeDiminished(xPos, yPos, page)
+                    width = self._plotTypeDiminishedOrHalfDiminished(xPos, yPos, page, halfDiminished=False)
 
                 if chordType == "sixth":
                     width = self._plotTypeSixth(xPos, yPos, page)
-
                 if chordType == "seventh":
                     width = self._plotTypeSeventh(xPos, yPos, page)
                 if chordType == "ninth":
@@ -197,24 +200,70 @@ class PlotterChords(Plotter):
         return self.Settings.fontSettings.widthMinus
 
     def _plotTypeMajor(self, xPos, yPos, page):
-        self.axs[page].text(xPos + 0.0001 * self.fontSizeType,
-                            yPos - 0.0006,  # symbol has an absolute bias (not relative to font size)
-                            "$\mathbb{\Delta}$", fontsize=self.fontSizeType, math_fontfamily='cm',
-                            va='baseline', ha='left')
-        return self.Settings.fontSettings.widthDelta
+        xShift = 0.0002 * self.fontSizeType
+        spaceAfter = 0.000082 * self.fontSizeType
+        height = self.Settings.capsizeType * .9
+        width = 0.00095 * self.fontSizeType
 
-    def _plotTypeHalfDiminished(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos - 0.00034,
-                            "$\\varnothing$", fontsize=self.fontSizeTypeSmall, math_fontfamily='dejavusans',
-                            va='baseline', ha='left')
-        return self.Settings.fontSettings.widthCircle
+        xPos += xShift
+        corners = [(xPos, yPos),
+                   (xPos + width/2, yPos + height),
+                   (xPos + width, yPos)]
+        patch = Polygon(corners, fill=True, color='black', linewidth=0)
+        self.axs[page].add_patch(patch)
 
-    def _plotTypeDiminished(self, xPos, yPos, page):
-        self.axs[page].text(xPos, yPos - 0.00017 * self.fontSizeType,
-                            "$\\circ$", fontsize=self.fontSizeType*1.5, #fontstyle='normal',
-                            math_fontfamily='cm',
-                            va='baseline', ha='left')
-        return self.Settings.fontSettings.widthCircle + 0.0003
+        linewidth0 = 0.0001 * self.fontSizeType # bottom
+        linewidth1 = 0.0001 * self.fontSizeType
+        linewidth2 = 0.0001 * self.fontSizeType
+
+        angle = math.atan(height / (width/2))
+        x0 = linewidth0 / math.tan(angle)
+        x1 = linewidth1 / math.sin(angle)
+        x2 = linewidth2 / math.sin(angle)
+
+        x3 = (x1 + x2) / 2 - x1
+        y3 = math.tan(angle) * ((x1 + x2)/2)
+
+        innerCorners = [(corners[0][0] + x1 + x0, corners[0][1] + linewidth0),
+                   (corners[1][0] - x3, corners[1][1] - y3),
+                   (corners[2][0] - x2 - x0, corners[2][1] + linewidth0)]
+        patchInner = Polygon(innerCorners, fill=True, color='white', linewidth=0)
+        self.axs[page].add_patch(patchInner)
+
+        # self.axs[page].text(xPos + 0.0001 * self.fontSizeType,
+        #                     yPos - 0.0006,  # symbol has an absolute bias (not relative to font size)
+        #                     "$\mathbb{\Delta}$", fontsize=self.fontSizeType, math_fontfamily='cm',
+        #                     va='baseline', ha='left')
+        return xShift + width + spaceAfter
+
+    def _plotTypeDiminishedOrHalfDiminished(self, xPos, yPos, page, halfDiminished=False):
+        xShift = 0.0002 * self.fontSizeType
+        spaceAfter = 0.00012 * self.fontSizeType
+        linewidth = 0.0001 * self.fontSizeType
+        diameter = self.Settings.capsizeType * 0.73
+        yShift = linewidth * 0.001
+        radius = diameter / 2
+        xyRatio = self.Settings.widthA4 / self.Settings.heightA4
+        xCenter = xPos + radius + xShift
+        yCenter = yPos + radius + yShift
+        patch1 = Ellipse((xCenter, yCenter), width=diameter / xyRatio,
+                         height=diameter, color='black', linewidth=0)
+        patch2 = Ellipse((xCenter, yCenter), width=(diameter-linewidth) / xyRatio,
+                        height=diameter-linewidth, color='white', linewidth=0)
+        self.axs[page].add_patch(patch1)
+        self.axs[page].add_patch(patch2)
+
+        if halfDiminished:
+            linewidthLine = linewidth * .5
+            corners = [(xCenter - radius, yCenter - radius),
+                       (xCenter + radius - linewidthLine, yCenter + radius),
+                       (xCenter + radius, yCenter + radius),
+                       (xCenter - radius + linewidthLine, yCenter - radius),]
+
+            patch3 = Polygon(corners, fill=True, color='black', linewidth=0)
+            self.axs[page].add_patch(patch3)
+
+        return diameter + xShift + spaceAfter
 
     def _plotTypeSixth(self, xPos, yPos, page):
         width = self._plotTypeAndModificationNumberAndAccidental(6, None, xPos, yPos, page)
