@@ -5,6 +5,9 @@ import music21
 from integerbook.plotter.PlotterBase import Plotter
 from matplotlib.patches import Ellipse, Polygon
 
+from integerbook.plotter.patches import Triangle
+
+
 
 
 class PlotterChords(Plotter):
@@ -32,8 +35,6 @@ class PlotterChords(Plotter):
             if chord.chordKind != 'none':    # not N.C.
                 if not self.Settings.romanNumerals:
                     widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
-
-                    print(chord)
 
                     self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
 
@@ -86,7 +87,6 @@ class PlotterChords(Plotter):
         return xPos
 
     def _plotTypes(self, chordSymbol, xPos, yPos, page):
-        print('xPosStart', xPos)
         chordTypes = self._getTypeList(chordSymbol)
 
         for i, chordType in enumerate(chordTypes):
@@ -128,8 +128,6 @@ class PlotterChords(Plotter):
                 if chordType == 'suspended-fourth':
                     width = self._plotTypeSuspendedFourth(xPos, yPos, page)
             xPos += width
-            print(width)
-            print('xPosEnd', xPos)
         return xPos
 
     def _plotModifications(self, chordSymbol, xPos, yPos, page):
@@ -168,7 +166,6 @@ class PlotterChords(Plotter):
                     if csMod.interval.semitones == 1:
                         accidental = music21.pitch.Accidental('sharp')
 
-                    print('xPosModification', xPos)
                     width = self._plotTypeAndModificationNumberAndAccidental(number, accidental, xPos, yPos, page)
 
                     xPos += width
@@ -206,64 +203,50 @@ class PlotterChords(Plotter):
         width = 0.00095 * self.fontSizeType
 
         xPos += xShift
-        corners = [(xPos, yPos),
-                   (xPos + width/2, yPos + height),
-                   (xPos + width, yPos)]
-        patch = Polygon(corners, fill=True, color='black', linewidth=0)
-        self.axs[page].add_patch(patch)
 
-        linewidth0 = 0.0001 * self.fontSizeType # bottom
-        linewidth1 = 0.0001 * self.fontSizeType
-        linewidth2 = 0.0001 * self.fontSizeType
+        patches = Triangle(xPos, yPos, height, width, self.Settings.xyRatio)
 
-        angle = math.atan(height / (width/2))
-        x0 = linewidth0 / math.tan(angle)
-        x1 = linewidth1 / math.sin(angle)
-        x2 = linewidth2 / math.sin(angle)
+        for patch in patches:
+            self.axs[page].add_patch(patch)
 
-        x3 = (x1 + x2) / 2 - x1
-        y3 = math.tan(angle) * ((x1 + x2)/2)
-
-        innerCorners = [(corners[0][0] + x1 + x0, corners[0][1] + linewidth0),
-                   (corners[1][0] - x3, corners[1][1] - y3),
-                   (corners[2][0] - x2 - x0, corners[2][1] + linewidth0)]
-        patchInner = Polygon(innerCorners, fill=True, color='white', linewidth=0)
-        self.axs[page].add_patch(patchInner)
-
-        # self.axs[page].text(xPos + 0.0001 * self.fontSizeType,
-        #                     yPos - 0.0006,  # symbol has an absolute bias (not relative to font size)
-        #                     "$\mathbb{\Delta}$", fontsize=self.fontSizeType, math_fontfamily='cm',
-        #                     va='baseline', ha='left')
         return xShift + width + spaceAfter
 
+
+
     def _plotTypeDiminishedOrHalfDiminished(self, xPos, yPos, page, halfDiminished=False):
-        xShift = 0.0002 * self.fontSizeType
+        xShift = 0.0001 * self.fontSizeType
         spaceAfter = 0.00012 * self.fontSizeType
-        linewidth = 0.0001 * self.fontSizeType
-        diameter = self.Settings.capsizeType * 0.73
-        yShift = linewidth * 0.001
-        radius = diameter / 2
+        linewidthY = 0.00005 * self.fontSizeType
+        diameterY = self.Settings.capsizeType * 0.73
+
+        radiusY = diameterY / 2
         xyRatio = self.Settings.widthA4 / self.Settings.heightA4
-        xCenter = xPos + radius + xShift
-        yCenter = yPos + radius + yShift
-        patch1 = Ellipse((xCenter, yCenter), width=diameter / xyRatio,
-                         height=diameter, color='black', linewidth=0)
-        patch2 = Ellipse((xCenter, yCenter), width=(diameter-linewidth) / xyRatio,
-                        height=diameter-linewidth, color='white', linewidth=0)
+
+        diameterX = diameterY / xyRatio
+        radiusX = diameterX / 2
+        linewidthX = linewidthY / xyRatio
+
+        xCenter = xPos + radiusX + xShift
+        yCenter = yPos + radiusY
+
+        patch1 = Ellipse((xCenter, yCenter), width=diameterX,
+                         height=diameterY, color='black', linewidth=0)
+        patch2 = Ellipse((xCenter, yCenter), width=diameterX - 2 * linewidthX,
+                        height=diameterY - 2 * linewidthY, color='white', linewidth=0)
         self.axs[page].add_patch(patch1)
         self.axs[page].add_patch(patch2)
 
         if halfDiminished:
-            linewidthLine = linewidth * .5
-            corners = [(xCenter - radius, yCenter - radius),
-                       (xCenter + radius - linewidthLine, yCenter + radius),
-                       (xCenter + radius, yCenter + radius),
-                       (xCenter - radius + linewidthLine, yCenter - radius),]
+            linewidthLine = linewidthX * .5
+            corners = [(xCenter - radiusX, yCenter - radiusY),
+                       (xCenter + radiusX - linewidthLine, yCenter + radiusY),
+                       (xCenter + radiusX, yCenter + radiusY),
+                       (xCenter - radiusX + linewidthLine, yCenter - radiusY),]
 
             patch3 = Polygon(corners, fill=True, color='black', linewidth=0)
             self.axs[page].add_patch(patch3)
 
-        return diameter + xShift + spaceAfter
+        return diameterX + xShift + spaceAfter
 
     def _plotTypeSixth(self, xPos, yPos, page):
         width = self._plotTypeAndModificationNumberAndAccidental(6, None, xPos, yPos, page)

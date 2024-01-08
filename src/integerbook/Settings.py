@@ -29,6 +29,7 @@ class Settings:
         self.overlapFactor = settings['overlapFactor']
         self.widthA4 = settings['widthA4']
         self.heightA4 = settings['heightA4']
+        self.xyRatio = self.widthA4 / self.heightA4
         self.widthMarginLine = settings['widthMarginLine']
         self.xMinimalPickupMeasureSpaceFraction = settings['xMinimalPickupMeasureSpaceFraction']
         self.vMarginLineTop = settings['vMarginLineTop']
@@ -121,8 +122,6 @@ class Settings:
 
         self.capsizeType = fD["capsize"] * self.fontSizeType
 
-        self.fontSizeSegno = self.capsizeNumberRelative / fontDimensions["segno"] * self.fontSizeNotes
-        self.fontSizeCoda = self.capsizeNumberRelative / fontDimensions["coda"] * self.fontSizeNotes
         self.numLinesLyrics = self._countNumLinesLyrics()
         self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
         self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative

@@ -2,16 +2,13 @@ import os
 import inspect
 import music21
 from matplotlib.patches import Ellipse, Rectangle
-import matplotlib.font_manager as fm
 import numpy as np
 from contextlib import nullcontext
 import matplotlib.pyplot as plt
 
+from integerbook.plotter.patches import Segno, relativeWidthSegno, Coda
+
 from integerbook.plotter.PlotterBase import Plotter
-
-fontDirectory = os.path.join(os.path.dirname(__file__), '../fonts/')
-fontPropertiesSymbola = fm.FontProperties(fname=fontDirectory + "symbola/Symbola.ttf")
-
 
 class PlotterBarLines(Plotter):
 
@@ -110,10 +107,6 @@ class PlotterBarLines(Plotter):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
         yPosLow = yPosLineBase + self.Settings.yMin
-        yPosHigh = yPosLineBase + self.Settings.yMax
-
-        # self.axs[page].vlines(xPos, yPosLow, yPosHigh + extension,
-        #                   linestyle='solid', linewidth=lineWidth, color='grey', zorder=.4)
 
         xPos -= 0.5 * lineWidth
 
@@ -238,33 +231,48 @@ class PlotterBarLines(Plotter):
 
 
                 if el.getOffsetInHierarchy(measure) < measure.duration.quarterLength * 0.5:
-                    ha = 'left'
                     xPos += self.Settings.xShiftChords
+                    alignRight = False
+                    ha = 'left'
                 else:
-                    ha = 'right'
                     xPos -= self.Settings.xShiftChords
-
+                    alignRight = True
+                    ha = 'right'
 
                 if el.name == 'segno':
-                    text = "𝄋"
-                    fontSize = self.Settings.fontSizeSegno
-                    fontProperties = fontPropertiesSymbola
-                    va = 'bottom'
+                    self._plotSegno(xPos, yPos, page, alignRight)
                 elif el.name == 'coda':
-                    text = '𝄌'
-                    fontSize = self.Settings.fontSizeCoda
-                    fontProperties = fontPropertiesSymbola
-                    va = 'bottom'
+                    self._plotCoda(xPos, yPos, page, alignRight)
                 else:
                     text = el.getText()
-                    fontProperties = None  # this makes sure to use default font properties
-                    fontSize = self.Settings.fontSizeNotes
-                    va = 'baseline'
+                    self.axs[page].text(xPos, yPos, text,
+                                        fontsize=self.Settings.fontSizeNotes,
+                                        ha=ha, va='baseline')
+    def _plotSegno(self, xPos, yPos, page, alignRight=True):
+        xyRatio = self.Settings.widthA4 / self.Settings.heightA4
+        height = self.Settings.capsizeNote
+        width = height / xyRatio * relativeWidthSegno()
+        if alignRight:
+            xPos -= width
 
-                self.axs[page].text(xPos, yPos, text,
-                                    fontsize=fontSize,
-                                    fontproperties=fontProperties,
-                                    va=va, ha=ha)
+        patches = Segno(xPos, yPos, height, xyRatio)
+        for patch in patches:
+            self.axs[page].add_patch(patch)
+
+
+    def _plotCoda(self, xPos, yPos, page, alignRight=True):
+
+        xyRatio = self.Settings.widthA4 / self.Settings.heightA4
+
+        height = self.Settings.capsizeNote
+        width = height / xyRatio * .85
+
+        if alignRight:
+            xPos -= width
+
+        patches = Coda(xPos, yPos, height, width, xyRatio)
+        for patch in patches:
+            self.axs[page].add_patch(patch)
 
 
     def _plotKey(self, measure):

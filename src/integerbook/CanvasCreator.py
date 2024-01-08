@@ -32,9 +32,6 @@ class CanvasCreator:
 
         self._createCanvas(numPages)
 
-
-
-
     def saveFig(self, pathName, yPosLowest):
 
         with PdfPages(pathName) as pdf:
