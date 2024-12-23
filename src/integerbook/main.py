@@ -5,7 +5,7 @@ from integerbook.plotter.PlotterMain import PlotterMain
 from integerbook.LocationFinder import LocationFinder
 from integerbook.CanvasCreator import CanvasCreator
 from integerbook.Settings import Settings
-from integerbook.utils import preprocessStreamObj
+from integerbook.preprocessStreamObj import preprocessStreamObj
 
 
 class Visualiser:
