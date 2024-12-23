@@ -140,7 +140,7 @@ class PlotterNotes(Plotter):
 
         self._plotArticulation(el, elNext)
 
-        if self.Settings.lyrics:
+        if self.Settings.plotLyrics:
             self._plotLyric(page, el, xPos, yPosLineBase)
 
     def _plotRectangle(self, page, el, xPos, xLength, yPos, key, measure, offset, measureEnd=None, isChordNote=False):

@@ -49,9 +49,12 @@
   "fontSizeAccidentalRelative": 0.7,
   "widthThickBarline": 0.003,
   "timeSignatureWithBarlines": true,
-  "lyrics": false,
+  "plotLyrics": false,
   "plotBarlines": true,
+  "plotMetadata": true,
+  "plotChords": true,
   "thickBarlines": true,
+  "extendBarlineTop": true,
   "printArranger": false,
   "plotTimeSignature": true,
   "saveCropped": false,
@@ -67,6 +70,6 @@
   "numbersRelativeToChord": false,
   "manualRomanNumerals": [],
   "ignoreSecondaryDominants": [],
-  "manualSecondaryChords": [],
+  "manualSecondaryChords": []
 }
 

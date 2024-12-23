@@ -72,10 +72,13 @@ class Settings:
         self.widthThickBarline = settings['widthThickBarline']
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
 
-        self.lyrics = settings['lyrics']
+        self.plotLyrics = settings['plotLyrics']
         self.plotBarlines = settings["plotBarlines"]
+        self.plotMetadata = settings["plotMetadata"]
+        self.plotChords = settings["plotChords"]
 
         self.thickBarlines = settings['thickBarlines']
+        self.extendBarlineTop = settings["extendBarlineTop"]
         self.printArranger = settings['printArranger']
         self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
         self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
@@ -143,7 +146,10 @@ class Settings:
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
         self.fontSizeGraceNotes = self.fontSizeGraceNotesPerFontSizeNotes * self.fontSizeNotes
 
-        self.heightBarline0Extension = self.capsizeNote
+        if self.extendBarlineTop:
+            self.heightBarline0Extension = self.capsizeNote
+        else:
+            self.heightBarline0Extension = 0
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
@@ -211,11 +217,11 @@ class Settings:
         yMin = 0
 
         chords = len(self.streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
-        if chords:
+        if chords and self.plotChords:
             yMin -= max(self.heightChordAddition * self.capsizeChord + self.capsizeType, self.capsizeType)
 
-        if self.lyrics:
-            yMin -= self.lyricHeightMax
+        if self.plotLyrics:
+            yMin -= self.lyricHeightMax  # ? this is zero when there are no lyrics
         return yMin, yMax
 
     def _countNumVoices(self):

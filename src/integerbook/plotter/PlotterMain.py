@@ -28,12 +28,18 @@ class PlotterMain:
 
     def plot(self):
 
-        self.PlotterMetadata.plotMetadata()
+        if self.Settings.plotMetadata:
+            self.PlotterMetadata.plotMetadata()
         # rc('text.latex', preamble=r'\usepackage{amssymb}')
+
         if self.Settings.plotMelody:
             self.PlotterNotes.plotNotes()
         if self.Settings.plotChordTones:
             self.PlotterNotes.plotChordNotes()
-        self.PlotterChords.plotChords()
-        # self.PlotterBarLines.plotBarLines()
+
+        if self.Settings.plotChords:
+            self.PlotterChords.plotChords()
+
+        if self.Settings.plotBarlines:
+            self.PlotterBarLines.plotBarLines()
 
