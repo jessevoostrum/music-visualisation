@@ -35,5 +35,5 @@ class PlotterMain:
         if self.Settings.plotChordTones:
             self.PlotterNotes.plotChordNotes()
         self.PlotterChords.plotChords()
-        self.PlotterBarLines.plotBarLines()
+        # self.PlotterBarLines.plotBarLines()
 

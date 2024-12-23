@@ -35,7 +35,7 @@ class Settings:
         self.vMarginLineTop = settings['vMarginLineTop']
         self.vMarginFirstLineTop = settings['vMarginFirstLineTop']
         self.vMarginBottomMinimal = settings['vMarginBottomMinimal']
-        self.alpha = settings['alpha']
+        self.alphaMelody = settings['alphaMelody']
         self.coloursCircleOfFifths = settings['coloursCircleOfFifths']
         self.coloursVoices = settings['coloursVoices']
         self.ptToInches = settings['ptToInches']
@@ -138,8 +138,10 @@ class Settings:
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
 
-        self.facecolorMajor = settings['facecolor']
-        self.facecolorMinor = settings['facecolor2']
+        self.facecolorMelody = settings['facecolorMelody']
+        self.facecolorSecondVoice = settings["facecolorSecondVoice"]
+        self.facecolorChordNotes = settings['facecolorChordNotes']
+        self.alphaChordNotes = settings["alphaChordNotes"]
 
 
 

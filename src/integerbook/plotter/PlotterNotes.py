@@ -348,18 +348,11 @@ class PlotterNotes(Plotter):
 
     def _adjustVisualParameters(self, el, key, isChordNote=False):
 
-        if key.mode == 'major':
-            facecolor = self.Settings.facecolorMajor
-            facecolor2 = self.Settings.facecolorMinor
-        if key.mode == 'minor':
-            facecolor = self.Settings.facecolorMinor
-            facecolor2 = self.Settings.facecolorMajor
-
-        alpha = self.Settings.alpha
+        facecolor = self.Settings.facecolorMelody
+        alpha = self.Settings.alphaMelody
         hatch = None
 
         if self.Settings.coloursCircleOfFifths:
-
             pitchKey = key.getTonic().ps
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
@@ -371,7 +364,7 @@ class PlotterNotes(Plotter):
 
         elif self.Settings.coloursVoices:
             if self.isSecondVoice(el):
-                facecolor = facecolor2
+                facecolor = self.Settings.facecolorSecondVoice
 
         # ghost note
         if el.notehead == 'x':
@@ -380,8 +373,8 @@ class PlotterNotes(Plotter):
             hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
 
         if isChordNote:
-            facecolor = 'red'
-            alpha = 0.05
+            facecolor = self.Settings.facecolorChordNotes
+            alpha = self.Settings.alphaChordNotes
 
         return alpha, facecolor, hatch
 
