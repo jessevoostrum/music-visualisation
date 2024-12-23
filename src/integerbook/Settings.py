@@ -35,9 +35,18 @@ class Settings:
         self.vMarginLineTop = settings['vMarginLineTop']
         self.vMarginFirstLineTop = settings['vMarginFirstLineTop']
         self.vMarginBottomMinimal = settings['vMarginBottomMinimal']
+
+        self.facecolorMelody = settings['facecolorMelody']
+        self.facecolorSecondVoice = settings["facecolorSecondVoice"]
+        self.facecolorChordNotes = settings['facecolorChordNotes']
+        self.colorTextMelody = settings["colorTextMelody"]
+        self.colorTextChords = settings["colorTextChords"]
+        self.colorLyrics = settings["colorLyrics"]
         self.alphaMelody = settings['alphaMelody']
+        self.alphaChordNotes = settings["alphaChordNotes"]
         self.coloursCircleOfFifths = settings['coloursCircleOfFifths']
         self.coloursVoices = settings['coloursVoices']
+
         self.ptToInches = settings['ptToInches']
         self.capHeightRatio = settings['capHeightRatio']
         self.xShiftNumberNote = settings['xShiftNumberNote']
@@ -62,7 +71,10 @@ class Settings:
 
         self.widthThickBarline = settings['widthThickBarline']
         self.timeSignatureWithBarlines = settings['timeSignatureWithBarlines']
+
         self.lyrics = settings['lyrics']
+        self.plotBarlines = settings["plotBarlines"]
+
         self.thickBarlines = settings['thickBarlines']
         self.printArranger = settings['printArranger']
         self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
@@ -138,10 +150,8 @@ class Settings:
         self.noteLowest, self.noteHighest = self._getRangeNotes()
         self.yMin, self.yMax = self._getRangeYs()
 
-        self.facecolorMelody = settings['facecolorMelody']
-        self.facecolorSecondVoice = settings["facecolorSecondVoice"]
-        self.facecolorChordNotes = settings['facecolorChordNotes']
-        self.alphaChordNotes = settings["alphaChordNotes"]
+
+
 
 
 

@@ -58,12 +58,14 @@ class PlotterChords(Plotter):
 
         chordNumber = number
 
-        plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
-                            va='baseline', size=self.Settings.fontSizeChords)
+        self.text = self.axs[page].text(xPos, yPos, chordNumber, va='baseline', size=self.Settings.fontSizeChords,
+                                        color=self.Settings.colorTextChords)
+        plottedNumber = self.text
 
         widthNumber = self._getPlottedWidth(page, plottedNumber)
 
-        self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
+        self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page,
+                             colorText=self.Settings.colorTextChords)
 
         return widthNumber
 
@@ -181,11 +183,11 @@ class PlotterChords(Plotter):
             xPos += self.accidentalSpace
             width += self.accidentalSpace
 
-        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
+        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page, colorText=self.Settings.colorTextChords)
 
         self.axs[page].text(xPos, yPos,
                             f"{number}", fontsize=self.fontSizeType,
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         width += len(str(number)) * self.width
 
         return width
@@ -193,7 +195,7 @@ class PlotterChords(Plotter):
     def _plotTypeMinor(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos + 0.00005 * self.fontSizeType,
                             u'\u2013', fontsize=self.fontSizeType,
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self.Settings.fontSettings.widthMinus
 
     def _plotTypeMajor(self, xPos, yPos, page):
@@ -204,7 +206,7 @@ class PlotterChords(Plotter):
 
         xPos += xShift
 
-        patches = Triangle(xPos, yPos, height, width, self.Settings.xyRatio)
+        patches = Triangle(xPos, yPos, height, width, self.Settings.xyRatio, colorText=self.Settings.colorTextChords)
 
         for patch in patches:
             self.axs[page].add_patch(patch)
@@ -230,7 +232,7 @@ class PlotterChords(Plotter):
         yCenter = yPos + radiusY
 
         patch1 = Ellipse((xCenter, yCenter), width=diameterX,
-                         height=diameterY, color='black', linewidth=0)
+                         height=diameterY, color=self.Settings.colorTextChords, linewidth=0)
         patch2 = Ellipse((xCenter, yCenter), width=diameterX - 2 * linewidthX,
                         height=diameterY - 2 * linewidthY, color='white', linewidth=0)
         self.axs[page].add_patch(patch1)
@@ -243,7 +245,7 @@ class PlotterChords(Plotter):
                        (xCenter + radiusX, yCenter + radiusY),
                        (xCenter - radiusX + linewidthLine, yCenter - radiusY),]
 
-            patch3 = Polygon(corners, fill=True, color='black', linewidth=0)
+            patch3 = Polygon(corners, fill=True, color=self.Settings.colorTextChords, linewidth=0)
             self.axs[page].add_patch(patch3)
 
         return diameterX + xShift + spaceAfter
@@ -271,11 +273,11 @@ class PlotterChords(Plotter):
     def _plotTypeAugmented(self, xPos, yPos, page):
         xPos += self.accidentalSpace
         accidental = music21.pitch.Accidental('sharp')
-        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page)
+        self._plotAccidental(accidental, self.fontSizeType, xPos, yPos, page, colorText=self.Settings.colorTextChords)
 
         self.axs[page].text(xPos, yPos,
                             "5", fontsize=self.fontSizeType,
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self.width + self.accidentalSpace
 
     def _plotTypeSuspendedSecond(self, xPos, yPos, page):
@@ -286,7 +288,7 @@ class PlotterChords(Plotter):
 
         self.axs[page].text(xPos2, yPos,
                             "2", fontsize=self.fontSizeType, # fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
 
         return self.width + widthSus
 
@@ -297,39 +299,39 @@ class PlotterChords(Plotter):
 
         self.axs[page].text(xPos4, yPos,
                             "4", fontsize=self.fontSizeType,
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
 
         return self.width + widthSus
 
     def _plotSus(self, xPos, yPos, page):
         plottedObject = self.axs[page].text(xPos, yPos,
                             "sus", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
 
         return self._getPlottedWidth(page, plottedObject) + self.Settings.fontSettings.spaceAfterAddSus
 
     def _plotModificationAdd(self, xPos, yPos, page):
         plottedObject = self.axs[page].text(xPos, yPos,
                             "add", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self._getPlottedWidth(page, plottedObject) + self.Settings.fontSettings.spaceAfterAddSus
 
     def _plotModificationSubtract(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
                             "sub", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self.Settings.fontSettings.spaceAddSus
 
     def _plotModificationAlter(self, xPos, yPos, page):
         self.axs[page].text(xPos, yPos,
                             "alt", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self.Settings.fontSettings.spaceAddSus
 
     def _plotComma(self, xPos, yPos, page):
         plottedObject = self.axs[page].text(xPos, yPos,
                             ",", fontsize=self.fontSizeTypeSmall, fontstyle='normal',
-                            va='baseline', ha='left')
+                            va='baseline', ha='left', color=self.Settings.colorTextChords)
         return self._getPlottedWidth(page, plottedObject)
 
     @staticmethod
@@ -404,7 +406,7 @@ class PlotterChords(Plotter):
                 yPosSlash = yPos - .4 * fontSizeAddition * self.Settings.capsizeNumberRelative
 
                 self.axs[page].text(xPosRightOfChord, yPosSlash, '/', fontsize=fontSizeAddition,
-                                    va='baseline', ha='left')
+                                    va='baseline', ha='left', color=self.Settings.colorTextChords)
 
                 # plot number
                 xPosRightOfSlash = xPosRightOfChord + 0.8 * self.Settings.widthNumberRelative * fontSizeAddition
@@ -415,7 +417,7 @@ class PlotterChords(Plotter):
                 yPosBass = yPosSlash - 0.25 * fontSizeAddition * self.Settings.capsizeNumberRelative
 
                 self.axs[page].text(xPosBass, yPosBass, number, fontsize=fontSizeAddition,
-                                    va='baseline', ha='left')
+                                    va='baseline', ha='left', color=self.Settings.colorTextChords)
 
                 # plot accidental
                 self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page)
@@ -429,7 +431,7 @@ class PlotterChords(Plotter):
     def _plotNoChord(self, xPos, yPos, page):
 
         self.axs[page].text(xPos, yPos, 'N.C.',
-                            va='baseline', size=self.Settings.fontSizeChords)
+                            va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
 
     def _plotRomanNumeral(self, chordSymbol, xPos, yPos, page, idxChord, chords):
 
@@ -447,7 +449,7 @@ class PlotterChords(Plotter):
             accidental = self._accidentalRootSecondaryChord(idxChord)
 
         plottedNumber = self.axs[page].text(xPos, yPos, chordNumber,
-                                            va='baseline', size=self.Settings.fontSizeChords)
+                                            va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
 
         widthNumber = self._getPlottedWidth(page, plottedNumber)
 
@@ -467,13 +469,13 @@ class PlotterChords(Plotter):
             target = self._targetSecondaryChord(chordSymbol, key, idxChord)
             accidental = self._accidentalTargetSecondaryChord(idxChord)
             plottedSlash = self.axs[page].text(xPos, yPos, "\\",
-                                                    va='baseline', size=self.Settings.fontSizeChords)
+                                                    va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
             widthSlash = self._getPlottedWidth(page, plottedSlash)
             xPos += widthSlash
             if accidental:
                 xPos += self.Settings.fontWidthChord * 0.1
             self.axs[page].text(xPos, yPos, target,
-                                va='baseline', size=self.Settings.fontSizeChords)
+                                va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
             self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
     def _isSecondaryChord(self, chordSymbol, key, idxChord):

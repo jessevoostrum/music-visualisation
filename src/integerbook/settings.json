@@ -20,6 +20,9 @@
   "facecolorMelody": "blue",
   "facecolorSecondVoice": "red",
   "facecolorChordNotes": "red",
+  "colorTextMeldy": "black",
+  "colorTextChords": "black",
+  "colorLyrics": "black",
   "alphaMelody": 0.2,
   "alphaChordNotes": 0.05,
   "coloursCircleOfFifths": false,
@@ -47,6 +50,7 @@
   "widthThickBarline": 0.003,
   "timeSignatureWithBarlines": true,
   "lyrics": false,
+  "plotBarlines": true,
   "thickBarlines": true,
   "printArranger": false,
   "plotTimeSignature": true,
@@ -63,6 +67,6 @@
   "numbersRelativeToChord": false,
   "manualRomanNumerals": [],
   "ignoreSecondaryDominants": [],
-  "manualSecondaryChords": []
+  "manualSecondaryChords": [],
 }
 

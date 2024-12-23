@@ -422,11 +422,11 @@ def Coda(xPos, yPos, height, width, xyRatio):
 
     return [patch1, patch2, patch3, patch4]
 
-def Triangle(xPos, yPos, height, width, xyRatio):
+def Triangle(xPos, yPos, height, width, xyRatio, colorText='black'):
     corners = [(xPos, yPos),
                (xPos + width / 2, yPos + height),
                (xPos + width, yPos)]
-    patch = patches.Polygon(corners, fill=True, color='black', linewidth=0)
+    patch = patches.Polygon(corners, fill=True, color=colorText, linewidth=0)
 
     angle = math.atan(height / (width / 2))
     linewidth0 = 0.06 * height  # bottom

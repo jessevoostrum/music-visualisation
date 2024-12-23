@@ -7,7 +7,7 @@ class Plotter:
         self.LocationFinder = LocationFinder
         self.axs = axs
 
-    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True):
+    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, colorText='black'):
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':
@@ -34,7 +34,7 @@ class Plotter:
 
                 self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
                                     fontsize=fontSizeAccidental,
-                                    va='baseline', ha='right', fontname=self.Settings.font)
+                                    va='baseline', ha='right', fontname=self.Settings.font, color=colorText)
 
     # used to print key of the song
     def _getKeyLetter(self, key):

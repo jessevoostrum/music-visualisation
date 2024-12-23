@@ -275,26 +275,26 @@ class PlotterNotes(Plotter):
 
             yPos += self._computeYShiftNumbers()
 
-            textColor = 'black'
+            colorText = self.Settings.colorTextMelody
             alpha = 1
             zorder = 1
             if isChordNote:
-                textColor = 'grey'
+                colorText = 'grey'
                 alpha = 0.5
                 zorder = .5
 
             if not self.Settings.alternativeSymbols:
                 self.axs[page].text(xPos, yPos, number,
                                     fontsize=fontSize,
-                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
+                                    va='baseline', ha=horizontalAlignment, color=colorText, zorder=zorder)
 
-                self._plotAccidental(accidental, fontSize, xPos, yPos, page)
+                self._plotAccidental(accidental, fontSize, xPos, yPos, page, colorText=colorText)
 
             else:
                 symbol = self._getSymbol(number, accidental)
                 self.axs[page].text(xPos, yPos, symbol,
                                     fontsize=fontSize,
-                                    va='baseline', ha=horizontalAlignment, color=textColor, zorder=zorder)
+                                    va='baseline', ha=horizontalAlignment, color=colorText, zorder=zorder)
 
     def _plotLyric(self, page, el, xPos, yPosLineBase):
 
@@ -321,7 +321,8 @@ class PlotterNotes(Plotter):
 
                 plottedLyric = self.axs[page].text(xPosLyric, yPos, lyric.text,
                                                    fontsize=self.Settings.fontSizeLyrics,
-                                                   va='baseline', ha='left', font='Dejavu Sans', fontstyle='normal')
+                                                   va='baseline', ha='left', font='Dejavu Sans', fontstyle='normal',
+                                                   color=self.Settings.colorLyrics)
 
                 renderer = self.axs[page].figure._get_renderer()
                 bb = plottedLyric.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
@@ -338,7 +339,8 @@ class PlotterNotes(Plotter):
 
                     self.axs[page].text(xPosHyphen, yPos, "-",
                                         fontsize=self.Settings.fontSizeLyrics,
-                                        va='baseline', ha='center', font='Dejavu Sans', fontstyle='normal')
+                                        va='baseline', ha='center', font='Dejavu Sans', fontstyle='normal',
+                                        color=self.Settings.colorLyrics)
 
                 self.xPosLyricEnd[voice][strLineNumber] = xPosLyric + lyricWidth
 
