@@ -34,7 +34,7 @@ class PlotterMain:
 
         if self.Settings.plotMelody:
             self.PlotterNotes.plotNotes()
-        if self.Settings.plotChordTones:
+        if self.Settings.plotChordNotes:
             self.PlotterNotes.plotChordNotes()
 
         if self.Settings.plotChords:

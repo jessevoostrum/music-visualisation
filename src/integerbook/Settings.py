@@ -65,7 +65,7 @@ class Settings:
         self.xkcd = settings["xkcd"]
         self.heightChordAddition = settings["heightChordAddition"]
         self.plotMelody = settings["plotMelody"]
-        self.plotChordTones = settings["plotChordTones"]
+        self.plotChordNotes = settings["plotChordNotes"]
 
         self.plotTimeSignature = settings["plotTimeSignature"]
 
@@ -85,6 +85,8 @@ class Settings:
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
         self.forceMinor = settings["forceMinor"]
+        self.minorFromMajorScalePerspective = settings["minorFromMajorScalePerspective"]
+
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
         self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(settings["manualRomanNumerals"])
