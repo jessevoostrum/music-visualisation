@@ -41,7 +41,7 @@ class PlotterChords(Plotter):
                     self._plotBass(chord, xPos, yPos, page)
 
                 else:
-                    widthNumber = self._plotRomanNumeral(chord, xPos, yPos, page, idxChord, chords)
+                    widthNumber = self._plotRomanNumeralAndAccidental(chord, xPos, yPos, page, idxChord, chords)
 
                     xPos = self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
 
@@ -434,7 +434,7 @@ class PlotterChords(Plotter):
         self.axs[page].text(xPos, yPos, 'N.C.',
                             va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
 
-    def _plotRomanNumeral(self, chordSymbol, xPos, yPos, page, idxChord, chords):
+    def _plotRomanNumeralAndAccidental(self, chordSymbol, xPos, yPos, page, idxChord, chords):
 
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
         key = self.Settings.getKey(offsetEl)
@@ -454,7 +454,7 @@ class PlotterChords(Plotter):
 
         widthNumber = self._getPlottedWidth(page, plottedNumber)
 
-        self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
+        self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page, colorText=self.Settings.colorTextChords)
 
         return widthNumber
 

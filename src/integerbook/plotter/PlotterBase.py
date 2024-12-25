@@ -10,7 +10,7 @@ class Plotter:
         self.LocationFinder = LocationFinder
         self.axs = axs
 
-    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, colorText='black'):
+    def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, colorText='black', zorder=1):
         if accidental:
             symbolAccidental = None
             if accidental.name == 'sharp':
@@ -37,7 +37,8 @@ class Plotter:
 
                 self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
                                     fontsize=fontSizeAccidental,
-                                    va='baseline', ha='right', fontname=self.Settings.font, color=colorText)
+                                    va='baseline', ha='right', fontname=self.Settings.font, color=colorText,
+                                    zorder=zorder)
 
     def getScaleDegreeAndAccidentalFromPitch(self, pitch, key):
         if self.Settings.minorFromMajorScalePerspective:

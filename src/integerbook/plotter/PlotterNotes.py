@@ -288,7 +288,7 @@ class PlotterNotes(Plotter):
                                     fontsize=fontSize,
                                     va='baseline', ha=horizontalAlignment, color=colorText, zorder=zorder)
 
-                self._plotAccidental(accidental, fontSize, xPos, yPos, page, colorText=colorText)
+                self._plotAccidental(accidental, fontSize, xPos, yPos, page, colorText=colorText, zorder=zorder)
 
             else:
                 symbol = self._getSymbol(number, accidental)
