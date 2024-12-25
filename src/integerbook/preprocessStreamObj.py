@@ -1,17 +1,8 @@
 import music21
 
-def preprocessStreamObj(streamObj, settings):
+def preprocessStreamObj(streamObj):
     # streamObj = self._removeBassStaff(streamObj)
     streamObj = _correctPickupMeasure(streamObj)
-
-    # if 'minorFromMajorScalePerspective' in settings:
-    #     if settings["minorFromMajorScalePerspective"]:
-    #         for measure in streamObj[music21.stream.Measure]:
-    #             if measure.keySignature:
-    #                 measure.keySignature = measure.keySignature.transpose(-3)
-
-    # streamObj.makeAccidentals(inPlace=True)
-    # streamObj.chordify().makeAccidentals(inPlace=True)
 
     return streamObj
 

@@ -2,10 +2,12 @@
 import music21
 
 from integerbook.plotter.PlotterMain import PlotterMain
-from integerbook.LocationFinder import LocationFinder
-from integerbook.CanvasCreator import CanvasCreator
+from integerbook.LocationFinderScroll import LocationFinder
+from integerbook.CanvasCreatorScroll import CanvasCreator
 from integerbook.Settings import Settings
 from integerbook.preprocessStreamObj import preprocessStreamObj
+
+
 
 
 class Visualiser:
@@ -14,6 +16,7 @@ class Visualiser:
     def __init__(self, pathToSong, userSettings=None):
 
         streamObj = music21.converter.parse(pathToSong)
+        numMeasures = len(streamObj[music21.stream.Measure])
 
         self.streamObj = preprocessStreamObj(streamObj)
 
@@ -21,7 +24,7 @@ class Visualiser:
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
-        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
+        self.CanvasCreator = CanvasCreator(self.Settings, numMeasures)
 
         self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
@@ -30,17 +33,17 @@ class Visualiser:
     def getSongTitle(self):
         return self.PlotterMain.PlotterMetadata.getSongTitle()
 
-    def saveFig(self, dirName=None, buffer=None):
-        yPosLowest = self.LocationFinder.getYPosLineBase(-1) + self.Settings.yMin
-        if buffer:
-            self.CanvasCreator.saveFig(buffer, yPosLowest)
+    def saveFig(self, dirName=None):
+        title = self.getSongTitle()
+        if not dirName:
+            pathName = title
         else:
-            title = self.getSongTitle()
-            if not dirName:
-                pathName = title + '.pdf'
-            else:
-                pathName = dirName + '/' + title + '.pdf'
-            self.CanvasCreator.saveFig(pathName, yPosLowest)
+            pathName = dirName + '/' + title
+        pathName += '.png'
+
+        # self.figs[0].savefig(pathName, dpi=1000, bbox_inches='tight')
+
+        self.CanvasCreator.saveFig(pathName, self.LocationFinder.getMaxXPos())
 
 
 
