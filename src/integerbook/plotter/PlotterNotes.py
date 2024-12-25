@@ -88,13 +88,14 @@ class PlotterNotes(Plotter):
 
         chords = self.streamObj[music21.harmony.ChordSymbol]
 
-        nL = self.Settings.noteLowest
-        nH = self.Settings.noteHighest
+        nL = music21.note.Note(self.Settings.noteLowest)
+        nH = music21.note.Note(self.Settings.noteHighest)
 
         for idx in range(len(chords)):
 
             chord = chords[idx]
 
+            # find out how long the chord needs to be
             if idx < len(chords) - 1:
                 chordNext = chords[idx + 1]
             else:
@@ -112,13 +113,13 @@ class PlotterNotes(Plotter):
 
             notes = chord.notes
             for note in notes:
-                midiNumber = note.pitch.ps
+                note.quarterLength = offsetNext - offset
+                note.octave = nL.octave
 
-                midiNumberPlottedNote = nL + (midiNumber - nL) % 12
-                while midiNumberPlottedNote <= nH:
-                    plottedNote = music21.note.Note(midiNumberPlottedNote, quarterLength=offsetNext - offset)
-                    self._plotNote(plottedNote, None, measure, offset=offset, measureEnd=measureEnd, isChordNote=True)
-                    midiNumberPlottedNote += 12
+                while note.octave <= nH.octave:
+                    if note.pitch.midi >= nL.pitch.midi and note.pitch.midi <= nH.pitch.midi:
+                        self._plotNote(note, None, measure, offset=offset, measureEnd=measureEnd, isChordNote=True)
+                    note.octave += 1
 
     def _plotNote(self, el, elNext, measure, offset, measureEnd=None, isChordNote=False):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
