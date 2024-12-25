@@ -279,8 +279,7 @@ class PlotterNotes(Plotter):
             alpha = 1
             zorder = 1
             if isChordNote:
-                colorText = 'grey'
-                alpha = 0.5
+                colorText = self.Settings.colorTextChordNotes
                 zorder = .5
 
             if not self.Settings.alternativeSymbols:
