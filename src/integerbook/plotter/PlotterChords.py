@@ -47,6 +47,7 @@ class PlotterChords(Plotter):
 
                     self._plotSecondaryTargetNumeral(chord, xPos, yPos, page, idxChord)
 
+                    # self._plotBass(chord, xPos, yPos, page)
 
             else:
                 self._plotNoChord(xPos, yPos, page)
@@ -54,7 +55,7 @@ class PlotterChords(Plotter):
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
         key = self.Settings.getKey(offsetEl)
-        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+        number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
 
         chordNumber = number
 
@@ -399,7 +400,7 @@ class PlotterChords(Plotter):
                 key = self.Settings.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
 
                 pitch = chordSymbol.bass()
-                number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
+                number, accidental = self.getScaleDegreeAndAccidentalFromPitch(pitch, key)
 
                 # plot slash
                 xPosRightOfChord = xPos + self.Settings.fontSettings.positionSlashRelative * self.Settings.widthNumberRelative * self.Settings.fontSizeChords
@@ -437,14 +438,14 @@ class PlotterChords(Plotter):
 
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
         key = self.Settings.getKey(offsetEl)
-        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+        number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
 
         chordNumber = self._getRomanNumeral(number, key, chordSymbol)
         if str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
             chordNumber = self.Settings.manualRomanNumeralDict[str(idxChord)]['numeral']
             accidental = self.Settings.manualRomanNumeralDict[str(idxChord)]['accidental']
 
-        elif self._isSecondaryChord(chordSymbol, key, idxChord):
+        elif self._plotAsSecondaryDominant(chordSymbol, key, idxChord):
             chordNumber = self._rootSecondaryChord(idxChord)
             accidental = self._accidentalRootSecondaryChord(idxChord)
 
@@ -465,7 +466,7 @@ class PlotterChords(Plotter):
     def _plotSecondaryTargetNumeral(self, chordSymbol, xPos, yPos, page, idxChord):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
         key = self.Settings.getKey(offsetEl)
-        if self._isSecondaryChord(chordSymbol, key, idxChord):
+        if self._plotAsSecondaryDominant(chordSymbol, key, idxChord):
             target = self._targetSecondaryChord(chordSymbol, key, idxChord)
             accidental = self._accidentalTargetSecondaryChord(idxChord)
             plottedSlash = self.axs[page].text(xPos, yPos, "\\",
@@ -478,12 +479,14 @@ class PlotterChords(Plotter):
                                 va='baseline', size=self.Settings.fontSizeChords, color=self.Settings.colorTextChords)
             self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
-    def _isSecondaryChord(self, chordSymbol, key, idxChord):
-        if idxChord in self.Settings.ignoreSecondaryDominants or str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
-            return False
+    def _plotAsSecondaryDominant(self, chordSymbol, key, idxChord):
         if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
             return True
-        if self._isSecondaryDominant(chordSymbol, key, idxChord):
+        elif self.Settings.onlyManualSecondaryDominants:
+            return False
+        elif idxChord in self.Settings.ignoreSecondaryDominants or str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
+            return False
+        elif self._isSecondaryDominant(chordSymbol, key):
             return True
         return False
 
@@ -514,12 +517,10 @@ class PlotterChords(Plotter):
         return None
 
 
-    def _isSecondaryDominant(self, chordSymbol, key, idxChord):
-        if idxChord in self.Settings.ignoreSecondaryDominants:
-            return False
+    def _isSecondaryDominant(self, chordSymbol, key):
         if self._isMajor(chordSymbol) and (self._isTriad(chordSymbol) or self._hasDominantSeventh(chordSymbol)) and \
                 self._rootEqualsBass(chordSymbol):
-            number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+            number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
             if not accidental:
                 if key.mode == 'major':
                     if number == 1:
@@ -536,7 +537,7 @@ class PlotterChords(Plotter):
         return False
 
     def _targetSecondaryDominant(self, chordSymbol, key):
-        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root())
+        number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
         targetNumber = (number + 3) % 7
         return self._getRomanNumeral(targetNumber, key)
 
@@ -577,7 +578,7 @@ class PlotterChords(Plotter):
         return True
 
     @staticmethod
-    def _isDiatonic(chordSymbol, key):
+    def _isDiatonic(chordSymbol, key):  # ?unused
         majorDiatonicChords = {
             "1": [0, 4, 7, 11],
             "2": [2, 5, 9, 12],
@@ -626,6 +627,8 @@ class PlotterChords(Plotter):
 
     def _getRomanNumeral(self, number, key, chordSymbol=None):
         numeral = None
+
+        # this is done so that the target of the secondary dominant can be determined in its default mode (major/minor)
         if key.mode == 'major':
             if number == 1:
                 numeral = 'I'

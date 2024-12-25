@@ -70,6 +70,7 @@
   "romanNumerals": false,
   "numbersRelativeToChord": false,
   "manualRomanNumerals": [],
+  "onlyManualSecondaryDominants": true,
   "ignoreSecondaryDominants": [],
   "manualSecondaryChords": []
 }

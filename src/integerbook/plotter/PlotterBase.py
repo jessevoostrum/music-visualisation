@@ -1,3 +1,6 @@
+import music21.pitch
+
+
 class Plotter:
 
     def __init__(self, streamObj, Settings, LocationFinder, axs):
@@ -35,6 +38,47 @@ class Plotter:
                 self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
                                     fontsize=fontSizeAccidental,
                                     va='baseline', ha='right', fontname=self.Settings.font, color=colorText)
+
+    def getScaleDegreeAndAccidentalFromPitch(self, pitch, key):
+        if self.Settings.minorFromMajorScalePerspective:
+            distance = (pitch.midi - key.tonic.midi) % 12
+            number = 0
+            accidental = None
+            if distance == 0:
+                number = 1
+            if distance == 1:
+                number = 2
+                accidental = -1
+            if distance == 2:
+                number = 2
+            if distance == 3:
+                number = 3
+                accidental = -1
+            if distance == 4:
+                number = 3
+            if distance == 5:
+                number = 4
+            if distance == 6:
+                number = 4
+                accidental = 1
+            if distance == 7:
+                number = 5
+            if distance == 8:
+                number = 6
+                accidental = -1
+            if distance == 9:
+                number = 6
+            if distance == 10:
+                number = 7
+                accidental = -1
+            if distance == 11:
+                number = 7
+
+            if accidental:
+                accidental = music21.pitch.Accidental(accidental)
+            return number, accidental
+        else:
+            return key.getScaleDegreeAndAccidentalFromPitch(pitch)
 
     # used to print key of the song
     def _getKeyLetter(self, key):

@@ -1,17 +1,22 @@
 import music21
 
-def preprocessStreamObj(self, streamObj, settings):
+def preprocessStreamObj(streamObj, settings):
     # streamObj = self._removeBassStaff(streamObj)
-    streamObj = self._correctPickupMeasure(streamObj)
+    streamObj = _correctPickupMeasure(streamObj)
 
-    if 'minorFromMajorScalePerspective' in settings:
-        if settings["minorFromMajorScalePerspective"]:
+    # if 'minorFromMajorScalePerspective' in settings:
+    #     if settings["minorFromMajorScalePerspective"]:
+    #         for measure in streamObj[music21.stream.Measure]:
+    #             if measure.keySignature:
+    #                 measure.keySignature = measure.keySignature.transpose(-3)
 
+    # streamObj.makeAccidentals(inPlace=True)
+    # streamObj.chordify().makeAccidentals(inPlace=True)
 
     return streamObj
 
 
-def _removeBassStaff(self, streamObj):
+def _removeBassStaff(streamObj):
     staffs = streamObj[music21.stream.PartStaff]
     if staffs:
         if len(staffs) > 1:
@@ -27,15 +32,15 @@ def _removeBassStaff(self, streamObj):
     return streamObj
 
 
-def _correctPickupMeasure(self, streamObj):
+def _correctPickupMeasure(streamObj):
     measures = streamObj[music21.stream.Measure]
     if measures[0].number == 1:
         if measures[0].quarterLength < measures[1].quarterLength:
-            streamObj = self._renumberMeasures(streamObj)
+            streamObj = _renumberMeasures(streamObj)
     return streamObj
 
 
-def _renumberMeasures(self, streamObj):
+def _renumberMeasures(streamObj):
     measures = streamObj[music21.stream.Measure]
     for i in range(len(measures)):
         measures[i].number = i

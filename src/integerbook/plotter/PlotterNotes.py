@@ -244,7 +244,7 @@ class PlotterNotes(Plotter):
 
     def _plotNumber(self, page, el, elNext, xPos, xLength, yPos, slope, key, offset, isChordNote=False):
         if not (el.tie and not (el.tie.type == 'start')):
-            number, accidental = key.getScaleDegreeAndAccidentalFromPitch(el.pitch)
+            number, accidental = self.getScaleDegreeAndAccidentalFromPitch(el.pitch, key)
 
             if self.Settings.numbersRelativeToChord:
                 number, accidental = self._getNumberRelativeToChord(el, offset, accidental)

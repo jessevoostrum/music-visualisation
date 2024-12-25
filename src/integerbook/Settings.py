@@ -90,6 +90,7 @@ class Settings:
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
         self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(settings["manualRomanNumerals"])
+        self.onlyManualSecondaryDominants = settings["onlyManualSecondaryDominants"]
         self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
         self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
 
@@ -141,6 +142,7 @@ class Settings:
 
         self.numLinesLyrics = self._countNumLinesLyrics()
         self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
+
         self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
 
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
@@ -152,6 +154,8 @@ class Settings:
             self.heightBarline0Extension = self.capsizeNote
         else:
             self.heightBarline0Extension = 0
+
+
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
