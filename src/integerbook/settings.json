@@ -73,6 +73,8 @@
   "manualRomanNumerals": [],
   "onlyManualSecondaryDominants": true,
   "ignoreSecondaryDominants": [],
-  "manualSecondaryChords": []
+  "manualSecondaryChords": [],
+  "dpi": 300,
+  "outputFormat": "pdf"
 }
 

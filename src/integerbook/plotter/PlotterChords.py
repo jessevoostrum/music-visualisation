@@ -5,7 +5,7 @@ import music21
 from integerbook.plotter.PlotterBase import Plotter
 from matplotlib.patches import Ellipse, Polygon
 
-from integerbook.plotter.patches import Triangle
+from integerbook.plotter.patches import Triangle, Doughnut, Slash
 
 
 
@@ -207,47 +207,33 @@ class PlotterChords(Plotter):
 
         xPos += xShift
 
-        patches = Triangle(xPos, yPos, height, width, self.Settings.xyRatio, colorText=self.Settings.colorTextChords)
+        patch = Triangle(xPos, yPos, height, width, self.Settings.xyRatio, colorText=self.Settings.colorTextChords)
 
-        for patch in patches:
-            self.axs[page].add_patch(patch)
+        self.axs[page].add_patch(patch)
 
         return xShift + width + spaceAfter
 
 
 
     def _plotTypeDiminishedOrHalfDiminished(self, xPos, yPos, page, halfDiminished=False):
+
         xShift = 0.0001 * self.fontSizeType
         spaceAfter = 0.00012 * self.fontSizeType
-        linewidthY = 0.00005 * self.fontSizeType
-        diameterY = self.Settings.capsizeType * 0.73
 
-        radiusY = diameterY / 2
+        xPos += xShift
+        height = self.Settings.capsizeType * 0.73
+
+
         xyRatio = self.Settings.widthA4 / self.Settings.heightA4
+        diameterX = height / xyRatio
 
-        diameterX = diameterY / xyRatio
-        radiusX = diameterX / 2
-        linewidthX = linewidthY / xyRatio
+        patch = Doughnut(xPos, yPos, height, xyRatio, colorText=self.Settings.colorTextChords)
 
-        xCenter = xPos + radiusX + xShift
-        yCenter = yPos + radiusY
-
-        patch1 = Ellipse((xCenter, yCenter), width=diameterX,
-                         height=diameterY, color=self.Settings.colorTextChords, linewidth=0)
-        patch2 = Ellipse((xCenter, yCenter), width=diameterX - 2 * linewidthX,
-                        height=diameterY - 2 * linewidthY, color='white', linewidth=0)
-        self.axs[page].add_patch(patch1)
-        self.axs[page].add_patch(patch2)
+        self.axs[page].add_patch(patch)
 
         if halfDiminished:
-            linewidthLine = linewidthX * .5
-            corners = [(xCenter - radiusX, yCenter - radiusY),
-                       (xCenter + radiusX - linewidthLine, yCenter + radiusY),
-                       (xCenter + radiusX, yCenter + radiusY),
-                       (xCenter - radiusX + linewidthLine, yCenter - radiusY),]
-
-            patch3 = Polygon(corners, fill=True, color=self.Settings.colorTextChords, linewidth=0)
-            self.axs[page].add_patch(patch3)
+            patch = Slash(xPos, yPos, height, xyRatio, colorText=self.Settings.colorTextChords)
+            self.axs[page].add_patch(patch)
 
         return diameterX + xShift + spaceAfter
 

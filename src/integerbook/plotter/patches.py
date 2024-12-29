@@ -1,6 +1,7 @@
 import math
 from matplotlib.path import Path
 import matplotlib.patches as patches
+from matplotlib.patches import PathPatch, Polygon
 import numpy as np
 
 
@@ -422,11 +423,60 @@ def Coda(xPos, yPos, height, width, xyRatio):
 
     return [patch1, patch2, patch3, patch4]
 
+def adjustLocationAndRatio(pos, xPos, yPos, height, xyRatio):
+    radius = height/2
+    x, y = pos
+    x *= 1 / xyRatio
+    x += xPos + radius / xyRatio
+    y += yPos + radius
+    return [x,y]
+
+def Doughnut(xPos, yPos, height, xyRatio, colorText='black'):
+
+    phi = np.linspace(0, 2 * np.pi, 100) + 0.5 * np.pi
+    circleOuter = height/2 * np.exp(1j * phi)
+    circleOuterV = [adjustLocationAndRatio([p.real, p.imag], xPos, yPos, height, xyRatio)  for p in circleOuter]
+
+    circleInner = height/2 * 0.8 * np.exp(1j * phi)
+    circleInnerV = [adjustLocationAndRatio([p.real, p.imag], xPos, yPos, height, xyRatio) for p in circleInner]
+
+    circleOuterC = [Path.LINETO for p in circleOuterV]
+    circleOuterC[0] = Path.MOVETO
+    circleInnerC = [Path.LINETO for p in circleInnerV]
+    circleInnerC[0] = Path.MOVETO
+
+    vertices = []
+    vertices.extend(circleOuterV)
+    vertices.extend(circleInnerV[::-1])
+
+    codes = []
+    codes.extend(circleOuterC)
+    codes.extend(circleInnerC)
+
+    path = Path(vertices, codes)
+    patch = PathPatch(path, facecolor=colorText, linewidth=0)
+    return patch
+
+def Slash(xPos, yPos, height, xyRatio, colorText='black'):
+    radiusY = height / 2
+    radiusX = radiusY / xyRatio
+    xCenter = xPos + radiusX
+    yCenter = yPos + radiusY
+
+    linewidthLine = 0.0006
+    corners = [(xCenter - radiusX, yCenter - radiusY),
+               (xCenter + radiusX - linewidthLine, yCenter + radiusY),
+               (xCenter + radiusX, yCenter + radiusY),
+               (xCenter - radiusX + linewidthLine, yCenter - radiusY), ]
+
+    patch = Polygon(corners, fill=True, color=colorText, linewidth=0)
+    return patch
+
 def Triangle(xPos, yPos, height, width, xyRatio, colorText='black'):
     corners = [(xPos, yPos),
                (xPos + width / 2, yPos + height),
-               (xPos + width, yPos)]
-    patch = patches.Polygon(corners, fill=True, color=colorText, linewidth=0)
+               (xPos + width, yPos),
+               (xPos, yPos)]
 
     angle = math.atan(height / (width / 2))
     linewidth0 = 0.06 * height  # bottom
@@ -444,10 +494,17 @@ def Triangle(xPos, yPos, height, width, xyRatio, colorText='black'):
 
     innerCorners = [(corners[0][0] + x1 + x0, corners[0][1] + linewidth0),
                     (corners[1][0] - x3, corners[1][1] - y3),
-                    (corners[2][0] - x2 - x0, corners[2][1] + linewidth0)]
-    patchInner = patches.Polygon(innerCorners, fill=True, color='white', linewidth=0)
+                    (corners[2][0] - x2 - x0, corners[2][1] + linewidth0),
+                    (corners[0][0] + x1 + x0, corners[0][1] + linewidth0)]
 
-    return patch, patchInner
+    vertices = corners + innerCorners[::-1]
+    codes = [Path.MOVETO, Path.LINETO, Path.LINETO, Path.LINETO,
+             Path.MOVETO, Path.LINETO, Path.LINETO, Path.LINETO]
+
+    path = Path(vertices, codes)
+    patch = PathPatch(path, facecolor=colorText, linewidth=0)
+
+    return patch
 
 def correctLineWidthTriangle(linewidth, xyRatio, angle):
     a = math.cos(angle) * linewidth

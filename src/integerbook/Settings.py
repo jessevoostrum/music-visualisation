@@ -95,6 +95,9 @@ class Settings:
         self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
         self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
 
+        self.dpi = settings["dpi"]
+        self.outputFormat = settings["outputFormat"]
+
         ### Font stuff
 
         self.fontDirectory = settings['fontDirectory']

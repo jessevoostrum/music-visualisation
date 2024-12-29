@@ -39,7 +39,7 @@ class CanvasCreator:
 
         bbox = Bbox([[0, heightStart], [widthEnd, self.heightA4]])
 
-        self.figs[0].savefig(pathName, dpi=700, bbox_inches=bbox, transparent=True)
+        self.figs[0].savefig(pathName, dpi=self.Settings.dpi, bbox_inches=bbox, transparent=True)
 
     def _createCanvas(self):
 

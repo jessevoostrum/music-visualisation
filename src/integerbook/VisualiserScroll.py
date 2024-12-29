@@ -39,9 +39,7 @@ class Visualiser:
             pathName = title
         else:
             pathName = dirName + '/' + title
-        pathName += '.png'
-
-        # self.figs[0].savefig(pathName, dpi=1000, bbox_inches='tight')
+        pathName += '.' + self.Settings.outputFormat
 
         self.CanvasCreator.saveFig(pathName, self.LocationFinder.getMaxXPos())
 
