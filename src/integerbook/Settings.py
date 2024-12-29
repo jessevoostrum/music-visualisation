@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 import music21
 
@@ -15,7 +16,8 @@ class Settings:
         if userSettings:
             settings.update(userSettings)
 
-        self.streamObj = streamObj
+        self.streamObj = copy.deepcopy(streamObj)
+
         self.settings = settings
 
         self.measuresPerLine = settings['measuresPerLine']
@@ -178,11 +180,11 @@ class Settings:
     def getKey(self, offset):
         lastKey = None
         if self.streamObj[music21.key.Key, music21.key.KeySignature]:
-            for key in self.streamObj[music21.key.Key, music21.key.KeySignature]:
-                offsetKey = key.getOffsetInHierarchy(self.streamObj)
-                key = self._preprocessKey(key)
+            for keyPreprocessed in self.streamObj[music21.key.Key, music21.key.KeySignature]:
+                offsetKey = keyPreprocessed.getOffsetInHierarchy(self.streamObj)
+                keyPreprocessed = self._preprocessKey(keyPreprocessed)
                 if offset >= offsetKey:
-                    lastKey = key
+                    lastKey = keyPreprocessed
                 else:
                     break
 

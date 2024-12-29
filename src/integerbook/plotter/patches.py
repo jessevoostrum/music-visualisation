@@ -5,7 +5,7 @@ from matplotlib.patches import PathPatch, Polygon
 import numpy as np
 
 
-def Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha=1, facecolor='blue', hatch=None, shape='straight'):
+def Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha=1, facecolor='blue', hatch=None, shape='straight', zorder=0.5):
 
     leftBottom = np.array(leftBottom)
     leftTop = np.array(leftTop)
@@ -42,7 +42,7 @@ def Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha=1, facecolor
         print("undefined shape")
         return
 
-    patch = patches.PathPatch(path, facecolor=facecolor, alpha=alpha, hatch=hatch, lw=0)
+    patch = patches.PathPatch(path, facecolor=facecolor, alpha=alpha, hatch=hatch, lw=0, zorder=zorder)
     return patch
 
 

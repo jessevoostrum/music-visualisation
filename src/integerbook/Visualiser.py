@@ -17,13 +17,13 @@ class Visualiser:
 
         self.streamObj = preprocessStreamObj(streamObj)
 
-        self.Settings = Settings(streamObj, userSettings)
+        self.Settings = Settings(self.streamObj, userSettings)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
         self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
 
-        self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
+        self.PlotterMain = PlotterMain(self.streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
         self.PlotterMain.plot()
 

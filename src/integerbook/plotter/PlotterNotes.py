@@ -63,6 +63,7 @@ class PlotterNotes(Plotter):
 
         notes = self.streamObj[music21.note.Note]
         chords = self.streamObj[music21.chord.Chord]
+        # self.streamObj[music21.stream.Measure][1]  # this fixes offset of first measure after pickup measure. no idea why
 
         for idx in range(len(notes)):
 
@@ -190,7 +191,7 @@ class PlotterNotes(Plotter):
         rightBottom = [xPos + xLength, yPos]
         rightTop = [xPos + xLength, yPos + self.barSpace]
 
-        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape=shape)
+        patch = Parallelogram(leftBottom, leftTop, rightBottom, rightTop, alpha, facecolor, hatch, shape=shape, zorder=0.5)
 
         self.axs[page].add_patch(patch)
 
@@ -281,7 +282,7 @@ class PlotterNotes(Plotter):
             zorder = 1
             if isChordNote:
                 colorText = self.Settings.colorTextChordNotes
-                zorder = .5
+                zorder = .7
 
             if not self.Settings.alternativeSymbols:
                 self.axs[page].text(xPos, yPos, number,

@@ -2,7 +2,7 @@ import os
 import json
 import argparse
 
-from integerbook.main import Visualiser
+from integerbook.Visualiser import Visualiser
 
 
 parser = argparse.ArgumentParser()

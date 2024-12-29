@@ -2,7 +2,7 @@ import music21
 
 def preprocessStreamObj(streamObj):
     # streamObj = self._removeBassStaff(streamObj)
-    streamObj = _correctPickupMeasure(streamObj)
+    # streamObj = _correctPickupMeasure(streamObj)
 
     return streamObj
 

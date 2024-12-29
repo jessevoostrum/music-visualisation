@@ -7,9 +7,6 @@ from integerbook.CanvasCreatorScroll import CanvasCreator
 from integerbook.Settings import Settings
 from integerbook.preprocessStreamObj import preprocessStreamObj
 
-
-
-
 class Visualiser:
     """class for making visualisations from a music21 stream"""
 
@@ -20,13 +17,13 @@ class Visualiser:
 
         self.streamObj = preprocessStreamObj(streamObj)
 
-        self.Settings = Settings(streamObj, userSettings)
+        self.Settings = Settings(self.streamObj, userSettings)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 
         self.CanvasCreator = CanvasCreator(self.Settings, numMeasures)
 
-        self.PlotterMain = PlotterMain(streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
+        self.PlotterMain = PlotterMain(self.streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
         self.PlotterMain.plot()
 
