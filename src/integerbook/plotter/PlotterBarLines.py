@@ -48,12 +48,25 @@ class PlotterBarLines(Plotter):
 
         if not measure.number == 0:
 
-            if measure.offset in self.LocationFinder.offsetsStartLine or measure.number == 1:
+            if self.isFirstNotPickUpMeasureOfLine(measure) and (not self.hasRepatBarline(
+                    measure, 'start') or not self.Settings.thickBarlines):
                 self._plotVLine(measure.offset, self.Settings.lineWidth0, self.Settings.heightBarline0Extension, start=True)
 
-            offsetEndMeasure = measure.offset + measure.quarterLength
-            self._plotVLine(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension,
-                            start=False)
+            if not self.hasRepatBarline(measure, 'end'):
+                offsetEndMeasure = measure.offset + measure.quarterLength
+                self._plotVLine(offsetEndMeasure, self.Settings.lineWidth0, self.Settings.heightBarline0Extension,
+                                start=False)
+
+    def hasRepatBarline(self, measure, direction):
+        for barline in measure[music21.bar.Barline]:
+            offset = measure.offset + barline.offset
+            if type(barline) == music21.bar.Repeat:
+                if barline.direction == direction:
+                    return True
+        return False
+
+    def isFirstNotPickUpMeasureOfLine(self, measure):
+        return measure.offset in self.LocationFinder.offsetsStartLine or measure.number == 1
 
     def _plotSubdivisions(self, measure):
         if self.Settings.subdivision == 1:
@@ -65,7 +78,7 @@ class PlotterBarLines(Plotter):
 
     def _plotSubdivisionBarLines(self, measure, step, lineWidth):
 
-        for t in np.arange(0, measure.quarterLength, step=step):
+        for t in np.arange(0, measure.quarterLength, step=step)[1:]:
             if measure.number == 0:
                 offset = measure.offset + measure.quarterLength - t
             elif measure.number >= 1:
@@ -98,7 +111,7 @@ class PlotterBarLines(Plotter):
         else:
             start = False
 
-        self._plotThickVLine(offset, self.Settings.heightBarline0Extension, start)
+        self._plotThickVLineRepeat(offset, self.Settings.heightBarline0Extension, start)
         self._plotDots(offset, start)
         self._plotHBar(offset, start)
 
@@ -138,6 +151,32 @@ class PlotterBarLines(Plotter):
                           )
         self.axs[page].add_patch(patch)
 
+    def _plotThickVLineRepeat(self, offset, extension, start):
+
+        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
+
+        yPosLow = yPosLineBase + self.Settings.yMin
+
+        lineWidth = self.Settings.widthThickBarline
+
+        if start:
+            xPos -= 0.5 * self.Settings.lineWidth0
+
+        if not start:
+            xPos += 0.5 * self.Settings.lineWidth0 - lineWidth
+
+        lineHeightTotal = self.Settings.yMax + extension - self.Settings.yMin
+        ySpaceDots = 0.033
+
+        lineHeight = lineHeightTotal/2 - ySpaceDots/2
+
+        patch = Rectangle((xPos, yPosLow), width=lineWidth, height=lineHeight,
+                          color='grey', fill=True, zorder=.4, linewidth=0)
+        self.axs[page].add_patch(patch)
+
+        patch = Rectangle((xPos, yPosLow + lineHeight + ySpaceDots), width=lineWidth, height=lineHeight,
+                          color='grey', fill=True, zorder=.4, linewidth=0)
+        self.axs[page].add_patch(patch)
 
     def _plotDots(self, offset, start):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
@@ -164,13 +203,6 @@ class PlotterBarLines(Plotter):
 
             self.axs[page].add_patch(patch)
 
-        # make background of dots white
-        margin = 0.007
-        extraWidth = 0.002
-        patch = Rectangle((xPos - 0.5 * self.Settings.widthThickBarline - extraWidth/2, yPos - distance - margin),
-                          width=self.Settings.widthThickBarline + extraWidth, height=2 * distance + 2 * margin, color='white', zorder=0.5)
-
-        self.axs[page].add_patch(patch)
 
     def _plotHBar(self, offset, start):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
