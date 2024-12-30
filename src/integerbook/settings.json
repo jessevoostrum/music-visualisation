@@ -24,6 +24,7 @@
   "colorTextChords": "black",
   "colorTextChordNotes": "grey",
   "colorLyrics": "black",
+  "colorBarlines": "grey",
   "alphaMelody": 0.2,
   "alphaChordNotes": 0.05,
   "coloursCircleOfFifths": false,

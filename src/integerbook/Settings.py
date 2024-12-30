@@ -45,6 +45,7 @@ class Settings:
         self.colorTextChords = settings["colorTextChords"]
         self.colorTextChordNotes = settings["colorTextChordNotes"]
         self.colorLyrics = settings["colorLyrics"]
+        self.colorBarlines = settings["colorBarlines"]
         self.alphaMelody = settings['alphaMelody']
         self.alphaChordNotes = settings["alphaChordNotes"]
         self.coloursCircleOfFifths = settings['coloursCircleOfFifths']

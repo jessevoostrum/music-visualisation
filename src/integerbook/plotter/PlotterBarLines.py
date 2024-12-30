@@ -124,7 +124,7 @@ class PlotterBarLines(Plotter):
         xPos -= 0.5 * lineWidth
 
         patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
-                          color='grey', fill=True,
+                          color=self.Settings.colorBarlines, fill=True,
                           zorder=.4,
                           linewidth=0
                           )
@@ -145,7 +145,7 @@ class PlotterBarLines(Plotter):
             xPos += 0.5 * self.Settings.lineWidth0 - lineWidth
 
         patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
-                          color='grey', fill=True,
+                          color=self.Settings.colorBarlines, fill=True,
                           zorder=.4,
                           linewidth=0
                           )
@@ -171,11 +171,11 @@ class PlotterBarLines(Plotter):
         lineHeight = lineHeightTotal/2 - ySpaceDots/2
 
         patch = Rectangle((xPos, yPosLow), width=lineWidth, height=lineHeight,
-                          color='grey', fill=True, zorder=.4, linewidth=0)
+                          color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
         self.axs[page].add_patch(patch)
 
         patch = Rectangle((xPos, yPosLow + lineHeight + ySpaceDots), width=lineWidth, height=lineHeight,
-                          color='grey', fill=True, zorder=.4, linewidth=0)
+                          color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
         self.axs[page].add_patch(patch)
 
     def _plotDots(self, offset, start):
@@ -199,7 +199,7 @@ class PlotterBarLines(Plotter):
             distance = 0.007
             xyRatio = self.Settings.widthA4 / self.Settings.heightA4
             patch = Ellipse((xPos, yPos + i*distance), width=self.Settings.widthThickBarline,
-                            height=self.Settings.widthThickBarline*xyRatio, color='grey', linewidth=0)
+                            height=self.Settings.widthThickBarline*xyRatio, color=self.Settings.colorBarlines, linewidth=0)
 
             self.axs[page].add_patch(patch)
 
@@ -216,7 +216,8 @@ class PlotterBarLines(Plotter):
             xPos -= width
 
         for yPos in [yPosLow, yPosHigh - self.Settings.widthThickBarline]:
-            patch = Rectangle((xPos, yPos), height=self.Settings.widthThickBarline, width=width, color='grey', linewidth=0)
+            patch = Rectangle((xPos, yPos), height=self.Settings.widthThickBarline, width=width,
+                              color=self.Settings.colorBarlines, linewidth=0)
             self.axs[page].add_patch(patch)
 
     def _plotRepeatBrackets(self, measure):
@@ -232,14 +233,14 @@ class PlotterBarLines(Plotter):
 
             lineWidth = 1
             self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
-                                  linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
+                                  linestyle='dotted', linewidth=lineWidth, color=self.Settings.colorBarlines, zorder=.5)
 
             if spanner.isFirst(measure):
                 number = spanner.number + "."
-                self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number)
+                self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number, color=self.Settings.colorBarlines)
 
                 self.axs[page].vlines(xPosStart, yPosHigh + 0.01, yPosHigh + 0.02,
-                                      linestyle='dotted', linewidth=lineWidth, color='grey', zorder=.5)
+                                      linestyle='dotted', linewidth=lineWidth, color=self.Settings.colorBarlines, zorder=.5)
 
             if spanner.isLast(measure):
                 # self.axs[page].vlines(xPosEnd, yPosHigh + 0.01, yPosHigh + 0.02,
@@ -279,7 +280,7 @@ class PlotterBarLines(Plotter):
                     text = el.getText()
                     self.axs[page].text(xPos, yPos, text,
                                         fontsize=self.Settings.fontSizeNotes,
-                                        ha=ha, va='baseline')
+                                        ha=ha, va='baseline', color=self.Settings.colorBarlines)
     def _plotSegno(self, xPos, yPos, page, alignRight=True):
         xyRatio = self.Settings.widthA4 / self.Settings.heightA4
         height = self.Settings.capsizeNote
@@ -287,7 +288,7 @@ class PlotterBarLines(Plotter):
         if alignRight:
             xPos -= width
 
-        patches = Segno(xPos, yPos, height, xyRatio)
+        patches = Segno(xPos, yPos, height, xyRatio, color=self.Settings.colorBarlines)
         for patch in patches:
             self.axs[page].add_patch(patch)
 
@@ -302,7 +303,7 @@ class PlotterBarLines(Plotter):
         if alignRight:
             xPos -= width
 
-        patches = Coda(xPos, yPos, height, width, xyRatio)
+        patches = Coda(xPos, yPos, height, width, xyRatio, color=self.Settings.colorBarlines)
         for patch in patches:
             self.axs[page].add_patch(patch)
 
@@ -323,7 +324,7 @@ class PlotterBarLines(Plotter):
             key = self.Settings.getKey(offset)
             letter = self._getKeyLetter(key)
             self.axs[page].text(xPos, yPos, f"1 = {letter}", fontsize=self.Settings.fontSizeNotes,
-                                va='baseline', ha='left')
+                                va='baseline', ha='left', color=self.Settings.colorBarlines)
 
     def _plotTimeSignature(self, measure):
 

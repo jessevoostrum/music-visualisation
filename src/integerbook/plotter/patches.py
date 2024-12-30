@@ -358,7 +358,7 @@ def verticesSegno():
        [7.04181487e-01, 2.42229208e-01]])
     return vertices
 
-def Segno(xPos, yPos, height, xyRatio):
+def Segno(xPos, yPos, height, xyRatio, color):
 
     vertices = verticesSegno()
 
@@ -374,7 +374,7 @@ def Segno(xPos, yPos, height, xyRatio):
 
     path = Path(vertices, codes)
 
-    patch1 = patches.PathPatch(path, facecolor='black', linewidth=0)
+    patch1 = patches.PathPatch(path, facecolor=color, linewidth=0)
 
     xPosEnd = vertices[:,0].max()
     widthSegno = xPosEnd - xPos
@@ -383,21 +383,21 @@ def Segno(xPos, yPos, height, xyRatio):
                (xPosEnd - widthLine, yPos + height),
                (xPosEnd, yPos + height),
                (xPos + widthLine, yPos)]
-    patch2 = patches.Polygon(corners, fill=True, color='black', linewidth=0)
+    patch2 = patches.Polygon(corners, fill=True, color=color, linewidth=0)
     radiusX = widthSegno * 0.1
     radiusY = radiusX * xyRatio
     offsetYCircle = 2 * radiusY
     patch3 = patches.Ellipse((xPos + radiusX, yPos + .5 * height - offsetYCircle), width=2 * radiusX, height= 2 * radiusY,
-                             color='black', linewidth=0)
+                             color=color, linewidth=0)
     patch4 = patches.Ellipse((xPos + widthSegno - radiusX, yPos + .5 * height + offsetYCircle), width=2 * radiusX, height=2 * radiusY,
-                             color='black', linewidth=0)
+                             color=color, linewidth=0)
 
     return [patch1, patch2, patch3, patch4]
 
 def relativeWidthSegno():
     return verticesSegno()[:,0].max()
 
-def Coda(xPos, yPos, height, width, xyRatio):
+def Coda(xPos, yPos, height, width, xyRatio, color):
 
     diameterOuterY = height * .75
     diameterInnerY = 0.9 * diameterOuterY
@@ -405,57 +405,75 @@ def Coda(xPos, yPos, height, width, xyRatio):
     diameterOuterX = width * .7
     diameterInnerX = 0.5 * diameterOuterX
 
+    xCenter = xPos + width / 2
+    yCenter = yPos + height / 2
+    center = (xCenter, yCenter)
+
+    patch1 = DoughnutEllipseFlexible(center, diameterOuterX/2, diameterOuterY/2, diameterInnerX/2, diameterInnerY/2,
+                                     colorText=color)
+
     linewidthY = 0.06 * height
     linewidthX = linewidthY / xyRatio
 
-    xCenter = xPos + width / 2
-    yCenter = yPos + height / 2
-
-    patch1 = patches.Ellipse((xCenter, yCenter), width=diameterOuterX,
-                     height=diameterOuterY, color='black', linewidth=0)
-    patch2 = patches.Ellipse((xCenter, yCenter), width=diameterInnerX,
-                     height=diameterInnerY, color='white', linewidth=0)
+    # patch1 = patches.Ellipse((xCenter, yCenter), width=diameterOuterX,
+    #                  height=diameterOuterY, color='black', linewidth=0)
+    # patch2 = patches.Ellipse((xCenter, yCenter), width=diameterInnerX,
+    #                  height=diameterInnerY, color='white', linewidth=0)
 
     patch3 = patches.Rectangle((xPos, yPos + .5 * height - 0.5 * linewidthY), width=width, height=linewidthY, fill=True,
-                       color='black', linewidth=0)
+                       color=color, linewidth=0)
     patch4 = patches.Rectangle((xPos + .5 * width - 0.5 * linewidthX, yPos), width=linewidthX, height=height, fill=True,
-                       color='black', linewidth=0)
+                       color=color, linewidth=0)
 
-    return [patch1, patch2, patch3, patch4]
+    return [patch1, patch3, patch4]
 
-def adjustLocationAndRatio(pos, xPos, yPos, height, xyRatio):
-    radius = height/2
-    x, y = pos
-    x *= 1 / xyRatio
-    x += xPos + radius / xyRatio
-    y += yPos + radius
-    return [x,y]
 
 def Doughnut(xPos, yPos, height, xyRatio, colorText='black'):
+    width = height / xyRatio
+    radiusX = width / 2
+    radiusY = height / 2
+    center = (xPos + radiusX, yPos + radiusY)
 
-    phi = np.linspace(0, 2 * np.pi, 100) + 0.5 * np.pi
-    circleOuter = height/2 * np.exp(1j * phi)
-    circleOuterV = [adjustLocationAndRatio([p.real, p.imag], xPos, yPos, height, xyRatio)  for p in circleOuter]
+    linewidth = 0.1 * height
 
-    circleInner = height/2 * 0.8 * np.exp(1j * phi)
-    circleInnerV = [adjustLocationAndRatio([p.real, p.imag], xPos, yPos, height, xyRatio) for p in circleInner]
+    return DoughnutEllipse(center, radiusX, radiusY, linewidth, xyRatio, colorText=colorText)
 
-    circleOuterC = [Path.LINETO for p in circleOuterV]
-    circleOuterC[0] = Path.MOVETO
-    circleInnerC = [Path.LINETO for p in circleInnerV]
-    circleInnerC[0] = Path.MOVETO
+def DoughnutEllipse(center, radiusX, radiusY, linewidth, xyRatio, colorText='black'):
+    radiusXInner = radiusX -  linewidth / xyRatio
+    radiusYInner = radiusY -  linewidth
+    return DoughnutEllipseFlexible(center, radiusX, radiusY, radiusXInner, radiusYInner, colorText=colorText)
+
+
+def DoughnutEllipseFlexible(center, radiusXOuter, radiusYOuter, radiusXInner, radiusYInner, colorText='black'):
+
+    ellipseOuterV = makeEllipse(center, radiusXOuter, radiusYOuter)
+    ellipseInnerV = makeEllipse(center, radiusXInner, radiusYInner)
+
+    ellipseOuterC = [Path.LINETO for p in ellipseOuterV]
+    ellipseOuterC[0] = Path.MOVETO
+    ellipseInnerC = [Path.LINETO for p in ellipseInnerV]
+    ellipseInnerC[0] = Path.MOVETO
 
     vertices = []
-    vertices.extend(circleOuterV)
-    vertices.extend(circleInnerV[::-1])
+    vertices.extend(ellipseOuterV)
+    vertices.extend(ellipseInnerV[::-1])
 
     codes = []
-    codes.extend(circleOuterC)
-    codes.extend(circleInnerC)
+    codes.extend(ellipseOuterC)
+    codes.extend(ellipseInnerC)
 
     path = Path(vertices, codes)
     patch = PathPatch(path, facecolor=colorText, linewidth=0)
     return patch
+
+def makeEllipse(center, radiusX, radiusY):
+    phi = np.linspace(0, 2 * np.pi, 100)
+    circle = np.exp(1j * phi)
+
+    vertices = [[center[0] + p.real * radiusX , center[1] + p.imag * radiusY] for p in circle]
+
+    return vertices
+
 
 def Slash(xPos, yPos, height, xyRatio, colorText='black'):
     radiusY = height / 2
