@@ -48,8 +48,9 @@ class Settings:
         self.colorBarlines = settings["colorBarlines"]
         self.alphaMelody = settings['alphaMelody']
         self.alphaChordNotes = settings["alphaChordNotes"]
-        self.coloursCircleOfFifths = settings['coloursCircleOfFifths']
-        self.coloursVoices = settings['coloursVoices']
+        self.coloringCircleOfFifths = settings['coloringCircleOfFifths']
+        self.fixAlphaCircleOfFifths = settings["fixAlphaCircleOfFifths"]
+        self.coloringVoices = settings['coloringVoices']
 
         self.ptToInches = settings['ptToInches']
         self.capHeightRatio = settings['capHeightRatio']

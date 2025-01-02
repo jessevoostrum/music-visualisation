@@ -28,6 +28,7 @@
   "alphaMelody": 0.2,
   "alphaChordNotes": 0.05,
   "coloursCircleOfFifths": false,
+  "fixAlphaCircleOfFifths": true,
   "coloursVoices": false,
   "ptToInches": 0.01389,
   "capHeightRatio": 0.673,

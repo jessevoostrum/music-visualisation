@@ -43,7 +43,7 @@ if args.bass:
     settings['saveCropped'] = True
 
 if args.colourNotes:
-    settings['coloursCircleOfFifths'] = True
+    settings['coloringCircleOfFifths'] = True
 
 if args.lyrics:
     settings['lyrics'] = True

@@ -22,8 +22,8 @@ settings["minorFromRelativeMajorScalePerspective"] = True
 
 settings["lyrics"] = True
 
-settings['coloursVoices'] = True
-settings['coloursCircleOfFifths'] = True
+settings['coloringVoices'] = True
+settings['coloringCircleOfFifths'] = True
 
 # settings['fontDirectory'] = "/Users/jvo/Library/Mobile Documents/com~apple~CloudDocs/fonts/Vulf Mono/Vulf Mono/Desktop/"
 # settings['font'] = 'Vulf Mono'

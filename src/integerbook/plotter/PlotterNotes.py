@@ -4,6 +4,7 @@ import io
 import music21
 from matplotlib.backend_bases import RendererBase
 from matplotlib.patches import FancyBboxPatch, Rectangle, Ellipse
+import matplotlib.patheffects as path_effects
 from itertools import tee, islice, chain
 import numpy as np
 
@@ -285,9 +286,14 @@ class PlotterNotes(Plotter):
                 zorder = .7
 
             if not self.Settings.alternativeSymbols:
-                self.axs[page].text(xPos, yPos, number,
+                text = self.axs[page].text(xPos, yPos, number,
                                     fontsize=fontSize,
                                     va='baseline', ha=horizontalAlignment, color=colorText, zorder=zorder)
+
+                text.set_path_effects([
+                    path_effects.Stroke(linewidth=0.3, foreground='black'),  # Edge color and width
+                    path_effects.Normal()  # Normal rendering on top of the stroke
+                ])
 
                 self._plotAccidental(accidental, fontSize, xPos, yPos, page, colorText=colorText, zorder=zorder)
 
@@ -355,17 +361,17 @@ class PlotterNotes(Plotter):
         alpha = self.Settings.alphaMelody
         hatch = None
 
-        if self.Settings.coloursCircleOfFifths:
+        if self.Settings.coloringCircleOfFifths:
             pitchKey = key.getTonic().ps
             pitchNote = el.pitch.ps
             relativePitch = (pitchNote - pitchKey) % 12
             circleOfFifthIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch)
 
             facecolor = self._colorwheel(circleOfFifthIndex)
-            alpha = self._alpha(circleOfFifthIndex)
+            alpha = self._getAlphaFromCircleOfFifthIndex(circleOfFifthIndex)
 
 
-        elif self.Settings.coloursVoices:
+        elif self.Settings.coloringVoices:
             if self.isSecondVoice(el):
                 facecolor = self.Settings.facecolorSecondVoice
 
@@ -422,13 +428,16 @@ class PlotterNotes(Plotter):
         pitchesCircleOfFifths = [(i * 7) % 12 for i in range(12)]
         return pitchesCircleOfFifths.index(relativePitch)
 
-    def _alpha(self, circleOfFifthIndex):
-        lowestAlpha = 0.2
-        highestAlpha = 0.4
-        firstAlphas = np.linspace(lowestAlpha, highestAlpha, 6, endpoint=False)
-        lastAlphas = np.linspace(highestAlpha, lowestAlpha, 6, endpoint=False)
-        alphas = np.concatenate((firstAlphas, lastAlphas))
-        alpha = alphas[circleOfFifthIndex]
+    def _getAlphaFromCircleOfFifthIndex(self, circleOfFifthIndex):
+        if self.Settings.fixAlphaCircleOfFifths:
+            alpha = self.Settings.alphaMelody
+        else:
+            lowestAlpha = 0.2
+            highestAlpha = 0.4
+            firstAlphas = np.linspace(lowestAlpha, highestAlpha, 6, endpoint=False)
+            lastAlphas = np.linspace(highestAlpha, lowestAlpha, 6, endpoint=False)
+            alphas = np.concatenate((firstAlphas, lastAlphas))
+            alpha = alphas[circleOfFifthIndex]
         return alpha
 
     def _computeXShiftNumbers(self, el, xLength):
@@ -738,6 +747,24 @@ class PlotterNotes(Plotter):
         return chordList
 
     def _colorwheel(self, circleOfFifthIndex):
+        rgbs = [(126/255, 127/255, 234/255, 1.0),
+                (181/255, 132/255, 231/255, 1.0),
+                (234/255, 128/255, 235/255, 1.0),
+                (241/255, 128/255, 188/255, 1.0),
+                (239/255, 122/255, 125/255, 1.0),
+                (204/255, 159/255, 111/255, 1.0),
+                (197/255, 198/255, 110/255, 1.0),
+                (162/255, 203/255, 111/255, 1.0),
+                (125/255, 234/255, 118/255, 1.0),
+                (130/255, 240/255, 191/255, 1.0),
+                (127/255, 240/255, 237/255, 1.0),
+                (140/255, 184/255, 234/255, 1.0)]
+
+        return rgbs[circleOfFifthIndex]
+
+
+
+    def _colorwheel2(self, circleOfFifthIndex):
         """index must be between 0 and 11"""
 
         rgbs = [(0.18062, 0.13244, 0.91856, 1.0),

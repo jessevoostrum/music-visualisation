@@ -1,5 +1,5 @@
 import music21.pitch
-
+import matplotlib.patheffects as path_effects
 
 class Plotter:
 
@@ -35,10 +35,17 @@ class Plotter:
 
             if symbolAccidental:
 
-                self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
+                text = self.axs[page].text(xPosAccidental, yPosAccidental, symbolAccidental,
                                     fontsize=fontSizeAccidental,
                                     va='baseline', ha='right', fontname=self.Settings.font, color=colorText,
                                     zorder=zorder)
+
+                text.set_path_effects([
+                    path_effects.Stroke(linewidth=0.3, foreground='black'),  # Edge color and width
+                    path_effects.Normal()  # Normal rendering on top of the stroke
+                ])
+
+
 
     def getScaleDegreeAndAccidentalFromPitch(self, pitch, key):
         if key.mode == 'major':

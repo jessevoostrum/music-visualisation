@@ -111,7 +111,7 @@ class PlotterBarLines(Plotter):
         else:
             start = False
 
-        self._plotThickVLineRepeat(offset, self.Settings.heightBarline0Extension, start)
+        self._plotThickVLine(offset, self.Settings.heightBarline0Extension, start, repeat=True)
         self._plotDots(offset, start)
         self._plotHBar(offset, start)
 
@@ -130,7 +130,7 @@ class PlotterBarLines(Plotter):
                           )
         self.axs[page].add_patch(patch)
 
-    def _plotThickVLine(self, offset, extension, start):
+    def _plotThickVLine(self, offset, extension, start, repeat=False):
 
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
 
@@ -144,39 +144,31 @@ class PlotterBarLines(Plotter):
         if not start:
             xPos += 0.5 * self.Settings.lineWidth0 - lineWidth
 
-        patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
-                          color=self.Settings.colorBarlines, fill=True,
-                          zorder=.4,
-                          linewidth=0
-                          )
-        self.axs[page].add_patch(patch)
+        if not repeat:
+            patch = Rectangle((xPos, yPosLow), width=lineWidth, height=self.Settings.yMax + extension - self.Settings.yMin,
+                              color=self.Settings.colorBarlines, fill=True,
+                              zorder=.4,
+                              linewidth=0
+                              )
+            self.axs[page].add_patch(patch)
 
-    def _plotThickVLineRepeat(self, offset, extension, start):
+        else:
 
-        page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)
+            lineHeightTotal = self.Settings.yMax + extension - self.Settings.yMin
+            ySpaceDots = 0.033
 
-        yPosLow = yPosLineBase + self.Settings.yMin
+            lineHeight = lineHeightTotal / 2 - ySpaceDots / 2
 
-        lineWidth = self.Settings.widthThickBarline
+            patch = Rectangle((xPos, yPosLow), width=lineWidth, height=lineHeight,
+                              color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
+            self.axs[page].add_patch(patch)
 
-        if start:
-            xPos -= 0.5 * self.Settings.lineWidth0
+            patch = Rectangle((xPos, yPosLow + lineHeight + ySpaceDots), width=lineWidth, height=lineHeight,
+                              color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
+            self.axs[page].add_patch(patch)
 
-        if not start:
-            xPos += 0.5 * self.Settings.lineWidth0 - lineWidth
 
-        lineHeightTotal = self.Settings.yMax + extension - self.Settings.yMin
-        ySpaceDots = 0.033
 
-        lineHeight = lineHeightTotal/2 - ySpaceDots/2
-
-        patch = Rectangle((xPos, yPosLow), width=lineWidth, height=lineHeight,
-                          color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
-        self.axs[page].add_patch(patch)
-
-        patch = Rectangle((xPos, yPosLow + lineHeight + ySpaceDots), width=lineWidth, height=lineHeight,
-                          color=self.Settings.colorBarlines, fill=True, zorder=.4, linewidth=0)
-        self.axs[page].add_patch(patch)
 
     def _plotDots(self, offset, start):
         page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start)

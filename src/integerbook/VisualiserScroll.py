@@ -23,6 +23,9 @@ class Visualiser:
 
         self.CanvasCreator = CanvasCreator(self.Settings, numMeasures)
 
+        for i in range(len(self.streamObj[music21.stream.Measure])):
+            self.streamObj[music21.stream.Measure][i]
+
         self.PlotterMain = PlotterMain(self.streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
         self.PlotterMain.plot()
