@@ -45,6 +45,7 @@ class Settings:
         self.colorTextChords = settings["colorTextChords"]
         self.colorTextChordNotes = settings["colorTextChordNotes"]
         self.colorLyrics = settings["colorLyrics"]
+        self.colorTextKey = settings["colorTextKey"]
         self.colorBarlines = settings["colorBarlines"]
         self.alphaMelody = settings['alphaMelody']
         self.alphaChordNotes = settings["alphaChordNotes"]

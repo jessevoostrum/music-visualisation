@@ -325,7 +325,7 @@ class PlotterBarLines(Plotter):
             self.axs[page].text(xPos, yPos,
                                 f"1 = {letter}",
                                 fontsize=self.Settings.fontSizeNotes,
-                                va='baseline', ha='left', color=self.Settings.colorTextMelody)
+                                va='baseline', ha='left', color=self.Settings.colorTextKey)
 
 
     def _plotTimeSignature(self, measure):
