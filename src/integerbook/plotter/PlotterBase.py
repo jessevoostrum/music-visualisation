@@ -41,59 +41,50 @@ class Plotter:
                                     zorder=zorder)
 
     def getScaleDegreeAndAccidentalFromPitch(self, pitch, key):
-        if self.Settings.minorFromMajorScalePerspective:
-            distance = (pitch.midi - key.tonic.midi) % 12
-            number = 0
-            accidental = None
-            if distance == 0:
-                number = 1
-            if distance == 1:
-                number = 2
-                accidental = -1
-            if distance == 2:
-                number = 2
-            if distance == 3:
-                number = 3
-                accidental = -1
-            if distance == 4:
-                number = 3
-            if distance == 5:
-                number = 4
-            if distance == 6:
-                number = 4
-                accidental = 1
-            if distance == 7:
-                number = 5
-            if distance == 8:
-                number = 6
-                accidental = -1
-            if distance == 9:
-                number = 6
-            if distance == 10:
-                number = 7
-                accidental = -1
-            if distance == 11:
-                number = 7
-
-            if accidental:
-                accidental = music21.pitch.Accidental(accidental)
-            return number, accidental
-        else:
+        if key.mode == 'major':
             return key.getScaleDegreeAndAccidentalFromPitch(pitch)
+        else:
+            if self.Settings.minorFromParallelMajorScalePerspective:
+                return self._getScaleDegreeAndAccidentalParralelMajor(key, pitch)
+            elif self.Settings.minorFromMinorScalePerspective:
+                return key.getScaleDegreeAndAccidentalFromPitch(pitch)
+            elif self.Settings.minorFromRelativeMajorScalePerspective:
+                return key.relative.getScaleDegreeAndAccidentalFromPitch(pitch)
 
-    # used to print key of the song
+    def _getScaleDegreeAndAccidentalParralelMajor(self, key, pitch):
+        number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
+
+        if number in {3, 6, 7}:
+            if accidental and accidental.name == 'flat':
+                number -= 1
+                accidental = None
+            if not accidental:
+                accidental = music21.pitch.Accidental('flat')
+            if accidental and accidental.name == 'sharp':
+                accidental = None
+
+        return number, accidental
+
+
+
+# used to print key of the song
     def _getKeyLetter(self, key):
-        letter = key.tonic.name[0]
-        accidental = key.tonic.accidental
+
+        tonicIsOne = key.mode == 'major' or not self.Settings.minorFromRelativeMajorScalePerspective
+
+        if tonicIsOne:
+            letter = key.tonic.name[0]
+            accidental = key.tonic.accidental
+        else:
+            letter = key.relative.tonic.name[0]
+            accidental = key.relative.tonic.accidental
         if accidental:
             if accidental.name == 'sharp':
-                letter = letter + "{}^\\#"
+                letter = letter + "#"
             elif accidental.name == 'flat':
-                letter = letter + "{}^b"
+                letter = letter + "♭"
 
-        letter = f"$\\mathregular{{{letter}}}$"
-
-        if key.mode == 'minor':
+        if key.mode == 'minor' and self.Settings.minorFromMinorScalePerspective:
             enDash = u'\u2013'
             letter += enDash
 

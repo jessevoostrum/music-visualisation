@@ -288,7 +288,7 @@ class PlotterBarLines(Plotter):
         if alignRight:
             xPos -= width
 
-        patches = Segno(xPos, yPos, height, xyRatio, color=self.Settings.colorBarlines)
+        patches = Segno(xPos, yPos, height, xyRatio, color=self.Settings.colorTextMelody)
         for patch in patches:
             self.axs[page].add_patch(patch)
 
@@ -303,28 +303,38 @@ class PlotterBarLines(Plotter):
         if alignRight:
             xPos -= width
 
-        patches = Coda(xPos, yPos, height, width, xyRatio, color=self.Settings.colorBarlines)
+        patches = Coda(xPos, yPos, height, width, xyRatio, color=self.Settings.colorTextMelody)
         for patch in patches:
             self.axs[page].add_patch(patch)
 
-
     def _plotKey(self, measure):
         for i, key in enumerate(measure[music21.key.Key, music21.key.KeySignature]):
-            if measure == self.streamObj[music21.stream.Measure][0] and i == 0:
+            if measure == self.streamObj[music21.stream.Measure][0] and i == 0 and not self.Settings.plotFirstKeyWithinBar:  # can key change halfway measure?
                 continue
+
             offset = key.getOffsetInHierarchy(self.streamObj)
 
-            page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
-            yPos = yPosLineBase + self.Settings.yMax + self.Settings.heightBarline0Extension - self.Settings.capsizeNote
+            if measure.number == 0:
+                measureInWhichKeyIsPlotted = self.streamObj[music21.stream.Measure][1]
+                offset = measureInWhichKeyIsPlotted.getOffsetInHierarchy(self.streamObj)
+            else:
+                measureInWhichKeyIsPlotted = measure
 
-            xPos += self.Settings.xShiftNumberNote
-            if self._hasRepeatExpressionAtStart(measure):
+
+            page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset, start=True)
+            yPos = yPosLineBase + self.Settings.yMax #+ self.Settings.heightBarline0Extension - self.Settings.capsizeNote
+
+            xPos += self.Settings.xShiftChords
+            if self._hasRepeatExpressionAtStart(measureInWhichKeyIsPlotted):
                 xPos += self.Settings.fontWidthNote * 2
 
             key = self.Settings.getKey(offset)
             letter = self._getKeyLetter(key)
-            self.axs[page].text(xPos, yPos, f"1 = {letter}", fontsize=self.Settings.fontSizeNotes,
-                                va='baseline', ha='left', color=self.Settings.colorBarlines)
+            self.axs[page].text(xPos, yPos,
+                                f"1 = {letter}",
+                                fontsize=self.Settings.fontSizeNotes,
+                                va='baseline', ha='left', color=self.Settings.colorTextMelody)
+
 
     def _plotTimeSignature(self, measure):
 

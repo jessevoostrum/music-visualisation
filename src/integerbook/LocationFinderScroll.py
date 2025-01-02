@@ -12,7 +12,6 @@ class LocationFinder:
         self.offsetsStartLine = [0]
 
     def getLocation(self, offset, start=True):
-        print(offset)
         yPosLineBase = self.getYPosLineBase(0)
         page = 0
         xPos = self._getXPosFromOffsetLine(offset)
@@ -26,8 +25,6 @@ class LocationFinder:
 
     def getMaxXPos(self):
         offsetLengthSong = self.streamObj.duration.quarterLength
-        print(offsetLengthSong)
-        print(self._getXPosFromOffsetLine(offsetLengthSong))
         return self._getXPosFromOffsetLine(offsetLengthSong)
 
     def _getXPosFromOffsetLine(self, offsetLine):

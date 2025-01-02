@@ -55,7 +55,6 @@ class Settings:
         self.capHeightRatio = settings['capHeightRatio']
         self.xShiftNumberNote = settings['xShiftNumberNote']
         self.xShiftChords = settings['xShiftChords']
-        self.setInMajorKey = settings['setInMajorKey']
         self.yLengthTitleAx = settings['yLengthTitleAx']
         self.yPosTitle = settings['yPosTitle']
         self.yPosComposer = settings['yPosComposer']
@@ -89,7 +88,12 @@ class Settings:
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
         self.forceMinor = settings["forceMinor"]
-        self.minorFromMajorScalePerspective = settings["minorFromMajorScalePerspective"]
+        self.minorFromParallelMajorScalePerspective = settings["minorFromParallelMajorScalePerspective"]
+        self.minorFromRelativeMajorScalePerspective = settings['minorFromRelativeMajorScalePerspective']
+        self.minorFromMinorScalePerspective = settings["minorFromMinorScalePerspective"]
+        if self.minorFromParallelMajorScalePerspective + self.minorFromRelativeMajorScalePerspective + self.minorFromMinorScalePerspective != 1:
+            print("specify minor scale perspecive")
+
 
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
@@ -97,6 +101,7 @@ class Settings:
         self.onlyManualSecondaryDominants = settings["onlyManualSecondaryDominants"]
         self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
         self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
+        self.plotFirstKeyWithinBar = settings["plotFirstKeyWithinBar"]
 
         self.dpi = settings["dpi"]
         self.outputFormat = settings["outputFormat"]
@@ -200,16 +205,13 @@ class Settings:
 
     def _preprocessKey(self, key):
         if type(key) == music21.key.KeySignature:
+            print("mode song not specified, assuming major")
             key = key.asKey()
-
-        if self.setInMajorKey and key.mode == 'minor':
-            key = key.relative
 
         if key.mode == 'major' and self.forceMinor:
             key = key.relative
 
         return key
-
 
     def _getRangeNotes(self):
         if self.plotMelody:

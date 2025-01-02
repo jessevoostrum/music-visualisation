@@ -33,7 +33,6 @@
   "capHeightRatio": 0.673,
   "xShiftNumberNote": 0.005,
   "xShiftChords": 0.01,
-  "setInMajorKey": true,
   "yLengthTitleAx": 0.07,
   "yPosTitle": 0.965,
   "yPosComposer": 0.935,
@@ -68,7 +67,9 @@
   "alternativeSymbols": false,
   "chordVerbosity": 2,
   "forceMinor": false,
-  "minorFromMajorScalePerspective": false,
+  "minorFromParallelMajorScalePerspective": true,
+  "minorFromRelativeMajorScalePerspective": false,
+  "minorFromMinorScalePerspective": false,
   "romanNumerals": false,
   "numbersRelativeToChord": false,
   "manualRomanNumerals": [],
@@ -76,6 +77,7 @@
   "ignoreSecondaryDominants": [],
   "manualSecondaryChords": [],
   "dpi": 300,
-  "outputFormat": "pdf"
+  "outputFormat": "pdf",
+  "plotFirstKeyWithinBar": false
 }
 

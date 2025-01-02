@@ -2,10 +2,10 @@ import json
 import glob
 import os
 
-from integerbook.Visualiser import Visualiser
+from integerbook.VisualiserScroll import Visualiser
 
 dirSongs = "/Users/jvo/Documents/programming/sheet-music/sheets/christmas-selection"
-outputDir = "/Users/jvo/Downloads/output-christmas-selection"
+outputDir = "/Users/jvo/Downloads/output"
 
 
 f = open('settings.json')
@@ -18,7 +18,7 @@ settings["measuresPerLine"] = 4
 settings["subdivision"] = 0
 settings['thickBarlines'] = True
 
-settings["setInMajorKey"] = True
+settings["minorFromRelativeMajorScalePerspective"] = True
 
 settings["lyrics"] = True
 

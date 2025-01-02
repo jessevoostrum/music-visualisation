@@ -409,8 +409,8 @@ def Coda(xPos, yPos, height, width, xyRatio, color):
     yCenter = yPos + height / 2
     center = (xCenter, yCenter)
 
-    patch1 = DoughnutEllipseFlexible(center, diameterOuterX/2, diameterOuterY/2, diameterInnerX/2, diameterInnerY/2,
-                                     colorText=color)
+    patch1 = _DoughnutEllipseFlexible(center, diameterOuterX / 2, diameterOuterY / 2, diameterInnerX / 2,
+                                      diameterInnerY / 2, colorText=color)
 
     linewidthY = 0.06 * height
     linewidthX = linewidthY / xyRatio
@@ -441,13 +441,13 @@ def Doughnut(xPos, yPos, height, xyRatio, colorText='black'):
 def DoughnutEllipse(center, radiusX, radiusY, linewidth, xyRatio, colorText='black'):
     radiusXInner = radiusX -  linewidth / xyRatio
     radiusYInner = radiusY -  linewidth
-    return DoughnutEllipseFlexible(center, radiusX, radiusY, radiusXInner, radiusYInner, colorText=colorText)
+    return _DoughnutEllipseFlexible(center, radiusX, radiusY, radiusXInner, radiusYInner, colorText=colorText)
 
 
-def DoughnutEllipseFlexible(center, radiusXOuter, radiusYOuter, radiusXInner, radiusYInner, colorText='black'):
+def _DoughnutEllipseFlexible(center, radiusXOuter, radiusYOuter, radiusXInner, radiusYInner, colorText='black'):
 
-    ellipseOuterV = makeEllipse(center, radiusXOuter, radiusYOuter)
-    ellipseInnerV = makeEllipse(center, radiusXInner, radiusYInner)
+    ellipseOuterV = _makeEllipse(center, radiusXOuter, radiusYOuter)
+    ellipseInnerV = _makeEllipse(center, radiusXInner, radiusYInner)
 
     ellipseOuterC = [Path.LINETO for p in ellipseOuterV]
     ellipseOuterC[0] = Path.MOVETO
@@ -466,7 +466,7 @@ def DoughnutEllipseFlexible(center, radiusXOuter, radiusYOuter, radiusXInner, ra
     patch = PathPatch(path, facecolor=colorText, linewidth=0)
     return patch
 
-def makeEllipse(center, radiusX, radiusY):
+def _makeEllipse(center, radiusX, radiusY):
     phi = np.linspace(0, 2 * np.pi, 100)
     circle = np.exp(1j * phi)
 
