@@ -224,12 +224,12 @@ class PlotterBarLines(Plotter):
             xPosEnd = xPosStart + self.LocationFinder._getXLengthFromOffsetLength(measure.quarterLength)
 
             lineWidth = 1
-            self.axs[page].hlines(yPosHigh + 0.02, xPosStart, xPosEnd,
+            self.axs[page].hlines(yPosHigh + 0.02, xPosStart - self.Settings.lineWidth0/2, xPosEnd,
                                   linestyle='dotted', linewidth=lineWidth, color=self.Settings.colorBarlines, zorder=.5)
 
             if spanner.isFirst(measure):
                 number = spanner.number + "."
-                self.axs[page].text(xPosStart + 0.0055, yPosHigh + 0.01,  number, color=self.Settings.colorBarlines)
+                self.axs[page].text(xPosStart + 0.0055, yPosHigh + self.Settings.heightBarline0Extension,  number, color=self.Settings.colorBarlines)
 
                 self.axs[page].vlines(xPosStart, yPosHigh + 0.01, yPosHigh + 0.02,
                                       linestyle='dotted', linewidth=lineWidth, color=self.Settings.colorBarlines, zorder=.5)
