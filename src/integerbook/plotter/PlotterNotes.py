@@ -368,24 +368,25 @@ class PlotterNotes(Plotter):
             circleOfFifthIndex = self._relativePitchToCircleOfFifthsIndex(relativePitch)
 
             facecolor = self._colorwheel(circleOfFifthIndex)
-            alpha = self._getAlphaFromCircleOfFifthIndex(circleOfFifthIndex)
-
 
         elif self.Settings.coloringVoices:
             if self.isSecondVoice(el):
                 facecolor = self.Settings.facecolorSecondVoice
 
         # ghost note
-        if el.notehead == 'x':
+        if self.isGhostNote(el):
             facecolor = 'grey'
             alpha = 0.15
-            hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern? TODO: make notebook
+            hatch = 'xxxxx'  # this controls the fine graindedness of the x pattern?
 
         if isChordNote:
             facecolor = self.Settings.facecolorChordNotes
             alpha = self.Settings.alphaChordNotes
 
         return alpha, facecolor, hatch
+
+    def isGhostNote(self, el):
+        return el.notehead == 'x'
 
     @staticmethod
     def isSecondVoice(el):
@@ -428,17 +429,6 @@ class PlotterNotes(Plotter):
         pitchesCircleOfFifths = [(i * 7) % 12 for i in range(12)]
         return pitchesCircleOfFifths.index(relativePitch)
 
-    def _getAlphaFromCircleOfFifthIndex(self, circleOfFifthIndex):
-        if self.Settings.fixAlphaCircleOfFifths:
-            alpha = self.Settings.alphaMelody
-        else:
-            lowestAlpha = 0.2
-            highestAlpha = 0.4
-            firstAlphas = np.linspace(lowestAlpha, highestAlpha, 6, endpoint=False)
-            lastAlphas = np.linspace(highestAlpha, lowestAlpha, 6, endpoint=False)
-            alphas = np.concatenate((firstAlphas, lastAlphas))
-            alpha = alphas[circleOfFifthIndex]
-        return alpha
 
     def _computeXShiftNumbers(self, el, xLength):
 
@@ -764,20 +754,4 @@ class PlotterNotes(Plotter):
 
 
 
-    def _colorwheel2(self, circleOfFifthIndex):
-        """index must be between 0 and 11"""
 
-        rgbs = [(0.18062, 0.13244, 0.91856, 1.0),
-                (0.44913, 0.17088, 0.97129, 1.0),
-                (0.69537, 0.25408, 0.98496, 1.0),
-                (0.93769, 0.33352, 0.94809, 1.0),
-                (0.98704, 0.57494, 0.75486, 1.0),
-                (0.98761, 0.78074, 0.51946, 1.0),
-                (0.94377, 0.93236, 0.2092, 1.0),
-                (0.7223, 0.87807, 0.079194, 1.0),
-                (0.46484, 0.78619, 0.051424, 1.0),
-                (0.19593, 0.67703, 0.15768, 1.0),
-                (0.27173, 0.52798, 0.46247, 1.0),
-                (0.183, 0.36488, 0.72404, 1.0)]
-
-        return rgbs[circleOfFifthIndex]

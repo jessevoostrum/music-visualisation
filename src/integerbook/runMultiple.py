@@ -2,7 +2,7 @@ import json
 import glob
 import os
 
-from integerbook.VisualiserScroll import Visualiser
+from integerbook.Visualiser import Visualiser
 
 dirSongs = "/Users/jvo/Documents/programming/sheet-music/sheets/christmas-selection"
 outputDir = "/Users/jvo/Downloads/output"

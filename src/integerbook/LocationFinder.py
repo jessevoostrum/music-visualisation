@@ -44,7 +44,9 @@ class LocationFinder:
             yPosLineBase -= self.Settings.vMarginFirstLineTop
         return yPosLineBase
 
-
+    def getMaxXPos(self):
+        offsetLengthSong = self.streamObj.duration.quarterLength
+        return self._getXPosFromOffsetLine(offsetLengthSong)
 
 
     def _getOffsetsAndXsStartLine(self, offsetLineMax):

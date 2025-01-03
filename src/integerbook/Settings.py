@@ -1,8 +1,8 @@
 import json
 import os
-import copy
 
 import music21
+from integerbook.FontSettings import FontSettings
 
 
 class Settings:
@@ -28,7 +28,6 @@ class Settings:
         self.overlapFactor = settings['overlapFactor']
         self.widthA4 = settings['widthA4']
         self.heightA4 = settings['heightA4']
-        self.xyRatio = self.widthA4 / self.heightA4
         self.widthMarginLine = settings['widthMarginLine']
         self.xMinimalPickupMeasureSpaceFraction = settings['xMinimalPickupMeasureSpaceFraction']
         self.vMarginLineTop = settings['vMarginLineTop']
@@ -46,8 +45,8 @@ class Settings:
         self.colorBarlines = settings["colorBarlines"]
         self.alphaMelody = settings['alphaMelody']
         self.alphaChordNotes = settings["alphaChordNotes"]
+
         self.coloringCircleOfFifths = settings['coloringCircleOfFifths']
-        self.fixAlphaCircleOfFifths = settings["fixAlphaCircleOfFifths"]
         self.coloringVoices = settings['coloringVoices']
 
         self.ptToInches = settings['ptToInches']
@@ -82,16 +81,16 @@ class Settings:
         self.thickBarlines = settings['thickBarlines']
         self.extendBarlineTop = settings["extendBarlineTop"]
         self.printArranger = settings['printArranger']
-        self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
         self.vMarginLyricsRelative = settings["vMarginLyricsRelative"]
         self.alternativeSymbols = settings["alternativeSymbols"]
         self.chordVerbosity = settings["chordVerbosity"]
+
         self.forceMinor = settings["forceMinor"]
+
         self.minorFromParallelMajorScalePerspective = settings["minorFromParallelMajorScalePerspective"]
         self.minorFromRelativeMajorScalePerspective = settings['minorFromRelativeMajorScalePerspective']
         self.minorFromMinorScalePerspective = settings["minorFromMinorScalePerspective"]
-        if self.minorFromParallelMajorScalePerspective + self.minorFromRelativeMajorScalePerspective + self.minorFromMinorScalePerspective != 1:
-            print("specify minor scale perspecive")
+
 
 
         self.romanNumerals = settings["romanNumerals"]
@@ -108,15 +107,32 @@ class Settings:
         self.dpi = settings["dpi"]
         self.outputFormat = settings["outputFormat"]
 
-        ### Font stuff
-
         self.fontDirectory = settings['fontDirectory']
         self.fontPath = settings["fontPath"]
         self.fontPathRoman = settings["fontPathRoman"]
         self.fontStyle = settings["fontStyle"]
         self.fontWeight = settings["fontWeight"]
         self.fontSizeAccidentalRelative = settings['fontSizeAccidentalRelative']
+        self.scroll = settings["scroll"]
 
+        ### change settings
+
+        if self.scroll:
+            self.plotMetadata = False
+            self.plotFirstKeyWithinBar = True
+
+        ### check if settings are passed correctly
+
+        if self.minorFromParallelMajorScalePerspective + self.minorFromRelativeMajorScalePerspective + self.minorFromMinorScalePerspective != 1:
+            print("specify minor scale perspecive")
+
+        if self.coloringVoices + self.coloringCircleOfFifths != 1:
+            print('specify coloring scheme')
+
+        ###
+
+        self.xyRatio = self.widthA4 / self.heightA4
+        self.xMarginNoteThickBarline = self.widthThickBarline - 0.5 * self.lineWidth0
 
         pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontDimensions.json')
         f = open(pathFontDimensions)
@@ -150,7 +166,6 @@ class Settings:
         self.fontSizeTypeSmall = settings['fontSizeTypeSmallPerFontSizeType'] * self.fontSizeType
 
         self.fontSettings = FontSettings(self.font, self.fontSizeType)
-
 
         self.capsizeType = fD["capsize"] * self.fontSizeType
 
@@ -237,28 +252,3 @@ class Settings:
 
 
 
-class FontSettings:
-
-    def __init__(self, font, fontSizeType):
-
-        pathFontDimensions = os.path.join(os.path.dirname(__file__), 'fontSettings.json')
-        f = open(pathFontDimensions)
-        fontSettings = json.load(f)
-        if font in fontSettings.keys():
-            fontSettings = fontSettings[font]
-        else:
-            fontSettings = fontSettings['DejaVu Sans']
-            print("no fontsettings available")
-
-
-        self.widthCharacter = fontSettings['widthCharacterRelative'] * fontSizeType
-        self.widthMinus = fontSettings['widthMinusRelative'] * fontSizeType
-        self.accidentalSpace = fontSettings['accidentalSpaceRelative'] * fontSizeType
-        self.accidentalSizeRelative = fontSettings["accidentalSizeRelative"]
-        self.widthDelta = fontSettings["widthDeltaRelative"] * fontSizeType
-        self.widthCircle = fontSettings["widthCircleRelative"] * fontSizeType
-        self.spaceAfterAddSus = fontSettings["spaceAfterAddSusRelative"] * fontSizeType
-        self.accidentalXPositionRelative = fontSettings["accidentalXPositionRelative"]
-        self.hDistanceChordAddition = fontSettings['hDistanceChordAdditionRelative'] * fontSizeType
-        self.positionSlashRelative = fontSettings["positionSlashRelative"]
-        self.widthAccidentalSlash = fontSettings["widthAccidentalSlashRelative"] * fontSizeType

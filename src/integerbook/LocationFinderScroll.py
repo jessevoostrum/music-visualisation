@@ -3,7 +3,7 @@ import math
 import music21
 
 
-class LocationFinder:
+class LocationFinderScroll:
 
     def __init__(self, streamObj, Settings):
         self.streamObj = streamObj
@@ -18,7 +18,6 @@ class LocationFinder:
 
         return page, yPosLineBase, xPos
 
-
     def getYPosLineBase(self, _):
         yPosLineBase = 1 - self.Settings.yMax - self.Settings.vMarginLineTop
         return yPosLineBase
@@ -26,6 +25,9 @@ class LocationFinder:
     def getMaxXPos(self):
         offsetLengthSong = self.streamObj.duration.quarterLength
         return self._getXPosFromOffsetLine(offsetLengthSong)
+
+    def getNumPages(self):
+        return 1
 
     def _getXPosFromOffsetLine(self, offsetLine):
         xPos = self._getXLengthFromOffsetLength(offsetLine) + 0.01

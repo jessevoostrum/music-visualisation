@@ -28,9 +28,8 @@
   "colorBarlines": "grey",
   "alphaMelody": 0.2,
   "alphaChordNotes": 0.05,
-  "coloursCircleOfFifths": false,
-  "fixAlphaCircleOfFifths": true,
-  "coloursVoices": false,
+  "coloringsCircleOfFifths": false,
+  "coloringsVoices": true,
   "ptToInches": 0.01389,
   "capHeightRatio": 0.673,
   "xShiftNumberNote": 0.005,
@@ -80,6 +79,7 @@
   "manualSecondaryChords": [],
   "dpi": 300,
   "outputFormat": "pdf",
-  "plotFirstKeyWithinBar": false
+  "plotFirstKeyWithinBar": false,
+  "scroll": false
 }
 

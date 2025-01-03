@@ -3,6 +3,7 @@ import music21
 
 from integerbook.plotter.PlotterMain import PlotterMain
 from integerbook.LocationFinder import LocationFinder
+from integerbook.LocationFinderScroll import LocationFinderScroll
 from integerbook.CanvasCreator import CanvasCreator
 from integerbook.Settings import Settings
 from integerbook.preprocessStreamObj import preprocessStreamObj
@@ -20,9 +21,14 @@ class Visualiser:
 
         self.Settings.updateSettings(self.streamObj)
 
-        self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
+        if not self.Settings.scroll:
+            self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
+        else:
+            self.LocationFinder = LocationFinderScroll(self.streamObj, self.Settings)
 
-        self.CanvasCreator = CanvasCreator(self.Settings, self.LocationFinder.getNumPages())
+        self.CanvasCreator = CanvasCreator(self.Settings,
+                                           numPages=self.LocationFinder.getNumPages(),
+                                           numMeasures=len(self.streamObj[music21.stream.Measure]) )
 
         self.PlotterMain = PlotterMain(self.streamObj, self.Settings, self.LocationFinder, self.CanvasCreator.getAxs())
 
@@ -33,15 +39,19 @@ class Visualiser:
 
     def saveFig(self, dirName=None, buffer=None):
         yPosLowest = self.LocationFinder.getYPosLineBase(-1) + self.Settings.yMin
+        maxXPos = self.LocationFinder.getMaxXPos()
         if buffer:
             self.CanvasCreator.saveFig(buffer, yPosLowest)
         else:
             title = self.getSongTitle()
             if not dirName:
-                pathName = title + '.pdf'
+                pathName = title
             else:
-                pathName = dirName + '/' + title + '.pdf'
-            self.CanvasCreator.saveFig(pathName, yPosLowest)
+                pathName = dirName + '/' + title
+            pathName += '.' + self.Settings.outputFormat
+
+            self.CanvasCreator.saveFig(pathName, yPosLowest, self.LocationFinder.getMaxXPos())
+
 
 
 
