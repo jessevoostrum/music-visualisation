@@ -7,15 +7,13 @@ import music21
 
 class Settings:
 
-    def __init__(self, streamObj, userSettings):
+    def __init__(self, userSettings):
 
         pathSettings = os.path.join(os.path.dirname(__file__), 'settings.json')
         f = open(pathSettings)
         settings = json.load(f)
 
         settings.update(userSettings)
-
-        self.streamObj = copy.deepcopy(streamObj)
 
         self.settings = settings
 
@@ -166,29 +164,30 @@ class Settings:
         else:
             self.heightBarline0Extension = 0
 
-
-
-
-        ### extract info about streamObj
-
-        self.numLinesLyrics = self._countNumLinesLyrics()
         self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
 
-        self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
 
-        self.lengthFirstMeasure = self._getLengthFirstMeasure()
+
+
+    def updateSettings(self, streamObj):
+        
+        self.numLinesLyrics = self._countNumLinesLyrics(streamObj)
+
+        self.lyricHeightMax = self._countNumVoices(streamObj) * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
+
+        self.lengthFirstMeasure = self._getLengthFirstMeasure(streamObj)
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
-        self.noteLowest, self.noteHighest = self._getRangeNotes()
-        self.yMin, self.yMax = self._getRangeYs()
+        self.noteLowest, self.noteHighest = self._getRangeNotes(streamObj)
+        self.yMin, self.yMax = self._getRangeYs(streamObj)
 
 
 
-    def _getRangeNotes(self):
+    def _getRangeNotes(self, streamObj):
         if self.plotMelody:
             p = music21.analysis.discrete.Ambitus()
-            if p.getPitchSpan(self.streamObj):
-                pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(self.streamObj)]
+            if p.getPitchSpan(streamObj):
+                pitchSpan = [int(thisPitch.ps) for thisPitch in p.getPitchSpan(streamObj)]
                 return pitchSpan[0], pitchSpan[1]
             else:
                 return 1, 10
@@ -197,12 +196,12 @@ class Settings:
             nH = nL + 12
             return nL, nH
 
-    def _getRangeYs(self):
+    def _getRangeYs(self, streamObj):
         numTones = self.noteHighest - self.noteLowest + 1
         yMax = numTones * self.barSpace * (1 - self.overlapFactor) + self.barSpace * self.overlapFactor
         yMin = 0
 
-        chords = len(self.streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
+        chords = len(streamObj.flatten().getElementsByClass('ChordSymbol')) > 0
         if chords and self.plotChords:
             yMin -= max(self.heightChordAddition * self.capsizeChord + self.capsizeType, self.capsizeType)
 
@@ -210,9 +209,9 @@ class Settings:
             yMin -= self.lyricHeightMax  # ? this is zero when there are no lyrics
         return yMin, yMax
 
-    def _countNumVoices(self):
+    def _countNumVoices(self, streamObj):
         "maximum is 2"
-        for el in self.streamObj[music21.note.Note]:
+        for el in streamObj[music21.note.Note]:
             if el.containerHierarchy():
                 container = el.containerHierarchy()[0]
                 if type(container) == music21.stream.Voice:
@@ -220,9 +219,9 @@ class Settings:
                         return 2
         return 1
 
-    def _countNumLinesLyrics(self):
+    def _countNumLinesLyrics(self, streamObj):
         maxNumLines = 0
-        for el in self.streamObj[music21.note.Note]:
+        for el in streamObj[music21.note.Note]:
             if el.lyric:
                 numLines = el.lyric.count('\n') + 1
                 if numLines > maxNumLines:
@@ -231,8 +230,8 @@ class Settings:
         return maxNumLines
 
 
-    def _getLengthFirstMeasure(self):
-        length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
+    def _getLengthFirstMeasure(self, streamObj):
+        length = streamObj.measure(1)[music21.stream.Measure][0].quarterLength
         return length
 
 

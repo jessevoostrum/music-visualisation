@@ -13,11 +13,12 @@ class Visualiser:
 
     def __init__(self, pathToSong, userSettings={}):
 
+        self.Settings = Settings(userSettings)
+
         streamObj = music21.converter.parse(pathToSong)
+        self.streamObj = preprocessStreamObj(streamObj, self.Settings)
 
-        self.streamObj = preprocessStreamObj(streamObj)
-
-        self.Settings = Settings(self.streamObj, userSettings)
+        self.Settings.updateSettings(self.streamObj)
 
         self.LocationFinder = LocationFinder(self.streamObj, self.Settings)
 

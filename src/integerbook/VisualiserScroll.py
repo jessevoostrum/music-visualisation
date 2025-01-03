@@ -15,7 +15,7 @@ class Visualiser:
         streamObj = music21.converter.parse(pathToSong)
         numMeasures = len(streamObj[music21.stream.Measure])
 
-        self.streamObj = preprocessStreamObj(streamObj)
+        self.streamObj = preprocessStreamObj(streamObj, self.Settings)
 
         self.Settings = Settings(self.streamObj, userSettings)
 
