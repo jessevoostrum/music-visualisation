@@ -13,8 +13,7 @@ class Settings:
         f = open(pathSettings)
         settings = json.load(f)
 
-        if userSettings:
-            settings.update(userSettings)
+        settings.update(userSettings)
 
         self.streamObj = copy.deepcopy(streamObj)
 
@@ -99,10 +98,13 @@ class Settings:
 
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
-        self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(settings["manualRomanNumerals"])
+
         self.onlyManualSecondaryDominants = settings["onlyManualSecondaryDominants"]
-        self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(settings["ignoreSecondaryDominants"])
-        self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(settings["manualSecondaryChords"])
+
+        self.manualRomanNumeralDict = settings["manualRomanNumerals"]
+        self.ignoreSecondaryDominants = settings["ignoreSecondaryDominants"]
+        self.manualSecondaryChordDict = settings["manualSecondaryChords"]
+
         self.plotFirstKeyWithinBar = settings["plotFirstKeyWithinBar"]
 
         self.dpi = settings["dpi"]
@@ -154,11 +156,6 @@ class Settings:
 
         self.capsizeType = fD["capsize"] * self.fontSizeType
 
-        self.numLinesLyrics = self._countNumLinesLyrics()
-        self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
-
-        self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
-
         self.fontSizeNoteAccidental = self.fontSizeAccidentalRelative * self.fontSizeNotes
         self.barSpace = self.barSpacePerCapsize * self.capsizeNote
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
@@ -170,6 +167,15 @@ class Settings:
             self.heightBarline0Extension = 0
 
 
+
+
+        ### extract info about streamObj
+
+        self.numLinesLyrics = self._countNumLinesLyrics()
+        self.lineHeightLyrics = (1 + self.vMarginLyricsRelative) * self.capsizeLyric
+
+        self.lyricHeightMax = self._countNumVoices() * self.numLinesLyrics * self.lineHeightLyrics + self.capsizeLyric * self.vMarginLyricsRelative
+
         self.lengthFirstMeasure = self._getLengthFirstMeasure()
         self.offsetLineMax = self.lengthFirstMeasure * self.measuresPerLine
         self.xMinimalPickupMeasureSpace = self.xMinimalPickupMeasureSpaceFraction * self.offsetLineMax
@@ -177,43 +183,6 @@ class Settings:
         self.yMin, self.yMax = self._getRangeYs()
 
 
-
-
-
-
-
-    def getSettings(self):
-        return self.settings
-
-    def getKey(self, offset):
-        lastKey = None
-        if self.streamObj[music21.key.Key, music21.key.KeySignature]:
-            for keyPreprocessed in self.streamObj[music21.key.Key, music21.key.KeySignature]:
-                offsetKey = keyPreprocessed.getOffsetInHierarchy(self.streamObj)
-                keyPreprocessed = self._preprocessKey(keyPreprocessed)
-                if offset >= offsetKey:
-                    lastKey = keyPreprocessed
-                else:
-                    break
-
-        if not lastKey:
-            try:
-                lastKey = self.streamObj.analyze('key')
-            except:
-                lastKey = music21.key.Key('C')
-                print('key analysis failed')
-
-        return lastKey
-
-    def _preprocessKey(self, key):
-        if type(key) == music21.key.KeySignature:
-            print("mode song not specified, assuming major")
-            key = key.asKey()
-
-        if key.mode == 'major' and self.forceMinor:
-            key = key.relative
-
-        return key
 
     def _getRangeNotes(self):
         if self.plotMelody:
@@ -266,41 +235,6 @@ class Settings:
         length = self.streamObj.measure(1)[music21.stream.Measure][0].quarterLength
         return length
 
-    def _convertMeasureChordIdcsToGlobalIdcs(self, measureChordIdcs):
-        globalChordIdcs = []
-        for measureChordIdx in measureChordIdcs:
-            globalChordIdx = self._measureChordIdxToGlobalChordIdx(measureChordIdx)
-            globalChordIdcs.append(globalChordIdx)
-        return globalChordIdcs
-
-    def _makeManualSecondaryChordDict(self, manualSecondaryChords):
-        manualSecondaryChordDict = {}
-        for manualSecondaryChord in manualSecondaryChords:
-            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualSecondaryChord[0])
-            manualSecondaryChordDict[str(globalChordlIdx)] = {
-                "root": manualSecondaryChord[1],
-                "target": manualSecondaryChord[2],
-                "accidentalRoot": manualSecondaryChord[3] if len(manualSecondaryChord) > 3 else None,
-                "accidentalTarget": manualSecondaryChord[4] if len(manualSecondaryChord) > 3 else None,
-            }
-        return manualSecondaryChordDict
-
-    def _makeManualRomanNumeralDict(self, manualRomanNumerals):
-        manualRomanNumeralDict = {}
-        for manualRomanNumeral in manualRomanNumerals:
-            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualRomanNumeral[0])
-            manualRomanNumeralDict[str(globalChordlIdx)] = {
-                "numeral": manualRomanNumeral[1],
-                "accidental": manualRomanNumeral[2] if len(manualRomanNumeral) > 2 else None,
-            }
-        return manualRomanNumeralDict
-
-    def _measureChordIdxToGlobalChordIdx(self, measureChordIdx):
-        globalChordIdx = 0
-        for measure in self.streamObj[music21.stream.Measure]:
-            if measure.number == measureChordIdx[0]:
-                return globalChordIdx + measureChordIdx[1]
-            globalChordIdx += len(measure[music21.harmony.ChordSymbol])
 
 
 

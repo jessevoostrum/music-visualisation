@@ -320,7 +320,7 @@ class PlotterBarLines(Plotter):
             if self._hasRepeatExpressionAtStart(measureInWhichKeyIsPlotted):
                 xPos += self.Settings.fontWidthNote * 2
 
-            key = self.Settings.getKey(offset)
+            key = self.getKey(offset)
             letter = self._getKeyLetter(key)
             self.axs[page].text(xPos, yPos,
                                 f"1 = {letter}",

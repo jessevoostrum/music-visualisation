@@ -130,7 +130,7 @@ class PlotterNotes(Plotter):
         offsetLength = el.duration.quarterLength
         xLength = self.LocationFinder._getXLengthFromOffsetLength(offsetLength)
 
-        key = self.Settings.getKey(offset)
+        key = self.getKey(offset)
 
         slope = None
         if self._isGlissando(el):

@@ -49,7 +49,7 @@ class PlotterMetadata(Plotter):
 
     def _plotKey(self):
 
-        key = self.Settings.getKey(0)
+        key = self.getKey(0)
         number = "1"
         if self.Settings.numbersRelativeToChord:
             number = "I"

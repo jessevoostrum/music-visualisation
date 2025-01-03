@@ -97,3 +97,33 @@ class Plotter:
 
         return letter
 
+    def getKey(self, offset):
+        lastKey = None
+        if self.streamObj[music21.key.Key, music21.key.KeySignature]:
+            for keyPreprocessed in self.streamObj[music21.key.Key, music21.key.KeySignature]:
+                offsetKey = keyPreprocessed.getOffsetInHierarchy(self.streamObj)
+                keyPreprocessed = self._preprocessKey(keyPreprocessed)
+                if offset >= offsetKey:
+                    lastKey = keyPreprocessed
+                else:
+                    break
+
+        if not lastKey:
+            try:
+                lastKey = self.streamObj.analyze('key')
+            except:
+                lastKey = music21.key.Key('C')
+                print('key analysis failed')
+
+        return lastKey
+
+    def _preprocessKey(self, key):
+        if type(key) == music21.key.KeySignature:
+            print("mode song not specified, assuming major")
+            key = key.asKey()
+
+        if key.mode == 'major' and self.Settings.forceMinor:
+            key = key.relative
+
+        return key
+

@@ -17,6 +17,10 @@ class PlotterChords(Plotter):
 
         self.yMin = self.Settings.yMin
 
+        self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(self.Settings.manualRomanNumeralDict)
+        self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(self.Settings.ignoreSecondaryDominants)
+        self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(self.Settings.manualSecondaryChordDict)
+
 
 
     def plotChords(self):
@@ -54,7 +58,7 @@ class PlotterChords(Plotter):
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
-        key = self.Settings.getKey(offsetEl)
+        key = self.getKey(offsetEl)
         number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
 
         chordNumber = number
@@ -383,7 +387,7 @@ class PlotterChords(Plotter):
 
                 fontSizeAddition = self.Settings.fontSizeAccidentalRelative * self.Settings.fontSizeChords
 
-                key = self.Settings.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
+                key = self.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
 
                 pitch = chordSymbol.bass()
                 number, accidental = self.getScaleDegreeAndAccidentalFromPitch(pitch, key)
@@ -423,13 +427,13 @@ class PlotterChords(Plotter):
     def _plotRomanNumeralAndAccidental(self, chordSymbol, xPos, yPos, page, idxChord, chords):
 
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
-        key = self.Settings.getKey(offsetEl)
+        key = self.getKey(offsetEl)
         number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
 
         chordNumber = self._getRomanNumeral(number, key, chordSymbol)
-        if str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
-            chordNumber = self.Settings.manualRomanNumeralDict[str(idxChord)]['numeral']
-            accidental = self.Settings.manualRomanNumeralDict[str(idxChord)]['accidental']
+        if str(idxChord) in self.manualRomanNumeralDict.keys():
+            chordNumber = self.manualRomanNumeralDict[str(idxChord)]['numeral']
+            accidental = self.manualRomanNumeralDict[str(idxChord)]['accidental']
 
         elif self._plotAsSecondaryDominant(chordSymbol, key, idxChord):
             chordNumber = self._rootSecondaryChord(idxChord)
@@ -451,7 +455,7 @@ class PlotterChords(Plotter):
 
     def _plotSecondaryTargetNumeral(self, chordSymbol, xPos, yPos, page, idxChord):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
-        key = self.Settings.getKey(offsetEl)
+        key = self.getKey(offsetEl)
         if self._plotAsSecondaryDominant(chordSymbol, key, idxChord):
             target = self._targetSecondaryChord(chordSymbol, key, idxChord)
             accidental = self._accidentalTargetSecondaryChord(idxChord)
@@ -466,38 +470,38 @@ class PlotterChords(Plotter):
             self._plotAccidental(accidental, self.Settings.fontSizeChords, xPos, yPos, page)
 
     def _plotAsSecondaryDominant(self, chordSymbol, key, idxChord):
-        if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
+        if str(idxChord) in self.manualSecondaryChordDict.keys():
             return True
         elif self.Settings.onlyManualSecondaryDominants:
             return False
-        elif idxChord in self.Settings.ignoreSecondaryDominants or str(idxChord) in self.Settings.manualRomanNumeralDict.keys():
+        elif idxChord in self.ignoreSecondaryDominants or str(idxChord) in self.manualRomanNumeralDict.keys():
             return False
         elif self._isSecondaryDominant(chordSymbol, key):
             return True
         return False
 
     def _rootSecondaryChord(self, idxChord):
-        if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
-            return self.Settings.manualSecondaryChordDict[str(idxChord)]["root"]
+        if str(idxChord) in self.manualSecondaryChordDict.keys():
+            return self.manualSecondaryChordDict[str(idxChord)]["root"]
         else:
             return "V"
 
     def _targetSecondaryChord(self, chordSymbol, key, idxChord):
-        if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
-            return self.Settings.manualSecondaryChordDict[str(idxChord)]["target"]
+        if str(idxChord) in self.manualSecondaryChordDict.keys():
+            return self.manualSecondaryChordDict[str(idxChord)]["target"]
         else:
             return self._targetSecondaryDominant(chordSymbol, key)
 
     def _accidentalRootSecondaryChord(self, idxChord):
-        if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
-            accidental = self.Settings.manualSecondaryChordDict[str(idxChord)]['accidentalRoot']
+        if str(idxChord) in self.manualSecondaryChordDict.keys():
+            accidental = self.manualSecondaryChordDict[str(idxChord)]['accidentalRoot']
             if accidental:
                 music21.pitch.Accidental(accidental)
         return None
 
     def _accidentalTargetSecondaryChord(self, idxChord):
-        if str(idxChord) in self.Settings.manualSecondaryChordDict.keys():
-            accidental = self.Settings.manualSecondaryChordDict[str(idxChord)]['accidentalTarget']
+        if str(idxChord) in self.manualSecondaryChordDict.keys():
+            accidental = self.manualSecondaryChordDict[str(idxChord)]['accidentalTarget']
             if accidental:
                 return music21.pitch.Accidental(accidental)
         return None
@@ -526,6 +530,43 @@ class PlotterChords(Plotter):
         number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
         targetNumber = (number + 3) % 7
         return self._getRomanNumeral(targetNumber, key)
+
+    def _convertMeasureChordIdcsToGlobalIdcs(self, measureChordIdcs):
+        globalChordIdcs = []
+        for measureChordIdx in measureChordIdcs:
+            globalChordIdx = self._measureChordIdxToGlobalChordIdx(measureChordIdx)
+            globalChordIdcs.append(globalChordIdx)
+        return globalChordIdcs
+
+    def _makeManualSecondaryChordDict(self, manualSecondaryChords):
+        manualSecondaryChordDict = {}
+        for manualSecondaryChord in manualSecondaryChords:
+            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualSecondaryChord[0])
+            manualSecondaryChordDict[str(globalChordlIdx)] = {
+                "root": manualSecondaryChord[1],
+                "target": manualSecondaryChord[2],
+                "accidentalRoot": manualSecondaryChord[3] if len(manualSecondaryChord) > 3 else None,
+                "accidentalTarget": manualSecondaryChord[4] if len(manualSecondaryChord) > 3 else None,
+            }
+        return manualSecondaryChordDict
+
+    def _makeManualRomanNumeralDict(self, manualRomanNumerals):
+        manualRomanNumeralDict = {}
+        for manualRomanNumeral in manualRomanNumerals:
+            globalChordlIdx = self._measureChordIdxToGlobalChordIdx(manualRomanNumeral[0])
+            manualRomanNumeralDict[str(globalChordlIdx)] = {
+                "numeral": manualRomanNumeral[1],
+                "accidental": manualRomanNumeral[2] if len(manualRomanNumeral) > 2 else None,
+            }
+        return manualRomanNumeralDict
+
+    def _measureChordIdxToGlobalChordIdx(self, measureChordIdx):
+        globalChordIdx = 0
+        for measure in self.streamObj[music21.stream.Measure]:
+            if measure.number == measureChordIdx[0]:
+                return globalChordIdx + measureChordIdx[1]
+            globalChordIdx += len(measure[music21.harmony.ChordSymbol])
+
 
 
     @staticmethod

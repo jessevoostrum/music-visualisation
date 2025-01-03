@@ -11,7 +11,7 @@ from integerbook.preprocessStreamObj import preprocessStreamObj
 class Visualiser:
     """class for making visualisations from a music21 stream"""
 
-    def __init__(self, pathToSong, userSettings=None):
+    def __init__(self, pathToSong, userSettings={}):
 
         streamObj = music21.converter.parse(pathToSong)
 
