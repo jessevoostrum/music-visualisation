@@ -8,6 +8,8 @@ from matplotlib.patches import Ellipse, Polygon
 from integerbook.plotter.patches import Triangle, Doughnut, Slash
 
 
+
+
 class PlotterChords(Plotter):
 
     def __init__(self, streamObj, settings, LocationFinder, axs):
@@ -22,10 +24,13 @@ class PlotterChords(Plotter):
 
 
     def plotChords(self):
-        chords = self.streamObj[music21.harmony.ChordSymbol]
+        chords = self.streamObj.flatten().getElementsByClass('ChordSymbol')
         for idxChord, chord, in enumerate(chords):
-
             offset = chord.offset
+
+            if self._twoChordsWithSameOffset(idxChord, chords):
+                continue
+
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
 
             xPos = xPos + self.Settings.xShiftChords
@@ -408,6 +413,11 @@ class PlotterChords(Plotter):
                 # plot accidental
                 self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page)
 
+    def _twoChordsWithSameOffset(self, i, chords):
+        if i > 0:
+            if chords[i].offset == chords[i-1].offset:
+                return True
+        return False
 
     def _plotNoChord(self, xPos, yPos, page):
 

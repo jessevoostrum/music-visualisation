@@ -11,7 +11,7 @@ import numpy as np
 from integerbook.plotter.patches import Parallelogram
 from integerbook.plotter.PlotterBase import Plotter
 
-from integerbook.plotter.PlotterChords import PlotterChords
+from integerbook.plotter.PlotterChordsOld import PlotterChords
 
 
 class PlotterNotes(Plotter):

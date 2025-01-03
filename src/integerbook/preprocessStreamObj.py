@@ -6,9 +6,20 @@ def preprocessStreamObj(streamObj, Settings):
     streamObj = _addKeyWhenKeyIsMissing(streamObj)
     # streamObj = self._removeBassStaff(streamObj)
     streamObj = _correctPickupMeasure(streamObj)
-
+    streamObj = _removeSecondChordSymbolInSamePlace(streamObj)
     return streamObj
 
+
+def _removeSecondChordSymbolInSamePlace(streamObj):
+    for measure in streamObj[music21.stream.Measure]:
+        lastChordSymbol = None
+        for chordSymbol in measure[music21.harmony.ChordSymbol]:
+            if lastChordSymbol:
+                if chordSymbol.offset == lastChordSymbol.offset:
+                    measure.remove(chordSymbol)
+                    print('removed chord symbol', chordSymbol)
+            lastChordSymbol = chordSymbol
+    return streamObj
 
 def _makeKeySignatureIntoKey(streamObj):
     for measure in streamObj[music21.stream.Measure]:
