@@ -2,7 +2,7 @@
 from matplotlib import rc
 
 from integerbook.plotter.PlotterNotes import PlotterNotes
-from integerbook.plotter.PlotterChordsOld import PlotterChords
+from integerbook.plotter.PlotterChords import PlotterChords
 from integerbook.plotter.PlotterBarLines import PlotterBarLines
 from integerbook.plotter.PlotterMetadata import PlotterMetadata
 

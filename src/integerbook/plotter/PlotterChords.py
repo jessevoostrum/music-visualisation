@@ -1,4 +1,6 @@
 import math
+import json
+import os
 
 import music21
 
@@ -19,37 +21,135 @@ class PlotterChords(Plotter):
         self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(self.Settings.ignoreSecondaryDominants)
         self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(self.Settings.manualSecondaryChordDict)
 
+        pathChordKindAbbreviations = os.path.join(os.path.dirname(__file__), 'chordKindAbbreviations.json')
+        f = open(pathChordKindAbbreviations)
+        self.chordKindAbbreviations = json.load(f)
+
 
 
     def plotChords(self):
-        chords = self.streamObj[music21.harmony.ChordSymbol]
-        for idxChord, chord, in enumerate(chords):
+        chordSymbols = self.streamObj[music21.harmony.ChordSymbol]
+        for idxChord, chordSymbol, in enumerate(chordSymbols):
 
-            offset = chord.offset
+            offset = chordSymbol.getOffsetInHierarchy(self.streamObj)
             page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
+            key = self.getKey(offset)
 
             xPos = xPos + self.Settings.xShiftChords
             yPos = self.yMin + yPosLineBase
 
-            if chord.chordKind != 'none':    # not N.C.
-                if not self.Settings.romanNumerals:
-                    widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+            widthNumeral, heightNumeral = self._plotRomanNumeral(chordSymbol, key, xPos, yPos, page)
 
-                    self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+            xPos += widthNumeral
+            yPos += 0.5 * heightNumeral
 
-                    self._plotBass(chord, xPos, yPos, page)
+            self._plotKindAndModifcations(chordSymbol, xPos, yPos, page)
 
-                else:
-                    widthNumber = self._plotRomanNumeralAndAccidental(chord, xPos, yPos, page, idxChord, chords)
 
-                    xPos = self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+    def _plotRomanNumeral(self, chordSymbol, key, xPos, yPos, page):
+        number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
+        numeral = self._intToRoman(number)
+        if self._isMinor(chordSymbol):
+            numeral = numeral.lower()
+        if accidental:
+            numeral = accidental.unicode + numeral
 
-                    self._plotSecondaryTargetNumeral(chord, xPos, yPos, page, idxChord)
+        plottedNumeral = self.axs[page].text(xPos, yPos, numeral, va='baseline', size=self.Settings.fontSizeChords,
+                            color=self.Settings.colorTextChords)
 
-                    # self._plotBass(chord, xPos, yPos, page)
+        return self._getPlottedWidthAndHeight(page, plottedNumeral)
 
-            else:
-                self._plotNoChord(xPos, yPos, page)
+
+    def _plotKindAndModifcations(self, chordSymbol, xPos, yPos, page):
+        chordKind = self.chordKindAbbreviations[chordSymbol.chordKind]
+        modifications = self._getModifications(chordSymbol)
+
+        self.axs[page].text(xPos, yPos, chordKind+modifications, va='baseline', size=self.Settings.fontSizeType,
+                            color=self.Settings.colorTextChords)
+
+
+    def _getModifications(self, chordSymbol):
+
+        modificationsString = ""
+
+        for csMod in chordSymbol.chordStepModifications:
+            modificationsString += self._getModType(csMod, chordSymbol.chordKind)
+            modificationsString += self._intervalToAccidentalString(csMod.interval)
+            modificationsString += str(csMod.degree)
+
+        return modificationsString
+
+
+    def _getModType(self, csMod, chordKind):
+        d = {
+            "add": "add",
+            "subtract": "omit",
+            "alter": ""
+        }
+        modType = d[csMod.modType]
+        if self._isAddAndNotTriadAndAccidentalModification(csMod, chordKind):
+            modType = ""
+
+        return modType
+
+    def _isAddAndNotTriadAndAccidentalModification(self, csMod, chordKind):
+        "e.g. C7♭9. We check this to avoid having expressions like c7add♭9  "
+        return csMod.modType == "add" and not self._isTriad(chordKind) and not csMod.interval.semitones == 0
+
+    def _isTriad(self, chordKind):
+        triadTypes = {"major", "minor", "augmented", "diminished", "suspended-second", "suspended-fourth"}
+        return chordKind in triadTypes
+
+    def _getScaleDegreesFromChordKind(self, chordKind):
+        return music21.harmony.CHORD_TYPES[chordKind][0].split(',')
+
+    def _intervalToAccidentalString(self, interval):
+        if interval.semitones == 0:
+            return ""
+        else:
+            return music21.pitch.Accidental(interval.semitones).unicode
+
+    def _intToRoman(self, number):
+        roman_mapping = {
+            1: "I",
+            2: "II",
+            3: "III",
+            4: "IV",
+            5: "V",
+            6: "VI",
+            7: "VII"
+        }
+        return roman_mapping.get(number, "Invalid input")
+
+    def _isMinor(self, chordSymbol):
+        return '-3' in self._getScaleDegreesFromChordKind(chordSymbol.chordKind)
+
+    def _getPlottedWidthAndHeight(self, page, plottedObject):
+        renderer = self.axs[page].figure._get_renderer()
+        bb = plottedObject.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
+        return bb.width, bb.height
+
+
+
+        # if chord.chordKind != 'none':    # not N.C.
+            #     if not self.Settings.romanNumerals:
+            #         widthNumber = self._plotChordNumberAndAccidental(chord, xPos, yPos, page)
+            #
+            #         self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+            #
+            #         self._plotBass(chord, xPos, yPos, page)
+            #
+            #     else:
+            #         widthNumber = self._plotRomanNumeralAndAccidental(chord, xPos, yPos, page, idxChord, chords)
+            #
+            #         xPos = self._plotTypesAndModifications(chord, xPos, yPos, page, widthNumber)
+            #
+            #         self._plotSecondaryTargetNumeral(chord, xPos, yPos, page, idxChord)
+            #
+            #         # self._plotBass(chord, xPos, yPos, page)
+            #
+            # else:
+            #     self._plotNoChord(xPos, yPos, page)
 
     def _plotChordNumberAndAccidental(self, chordSymbol, xPos, yPos, page):
         offsetEl = chordSymbol.getOffsetInHierarchy(self.streamObj)
@@ -569,13 +669,6 @@ class PlotterChords(Plotter):
                 return True
         return False
 
-    @staticmethod
-    def _isTriad(chordSymbol):
-        notes = chordSymbol.notes
-        if len(notes) == 3:
-            return True
-        else:
-            return False
 
     @staticmethod
     def _hasDominantSeventh(chordSymbol):
