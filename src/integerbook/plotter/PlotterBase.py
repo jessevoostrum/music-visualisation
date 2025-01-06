@@ -12,17 +12,7 @@ class Plotter:
 
     def _plotAccidental(self, accidental, fontSize, xPos, yPos, page, front=True, colorText='black', zorder=1):
         if accidental:
-            symbolAccidental = None
-            if accidental.name == 'sharp':
-                symbolAccidental = '♯'
-            elif accidental.name == 'flat':
-                symbolAccidental = '♭'
-            elif accidental.name == 'natural':
-                symbolAccidental = '♮'
-            elif accidental.name == 'double-sharp':
-                symbolAccidental = '♯♯'
-            elif accidental.name == 'double-flat':
-                symbolAccidental = '♭♭'
+            symbolAccidental = accidental.unicode
 
             relativeXLocation = self.Settings.fontSettings.accidentalXPositionRelative
             if not front:
@@ -47,16 +37,22 @@ class Plotter:
 
 
 
-    def getScaleDegreeAndAccidentalFromPitch(self, pitch, key):
+    def getScaleDegreeAndAccidentalFromPitch(self, pitch, key, accidentalAsString=False):
         if key.mode == 'major':
-            return key.getScaleDegreeAndAccidentalFromPitch(pitch)
+            number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
         else:
             if self.Settings.minorFromParallelMajorScalePerspective:
-                return self._getScaleDegreeAndAccidentalParralelMajor(key, pitch)
+                number, accidental = self._getScaleDegreeAndAccidentalParralelMajor(key, pitch)
             elif self.Settings.minorFromMinorScalePerspective:
-                return key.getScaleDegreeAndAccidentalFromPitch(pitch)
+                number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)
             elif self.Settings.minorFromRelativeMajorScalePerspective:
-                return key.relative.getScaleDegreeAndAccidentalFromPitch(pitch)
+                number, accidental = key.relative.getScaleDegreeAndAccidentalFromPitch(pitch)
+        if accidentalAsString:
+            if accidental:
+                accidental = accidental.unicode
+            else:
+                accidental = ""
+        return number, accidental
 
     def _getScaleDegreeAndAccidentalParralelMajor(self, key, pitch):
         number, accidental = key.getScaleDegreeAndAccidentalFromPitch(pitch)

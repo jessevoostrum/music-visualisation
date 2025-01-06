@@ -38,12 +38,13 @@ class PlotterChords(Plotter):
             xPos = xPos + self.Settings.xShiftChords
             yPos = self.yMin + yPosLineBase
 
-            widthNumeral, heightNumeral = self._plotRomanNumeral(chordSymbol, key, xPos, yPos, page)
+            widthNumeral = self._plotRomanNumeral(chordSymbol, key, xPos, yPos, page)
 
             xPos += widthNumeral
-            yPos += 0.5 * heightNumeral
 
             self._plotKindAndModifcations(chordSymbol, xPos, yPos, page)
+
+            self._plotBass(chordSymbol, key, xPos, yPos, page)
 
 
     def _plotRomanNumeral(self, chordSymbol, key, xPos, yPos, page):
@@ -57,15 +58,33 @@ class PlotterChords(Plotter):
         plottedNumeral = self.axs[page].text(xPos, yPos, numeral, va='baseline', size=self.Settings.fontSizeChords,
                             color=self.Settings.colorTextChords)
 
-        return self._getPlottedWidthAndHeight(page, plottedNumeral)
+        return self._getPlottedWidth(page, plottedNumeral)
 
 
     def _plotKindAndModifcations(self, chordSymbol, xPos, yPos, page):
         chordKind = self.chordKindAbbreviations[chordSymbol.chordKind]
         modifications = self._getModifications(chordSymbol)
 
-        self.axs[page].text(xPos, yPos, chordKind+modifications, va='baseline', size=self.Settings.fontSizeType,
+        yPosKindAndModification = yPos + 0.6 * self.Settings.capsizeChord
+
+        self.axs[page].text(xPos, yPosKindAndModification, chordKind+modifications, va='baseline', size=self.Settings.fontSizeType,
                             color=self.Settings.colorTextChords)
+
+    def _plotBass(self, chordSymbol, key, xPos, yPos, page):
+
+        if chordSymbol.root().name != chordSymbol.bass().name:
+
+            key = self.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
+
+            pitch = chordSymbol.bass()
+            number, accidental = self.getScaleDegreeAndAccidentalFromPitch(pitch, key, accidentalAsString=True)
+
+            text = '/' + accidental + str(number)
+
+            yPosBass = yPos - 0.5 * self.Settings.capsizeChord
+
+            self.axs[page].text(xPos, yPosBass, text, fontsize=self.Settings.fontSizeType,
+                                va='baseline', ha='left', color=self.Settings.colorTextChords)
 
 
     def _getModifications(self, chordSymbol):
@@ -124,10 +143,10 @@ class PlotterChords(Plotter):
     def _isMinor(self, chordSymbol):
         return '-3' in self._getScaleDegreesFromChordKind(chordSymbol.chordKind)
 
-    def _getPlottedWidthAndHeight(self, page, plottedObject):
+    def _getPlottedWidth(self, page, plottedObject):
         renderer = self.axs[page].figure._get_renderer()
         bb = plottedObject.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
-        return bb.width, bb.height
+        return bb.width
 
 
 
@@ -474,39 +493,6 @@ class PlotterChords(Plotter):
             types.append("Tristan")
 
         return types
-
-    def _plotBass(self, chordSymbol, xPos, yPos, page):
-
-        if chordSymbol.bass() is not None:
-            if chordSymbol.root().name != chordSymbol.bass().name:
-
-                fontSizeAddition = self.Settings.fontSizeAccidentalRelative * self.Settings.fontSizeChords
-
-                key = self.getKey(chordSymbol.getOffsetInHierarchy(self.streamObj))
-
-                pitch = chordSymbol.bass()
-                number, accidental = self.getScaleDegreeAndAccidentalFromPitch(pitch, key)
-
-                # plot slash
-                xPosRightOfChord = xPos + self.Settings.fontSettings.positionSlashRelative * self.Settings.widthNumberRelative * self.Settings.fontSizeChords
-                yPosSlash = yPos - .4 * fontSizeAddition * self.Settings.capsizeNumberRelative
-
-                self.axs[page].text(xPosRightOfChord, yPosSlash, '/', fontsize=fontSizeAddition,
-                                    va='baseline', ha='left', color=self.Settings.colorTextChords)
-
-                # plot number
-                xPosRightOfSlash = xPosRightOfChord + 0.8 * self.Settings.widthNumberRelative * fontSizeAddition
-                xPosBass = xPosRightOfSlash
-                if accidental:
-                    xPosBass += self.Settings.fontSettings.widthAccidentalSlash
-
-                yPosBass = yPosSlash - 0.25 * fontSizeAddition * self.Settings.capsizeNumberRelative
-
-                self.axs[page].text(xPosBass, yPosBass, number, fontsize=fontSizeAddition,
-                                    va='baseline', ha='left', color=self.Settings.colorTextChords)
-
-                # plot accidental
-                self._plotAccidental(accidental, fontSizeAddition, xPosBass, yPosBass, page)
 
 
     def _plotNoChord(self, xPos, yPos, page):
