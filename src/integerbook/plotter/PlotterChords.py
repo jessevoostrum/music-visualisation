@@ -17,9 +17,6 @@ class PlotterChords(Plotter):
 
         self.yMin = self.Settings.yMin
 
-        self.manualRomanNumeralDict = self._makeManualRomanNumeralDict(self.Settings.manualRomanNumeralDict)
-        self.ignoreSecondaryDominants = self._convertMeasureChordIdcsToGlobalIdcs(self.Settings.ignoreSecondaryDominants)
-        self.manualSecondaryChordDict = self._makeManualSecondaryChordDict(self.Settings.manualSecondaryChordDict)
 
         pathChordKindAbbreviations = os.path.join(os.path.dirname(__file__), 'chordKindAbbreviations.json')
         f = open(pathChordKindAbbreviations)
@@ -38,14 +35,15 @@ class PlotterChords(Plotter):
             xPos = xPos + self.Settings.xShiftChords
             yPos = self.yMin + yPosLineBase
 
-            widthNumeral = self._plotRomanNumeral(chordSymbol, key, xPos, yPos, page)
+            plottedNumeral = self._plotRomanNumeral(chordSymbol, key, xPos, yPos, page)
 
-            xPos += widthNumeral
+            xPos += self._getPlottedWidth(plottedNumeral, page)
 
-            self._plotKindAndModifcations(chordSymbol, xPos, yPos, page)
+            self._plotKindAndModifcations(chordSymbol, xPos, yPos, page, self.Settings.fontSizeType, self.Settings.capsizeChord)
 
             self._plotBass(chordSymbol, key, xPos, yPos, page)
 
+        self._plotSecondaryChords()
 
     def _plotRomanNumeral(self, chordSymbol, key, xPos, yPos, page):
         number, accidental = self.getScaleDegreeAndAccidentalFromPitch(chordSymbol.root(), key)
@@ -55,20 +53,20 @@ class PlotterChords(Plotter):
         if accidental:
             numeral = accidental.unicode + numeral
 
-        plottedNumeral = self.axs[page].text(xPos, yPos, numeral, va='baseline', size=self.Settings.fontSizeChords,
+        return self.axs[page].text(xPos, yPos, numeral, va='baseline', size=self.Settings.fontSizeChords,
                             color=self.Settings.colorTextChords)
 
-        return self._getPlottedWidth(page, plottedNumeral)
 
 
-    def _plotKindAndModifcations(self, chordSymbol, xPos, yPos, page):
+    def _plotKindAndModifcations(self, chordSymbol, xPos, yPos, page, fontSizeType, capsizeChord):
         chordKind = self.chordKindAbbreviations[chordSymbol.chordKind]
         modifications = self._getModifications(chordSymbol)
 
-        yPosKindAndModification = yPos + 0.6 * self.Settings.capsizeChord
+        yPosKindAndModification = yPos + 0.6 * capsizeChord
 
-        self.axs[page].text(xPos, yPosKindAndModification, chordKind+modifications, va='baseline', size=self.Settings.fontSizeType,
-                            color=self.Settings.colorTextChords)
+        return self.axs[page].text(xPos, yPosKindAndModification, chordKind + modifications, va='baseline', size=fontSizeType,
+                                   color=self.Settings.colorTextChords)
+
 
     def _plotBass(self, chordSymbol, key, xPos, yPos, page):
 
@@ -86,6 +84,41 @@ class PlotterChords(Plotter):
             self.axs[page].text(xPos, yPosBass, text, fontsize=self.Settings.fontSizeType,
                                 va='baseline', ha='left', color=self.Settings.colorTextChords)
 
+    def _plotSecondaryChords(self):
+        for chordInfo in self.Settings.manualSecondaryChords:
+            measureNumber, chordIndexWithinMeasure = chordInfo[0]
+            numeralFunction, numeralKey = [self._formatManualNumeral(chordInfo[i]) for i in [1,2]]
+
+            try:
+                chordSymbol = self.streamObj.measure(measureNumber)[music21.harmony.ChordSymbol][chordIndexWithinMeasure]
+            except IndexError:
+                print("Index secondary chord out of range")
+
+            offset = chordSymbol.getOffsetInHierarchy(self.streamObj)
+            page, yPosLineBase, xPos = self.LocationFinder.getLocation(offset)
+            key = self.getKey(offset)
+
+            xPos = xPos + self.Settings.xShiftChords
+            yPos = self.yMin + yPosLineBase - 2 * self.Settings.capsizeSecondaryChord
+
+            plottedNumeral = self.axs[page].text(xPos, yPos, numeralFunction, va='baseline', size=self.Settings.fontSizeSecondaryChord,
+                                                 color=self.Settings.colorTextChords)
+
+            xPos += self._getPlottedWidth(plottedNumeral, page)
+
+            plottedKindAndModification = self._plotKindAndModifcations(chordSymbol, xPos, yPos, page,
+                                                                       self.Settings.fontSizeTypeSecondaryChord,
+                                                                       self.Settings.capsizeSecondaryChord)
+
+            xPos += self._getPlottedWidth(plottedKindAndModification, page)
+
+            plottedNumeral = self.axs[page].text(xPos, yPos, '/' + numeralFunction, va='baseline',
+                                                 size=self.Settings.fontSizeSecondaryChord,
+                                                 color=self.Settings.colorTextChords)
+
+
+    def _formatManualNumeral(self, manualNumeral):
+        return manualNumeral.replace("#", "♯").replace("b", "♭")
 
     def _getModifications(self, chordSymbol):
 
@@ -143,7 +176,7 @@ class PlotterChords(Plotter):
     def _isMinor(self, chordSymbol):
         return '-3' in self._getScaleDegreesFromChordKind(chordSymbol.chordKind)
 
-    def _getPlottedWidth(self, page, plottedObject):
+    def _getPlottedWidth(self, plottedObject, page):
         renderer = self.axs[page].figure._get_renderer()
         bb = plottedObject.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
         return bb.width
@@ -524,7 +557,7 @@ class PlotterChords(Plotter):
 
         return widthNumber
 
-    def _getPlottedWidth(self, page, plottedObject):
+    def _getPlottedWidth(self, plottedObject, page):
         renderer = self.axs[page].figure._get_renderer()
         bb = plottedObject.get_window_extent(renderer=renderer).transformed(self.axs[page].transData.inverted())
         return bb.width

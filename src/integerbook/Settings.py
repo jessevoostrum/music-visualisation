@@ -95,12 +95,7 @@ class Settings:
 
         self.romanNumerals = settings["romanNumerals"]
         self.numbersRelativeToChord = settings["numbersRelativeToChord"]
-
-        self.onlyManualSecondaryDominants = settings["onlyManualSecondaryDominants"]
-
-        self.manualRomanNumeralDict = settings["manualRomanNumerals"]
-        self.ignoreSecondaryDominants = settings["ignoreSecondaryDominants"]
-        self.manualSecondaryChordDict = settings["manualSecondaryChords"]
+        self.manualSecondaryChords = settings["manualSecondaryChords"]
 
         self.plotFirstKeyWithinBar = settings["plotFirstKeyWithinBar"]
 
@@ -156,14 +151,16 @@ class Settings:
         self.fontWidthNote = fD["width"] * self.fontSizeNotes
 
         self.fontSizeChords = self.fontSizeChordsPerFontSizeNotes * self.fontSizeNotes
+        self.fontSizeSecondaryChord = self.settings["fontSizeSecondaryChordPerFontSizeChord"] * self.fontSizeChords
         self.capsizeChord = fD["capsize"] * self.fontSizeChords
+        self.capsizeSecondaryChord = fD["capsize"] * self.fontSizeSecondaryChord
         self.fontWidthChord = fD["width"] * self.fontSizeChords
 
         self.capsizeLyric = fDLyrics["capsize"] * self.fontSizeLyrics
         self.fontWidthLyric = fDLyrics["width"] * self.fontSizeLyrics
 
         self.fontSizeType = settings['fontSizeTypePerFontSizeChord'] * self.fontSizeChords
-        self.fontSizeTypeSmall = settings['fontSizeTypeSmallPerFontSizeType'] * self.fontSizeType
+        self.fontSizeTypeSecondaryChord = settings['fontSizeTypePerFontSizeChord'] * self.fontSizeSecondaryChord
 
         self.fontSettings = FontSettings(self.font, self.fontSizeType)
 
